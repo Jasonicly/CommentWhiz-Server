@@ -3,7 +3,6 @@ import React from "react";
 function Overview() {
     return (
         <div className="w-4/5 bg-gray-100 p-8 rounded-lg mb-8 mx-auto">
-            <h2 className="text-xl mb-4">Logitech M170 Wireless Mouse</h2>
             <div className="mb-8">
                 <h3 className="text-lg mb-2">Summary</h3>
                 <p>
