@@ -20,7 +20,7 @@ function Details() {
                     </button>
                 )}
             </div>
-            {showDetails && (
+            {showDetails && ( //This need to be made automatic
                 <div className="w-full bg-transparent text-right px-20">
                     <p><strong>Brand:</strong> Logitech</p>
                     <p><strong>Colour:</strong> Black</p>

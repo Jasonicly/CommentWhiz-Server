@@ -37,9 +37,9 @@ function Extension() {
     };
 
     return (
-        <Container.Outer>
-            <Container.Inner>
-                <Button onClick={onClick} />
+        <Container.Outer customStyles={{ backgroundColor: 'lime-700' }} showIcon={true} showHeader={true}>
+            <Container.Inner customStyles={{ backgroundColor: '#e0e0e0', padding: 50, borderRadius: '3rem', minHeight: '500px' }}>
+                <Button onClick={onClick} text="Scan the comments!" />
                 <Textarea onChange={onChange} />
                 <Divider />
                 {loading ? <Loader /> : <Response response={response} />}
@@ -47,6 +47,8 @@ function Extension() {
             </Container.Inner>
         </Container.Outer>
     );
+    
+    
 }
 
 export default Extension;
