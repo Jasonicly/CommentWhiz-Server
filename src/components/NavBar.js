@@ -6,9 +6,6 @@ function NavBar() {
         <nav>
             <ul>
                 <li>
-                    <Link to="/extension">Extension</Link>
-                </li>
-                <li>
                     <Link to="/newpage">New Page</Link>
                 </li>
             </ul>
