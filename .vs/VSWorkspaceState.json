@@ -1,12 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\AI",
-    "\\AI\\summary_sentimentanalysis",
-    "\\src",
-    "\\src\\components",
-    "\\src\\pages"
+    "\\capstone-react-web",
+    "\\capstone-react-web\\src",
+    "\\capstone-react-web\\src\\pages"
   ],
-  "SelectedNode": "\\AI\\summary_sentimentanalysis\\ai.py",
+  "SelectedNode": "\\capstone-react-web\\public",
   "PreviewInSolutionExplorer": false
 }
