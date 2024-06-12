@@ -1,0 +1,123 @@
+// src/pages/Register.js
+import React, { useState } from 'react';
+import Header from "../components/Header";
+
+const Register = () => {
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value);
+    };
+
+    const handleConfirmPasswordChange = (e) => {
+        setConfirmPassword(e.target.value);
+    };
+
+    const validateForm = (e) => {
+        e.preventDefault();
+        if (password !== confirmPassword) {
+            setErrorMessage('Passwords do not match');
+        } else {
+            setErrorMessage('');
+            // Handle successful registration, e.g., send data to server
+            console.log('Form submitted');
+        }
+    };
+
+    // Define styles
+    const styles = {
+        customGradient: {
+            background: 'linear-gradient(to bottom, #5da0b8, #477a8e)',
+        },
+        commentImage: {
+            position: 'absolute',
+            top: '18%',
+            right: '-50px',
+            transform: 'translateY(-50%)',
+            width: '100px',
+        },
+        formContainer: {
+            position: 'relative',
+        },
+        errorMessage: {
+            color: 'red',
+            display: 'block',
+        },
+    };
+
+    return (
+        <div className="bg-custom-green">
+            <Header />
+            <div className="flex flex-col justify-center items-center h-screen relative">
+                <div className="flex bg-white rounded-2xl shadow-2xl overflow-visible max-w-4xl w-full relative mt-6">
+                    <div className="hidden md:flex flex-col items-center justify-center text-white p-10 rounded-l-2xl" style={styles.customGradient}>
+                        <h1 className="text-3xl font-bold mb-2">Welcome to</h1>
+                        <h2 className="text-5xl font-bold">Comment Whiz</h2>
+                        <img src="/images/logo.png" alt="CommentSense Logo" className="w-64 mt-6" />
+                    </div>
+                    <div className="flex-1 p-8 bg-gray-100 rounded-r-2xl" style={styles.formContainer}>
+                        <h2 className="text-4xl font-semibold text-center mb-6 text-green-800">Register</h2>
+                        <form id="registerForm" onSubmit={validateForm} className="space-y-6">
+                            <label htmlFor="email" className="sr-only">Email</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="_id"
+                                placeholder="Email"
+                                required
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-gray-400 hover:border-green-500 transition duration-200 ease-in-out"
+                            />
+
+                            <label htmlFor="password" className="sr-only">Password</label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password_hash"
+                                placeholder="Password"
+                                required
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-gray-400 hover:border-green-500 transition duration-200 ease-in-out"
+                                value={password}
+                                onChange={handlePasswordChange}
+                            />
+
+                            <label htmlFor="confirm_password" className="sr-only">Confirm Password</label>
+                            <input
+                                type="password"
+                                id="confirm_password"
+                                name="confirm_password"
+                                placeholder="Confirm Password"
+                                required
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-gray-400 hover:border-green-500 transition duration-200 ease-in-out"
+                                value={confirmPassword}
+                                onChange={handleConfirmPasswordChange}
+                            />
+
+                            {errorMessage && <div id="error-message" style={styles.errorMessage}>{errorMessage}</div>}
+
+                            <div className="flex justify-end space-x-4 mt-6">
+                                <button type="button" aria-label="Cancel registration" className="px-5 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition duration-200 ease-in-out">
+                                    Cancel
+                                </button>
+                                <input type="submit" value="Register" className="px-5 py-2 bg-green-700 text-white rounded-lg cursor-pointer hover:bg-green-800 transition duration-200 ease-in-out" />
+                            </div>
+                        </form>
+                        <p className="text-center mt-6">Already have an account? <a href="/login" className="text-green-700 hover:underline">Log in</a></p>
+                        <div className="flex items-center justify-center mt-6">
+                            <button aria-label="Register with Google" className="bg-gray-300 p-3 rounded-full mx-2 hover:bg-gray-400 transition duration-200 ease-in-out">
+                                <img src="https://img.icons8.com/ios-filled/50/000000/google-logo.png" alt="Google" className="w-6 h-6" />
+                            </button>
+                            <button aria-label="Register with Facebook" className="bg-gray-300 p-3 rounded-full mx-2 hover:bg-gray-400 transition duration-200 ease-in-out">
+                                <img src="https://img.icons8.com/ios-filled/50/000000/facebook-new.png" alt="Facebook" className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <img src="/images/text.png" alt="Comment Image" style={styles.commentImage} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default Register;

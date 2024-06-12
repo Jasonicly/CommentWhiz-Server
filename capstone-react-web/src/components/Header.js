@@ -18,13 +18,19 @@ function Header() {
                 </div>
                 <nav className="absolute left-1/2 transform -translate-x-1/2 hidden md:flex space-x-8 justify-center mx-auto">
                     <ul className="flex space-x-8">
-                        <li><a href="#" className="text-white hover:text-gray-300">HOME</a></li>
+                        <li><a href="/home" className="text-white hover:text-gray-300">HOME</a></li>
                         <li><a href="#" className="text-white hover:text-gray-300">FEATURES</a></li>
                         <li><a href="#" className="text-white hover:text-gray-300">ABOUT</a></li>
                     </ul>
                 </nav>
-                <div className="md:hidden flex items-center">
-                    <button onClick={toggleMenu} className="text-white focus:outline-none">
+                <div className="flex items-center space-x-4">
+                <a href="/login" className="text-white hover:text-gray-300">
+                        Log In
+                    </a>
+                    <a href="/signup" className="hidden md:inline-block bg-white text-custom-green px-4 py-2 rounded hover:bg-gray-200">
+                        Sign Up
+                    </a>
+                    <button onClick={toggleMenu} className="md:hidden text-white focus:outline-none">
                         {menuOpen ? <FaTimes size="24" /> : <FaBars size="24" />}
                     </button>
                 </div>
@@ -35,6 +41,8 @@ function Header() {
                         <li><a href="#" className="block text-white hover:text-gray-300">HOME</a></li>
                         <li><a href="#" className="block text-white hover:text-gray-300">FEATURES</a></li>
                         <li><a href="#" className="block text-white hover:text-gray-300">ABOUT</a></li>
+                        <li><a href="/login" className="block text-white hover:text-gray-300">Log In</a></li>
+                        <li><a href="/register" className="block text-white hover:text-gray-300">Sign Up</a></li>
                     </ul>
                 </nav>
             )}
