@@ -21,7 +21,7 @@ app.post('/scrape', async (req, res) => {
         console.log(`Received URL: ${url}`);
 
         // Scrape the reviews from the provided URL
-        const reviews = await scrapeReviews(url, 5); // Adjust maxComments as needed
+        const reviews = await scrapeReviews(url, 5);
         console.log('Scraping completed successfully.');
 
         // Save reviews locally
@@ -35,15 +35,20 @@ app.post('/scrape', async (req, res) => {
         fs.writeFileSync(outputPath, JSON.stringify(reviews, null, 2));
         console.log(`Reviews saved to ${outputPath}`);
 
+        // Create a FormData object
+        const formData = new FormData();
+        formData.append('file', fs.createReadStream(outputPath), 'Scrape_Output.json');
+
         // Send the JSON data to the actual AI server on port 5000
         const serverUrl = 'http://localhost:5000/process_reviews';
         console.log(`Sending scraped data to AI server at ${serverUrl}`);
 
-        const response = await axios.post(serverUrl, { file: reviews }, {
+        const response = await axios.post(serverUrl, formData, {
             headers: {
-                'Content-Type': 'application/json',
+                ...formData.getHeaders(),
             },
         });
+
         console.log('AI server response received.');
 
         // Save the AI analysis response locally
@@ -58,10 +63,20 @@ app.post('/scrape', async (req, res) => {
         fs.writeFileSync(overallRatingsPath, JSON.stringify(overallRatings, null, 2));
         console.log(`Overall ratings saved to ${overallRatingsPath}`);
 
-        // Respond back to the client
+        // Send AI_analysis.json to the React server on port 3000
+        const reactServerUrl = 'http://localhost:3000/'; // Update this path based on your React server endpoint
+        console.log(`Sending AI analysis to React server at ${reactServerUrl}`);
+
+        await axios.post(reactServerUrl, response.data, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        console.log('AI analysis sent to React server.');
+
+        // Send overall_ratings.json back to the browser extension
         res.json({
             message: 'Scrape and AI processing successful',
-            aiResponse: response.data,
             overallRatings
         });
 
