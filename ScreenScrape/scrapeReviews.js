@@ -1,13 +1,7 @@
-// scrapeReviews.js
+// scripts/scrapeReviews.js
 const puppeteer = require('puppeteer');
 
-function delay(time) {
-    return new Promise(function(resolve) {
-        setTimeout(resolve, time);
-    });
-}
-
-async function scrapeReviews(initialUrl) {
+async function scrapeReviews(initialUrl, maxComments) {
     const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
     const page = await browser.newPage();
     await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36");
@@ -19,7 +13,6 @@ async function scrapeReviews(initialUrl) {
     await page.goto(currentPageUrl, { waitUntil: 'networkidle2' });
 
     try {
-        // Click the "See more reviews" link
         await page.waitForSelector('a[data-hook="see-all-reviews-link-foot"]', { timeout: 30000 });
         const reviewsPageUrl = await page.evaluate(() => {
             const reviewLink = document.querySelector('a[data-hook="see-all-reviews-link-foot"]');
@@ -37,7 +30,7 @@ async function scrapeReviews(initialUrl) {
         return results;
     }
 
-    while (currentPageUrl) {
+    while (currentPageUrl && results.length < maxComments) {
         console.log("Scraping reviews from:", currentPageUrl);
         await page.waitForSelector('.a-section.review.aok-relative', { timeout: 30000 });
 
@@ -58,16 +51,17 @@ async function scrapeReviews(initialUrl) {
             return nextButton && !nextButton.parentElement.classList.contains('a-disabled') ? nextButton.href : null;
         });
 
-        if (nextPageLink) {
+        if (nextPageLink && results.length < maxComments) {
             currentPageUrl = nextPageLink;
             await page.goto(currentPageUrl, { waitUntil: 'networkidle2' });
-            await delay(10000); // Wait to avoid rapid page loading that might seem bot-like
+            await new Promise(resolve => setTimeout(resolve, 10000));
         } else {
             currentPageUrl = null;
         }
     }
+
     await browser.close();
-    return results;
+    return results.slice(0, maxComments);
 }
 
 module.exports = scrapeReviews;
