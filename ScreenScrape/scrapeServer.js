@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const FormData = require('form-data');
 const scrapeReviews = require('./scrapeReviews');
 
 const app = express();
@@ -56,15 +57,26 @@ app.post('/scrape', async (req, res) => {
         fs.writeFileSync(aiAnalysisPath, JSON.stringify(response.data, null, 2));
         console.log(`AI analysis saved to ${aiAnalysisPath}`);
 
-        // Extract and save the overall rating from AI analysis
+        // Extract enhanced rating and create a structured JSON with reviews
         const enhancedRating = response.data.summary['Enhanced Rating'];
-        const overallRatings = { "overall_ratings": enhancedRating };
-        const overallRatingsPath = path.join(outputDirectory, 'overall_ratings.json');
-        fs.writeFileSync(overallRatingsPath, JSON.stringify(overallRatings, null, 2));
-        console.log(`Overall ratings saved to ${overallRatingsPath}`);
+        const reviewsWithAI = response.data.reviews.map((review, index) => ({
+            "AI-rating": review["AI-rating"],
+            "body": review.body,
+            "sentiment": review.sentiment,
+            "title": review.title
+        }));
+
+        const enhancedRatingsData = {
+            "reviews": reviewsWithAI,
+            "Enhanced Rating": enhancedRating
+        };
+
+        const enhancedRatingsPath = path.join(outputDirectory, 'enhanced_Ratings.json');
+        fs.writeFileSync(enhancedRatingsPath, JSON.stringify(enhancedRatingsData, null, 2));
+        console.log(`Enhanced ratings saved to ${enhancedRatingsPath}`);
 
         // Send AI_analysis.json to the React server on port 3000
-        const reactServerUrl = 'http://localhost:3000/'; // Update this path based on your React server endpoint
+        const reactServerUrl = 'http://localhost:3000/api/ai-analysis'; // Update this path based on your React server endpoint
         console.log(`Sending AI analysis to React server at ${reactServerUrl}`);
 
         await axios.post(reactServerUrl, response.data, {
@@ -74,10 +86,10 @@ app.post('/scrape', async (req, res) => {
         });
         console.log('AI analysis sent to React server.');
 
-        // Send overall_ratings.json back to the browser extension
+        // Send enhanced_Ratings.json back to the browser extension
         res.json({
             message: 'Scrape and AI processing successful',
-            overallRatings
+            enhancedRatings: enhancedRatingsData
         });
 
     } catch (error) {
