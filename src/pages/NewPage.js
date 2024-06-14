@@ -55,41 +55,60 @@ function NewPage() {
         return (
             <div className="container mx-auto p-4">
                 <div className="bg-gray-100 p-6 rounded-lg shadow-lg mb-6">
-                    <h3 className="text-2xl font-bold mb-4">Overview</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-white p-4 rounded-lg shadow-md">
-                            <h4 className="text-xl font-semibold mb-2">Summary</h4>
-                            <ul className="list-disc list-inside">
-                                <li>Number of Reviews: {summary["Number of Reviews"]}</li>
-                                <li>Number of Positive Reviews: {summary["Number of Positive Reviews"]}</li>
-                                <li>Number of Negative Reviews: {summary["Number of Negative Reviews"]}</li>
-                                <li>Number of Neutral Reviews: {summary["Number of Neutral Reviews"]}</li>
-                                <li>Percentage of Positive Reviews: {summary["Percentage of Positive Reviews"]}%</li>
-                                <li>Percentage of Negative Reviews: {summary["Percentage of Negative Reviews"]}%</li>
-                                <li>Percentage of Neutral Reviews: {summary["Percentage of Neutral Reviews"]}%</li>
-                                <li>Enhanced Rating: {summary["Enhanced Rating"]}</li>
-                            </ul>
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-2xl font-bold">Analysis Overview</h3>
+                        <div className="flex">
+                            <div className="bg-gray-200 p-4 rounded-lg flex flex-col items-center justify-center mr-4">
+                                <h4 className="mb-2">Number of Reviews</h4>
+                                <span>{summary["Number of Reviews"]}</span>
+                            </div>
+                            <div className="bg-gray-200 p-4 rounded-lg flex flex-col items-center justify-center mr-4">
+                                <h4 className="mb-2">Number of Positive Reviews</h4>
+                                <span>{summary["Number of Positive Reviews"]}</span>
+                            </div>
+                            <div className="bg-gray-200 p-4 rounded-lg flex flex-col items-center justify-center mr-4">
+                                <h4 className="mb-2">Number of Negative Reviews</h4>
+                                <span>{summary["Number of Negative Reviews"]}</span>
+                            </div>
+                            <div className="bg-gray-200 p-4 rounded-lg flex flex-col items-center justify-center">
+                                <h4 className="mb-2">Number of Neutral Reviews</h4>
+                                <span>{summary["Number of Neutral Reviews"]}</span>
+                            </div>
                         </div>
-                        <div className="bg-white p-4 rounded-lg shadow-md">
-                            <h4 className="text-xl font-semibold mb-2">Review Distribution</h4>
-                            <PieChart width={400} height={400}>
-                                <Pie
-                                    data={pieData}
-                                    cx={200}
-                                    cy={200}
-                                    labelLine={false}
-                                    outerRadius={150}
-                                    fill="#8884d8"
-                                    dataKey="value"
-                                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                                >
-                                    {pieData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip />
-                                <Legend />
-                            </PieChart>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-center items-center">
+                        <div className="bg-white p-4 rounded-lg shadow-md text-center">
+                            <h4 className="text-xl font-semibold mb-2">Summary</h4>
+                            <p>Here is a summary of key points.fffsdfsdfrethythyt hytrhthdh</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg shadow-md text-center flex flex-col justify-center items-center">
+                            <h4 className="text-xl font-semibold mb-2">Enhanced Rating</h4>
+                            <div className="text-4xl font-bold">
+                                {summary["Enhanced Rating"]}
+                            </div>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg shadow-md flex justify-center items-center">
+                            <div className="text-center">
+                                <h4 className="text-xl font-semibold mb-2">Review Distribution</h4>
+                                <PieChart width={300} height={300}>
+                                    <Pie
+                                        data={pieData}
+                                        cx={150}
+                                        cy={150}
+                                        labelLine={false}
+                                        outerRadius={100} // Adjust outerRadius as needed
+                                        fill="#8884d8"
+                                        dataKey="value"
+                                        label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+                                    >
+                                        {pieData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip />
+                                    <Legend />
+                                </PieChart>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -135,7 +154,7 @@ function NewPage() {
             <Container.Outer customStyles={{ backgroundColor: '#53a079', padding: '20px', margin: '20px' }} showIcon={false} showHeader={false}>
                 <Container.Inner>
                     <div className="flex items-center mb-8">
-                        <h2 className="text-xl font-bold text-white mr-2">Name of product</h2>
+                        <h1 className="text-xl font-bold text-white mr-2"><strong>Name of product</strong></h1>
                         {!showDetails && (
                             <Button
                                 onClick={toggleDetails}
@@ -147,20 +166,7 @@ function NewPage() {
                     {showDetails && (
                         <div className="w-full bg-white p-4 rounded-lg shadow-md">
                             <p><strong>Brand:</strong> .....</p>
-                            <p><strong>Colour:</strong> ....</p>
-                            <p><strong>Connectivity technology:</strong>.....</p>
-                            <p><strong>Special features:</strong> .....</p>
-                            <p><strong>Movement detection technology:</strong> .....</p>
-                            <p><strong>Number of buttons:</strong> .....</p>
-                            <p><strong>Hand orientation:</strong> .....</p>
-                            <p><strong>Model name:</strong> .....</p>
-                            <p><strong>Item weight:</strong> .....</p>
-                            <ul className="list-disc list-inside">
-                                <li><strong>......</strong></li>
-                                <li><strong>....</strong></li>
-                                <li><strong>.....</strong></li>
-                                <li><strong>.......</strong></li>
-                            </ul>
+                            <p><strong>Description:</strong> Description of product......</p>
                             <Button
                                 onClick={toggleDetails}
                                 text="View Less"
