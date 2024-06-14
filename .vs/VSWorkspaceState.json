@@ -1,12 +1,12 @@
 {
   "ExpandedNodes": [
     "",
-    "\\AI",
-    "\\AI\\summary_sentimentanalysis",
+    "\\example_text_output_input",
+    "\\ScreenScrape",
     "\\src",
     "\\src\\components",
     "\\src\\pages"
   ],
-  "SelectedNode": "\\AI\\summary_sentimentanalysis\\ai.py",
+  "SelectedNode": "\\example_text_output_input\\output.json",
   "PreviewInSolutionExplorer": false
 }
