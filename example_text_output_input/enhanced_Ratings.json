@@ -1,0 +1,35 @@
+{
+  "reviews": [
+    {
+      "AI-rating": 3.4,
+      "body": "Just the right texture and value for money.",
+      "sentiment": "Positive",
+      "title": "5.0 out of 5 stars\n Just the right texture"
+    },
+    {
+      "AI-rating": 2.5,
+      "body": "👍",
+      "sentiment": "Neutral",
+      "title": "5.0 out of 5 stars\n Good 😊"
+    },
+    {
+      "AI-rating": 3.6,
+      "body": "Good product",
+      "sentiment": "Positive",
+      "title": "5.0 out of 5 stars\n Good buy"
+    },
+    {
+      "AI-rating": 3.1,
+      "body": "Good quality, but a bit pricey",
+      "sentiment": "Neutral",
+      "title": "4.0 out of 5 stars\n Good quality, but a bit pricey"
+    },
+    {
+      "AI-rating": 3.6,
+      "body": "The tissues are good. Delivery is fast.",
+      "sentiment": "Positive",
+      "title": "5.0 out of 5 stars\n Fast delivery. Good product."
+    }
+  ],
+  "Enhanced Rating": 3.2
+}
