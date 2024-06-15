@@ -4,13 +4,8 @@ const path = require('path');
 const axios = require('axios');
 const FormData = require('form-data');
 const scrapeReviews = require('./scrapeReviews');
-
-// File where the extension will save the URL to scrape
-const inputFilePath = path.join(__dirname, '../example_text_output_input', 'scrape_input.json');
-const outputDirectory = path.join(__dirname, '../example_text_output_input');
-const outputPath = path.join(outputDirectory, 'Scrape_Output.json');
 const serverUrl = 'http://localhost:5000/process_reviews';
-const maxComments = 5; // Number of reviews to scrape
+const maxComments = 100; // Number of reviews to scrape
 
 // Read the URL from the input file
 fs.readFile(inputFilePath, 'utf8', (err, data) => {
@@ -19,6 +14,7 @@ fs.readFile(inputFilePath, 'utf8', (err, data) => {
         return;
     }
 
+//Set the URL to scrape
     let url;
     try {
         const inputData = JSON.parse(data);
@@ -33,12 +29,8 @@ fs.readFile(inputFilePath, 'utf8', (err, data) => {
 
     console.log(`Using URL: ${url} for scraping.`);
 
+    // Scrape the reviews from the URL
     scrapeReviews(url, maxComments).then(reviews => {
-        // Ensure the output directory exists
-        if (!fs.existsSync(outputDirectory)) {
-            fs.mkdirSync(outputDirectory, { recursive: true });
-        }
-
         // Write reviews to Scrape_Output.json
         fs.writeFileSync(outputPath, JSON.stringify(reviews, null, 2));
         console.log(`Reviews saved to ${outputPath}`);
@@ -56,22 +48,6 @@ fs.readFile(inputFilePath, 'utf8', (err, data) => {
         .then(response => {
             console.log('AI server response received.');
             const aiAnalysis = response.data;
-
-            // Save the AI analysis to AI_analysis.json
-            const aiAnalysisPath = path.join(outputDirectory, 'AI_analysis.json');
-            fs.writeFileSync(aiAnalysisPath, JSON.stringify(aiAnalysis, null, 2));
-            console.log(`AI analysis saved to ${aiAnalysisPath}`);
-
-            // Extract overall rating and save it to overall_ratings.json
-            if (aiAnalysis.summary && aiAnalysis.summary['Enhanced Rating']) {
-                const enhancedRating = aiAnalysis.summary['Enhanced Rating'];
-                const overallRatings = { "overall_ratings": enhancedRating };
-                const overallRatingsPath = path.join(outputDirectory, 'overall_ratings.json');
-                fs.writeFileSync(overallRatingsPath, JSON.stringify(overallRatings, null, 2));
-                console.log(`Overall ratings saved to ${overallRatingsPath}`);
-            } else {
-                console.error('Enhanced Rating not found in the AI analysis.');
-            }
         })
         .catch(error => {
             if (error.response) {

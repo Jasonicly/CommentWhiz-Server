@@ -22,19 +22,8 @@ app.post('/scrape', async (req, res) => {
         console.log(`Received URL: ${url}`);
 
         // Scrape the reviews from the provided URL
-        const reviews = await scrapeReviews(url, 5);
+        const reviews = await scrapeReviews(url, 100);
         console.log('Scraping completed successfully.');
-
-        // Save reviews locally
-        const outputDirectory = path.join(__dirname, '../example_text_output_input');
-        const outputPath = path.join(outputDirectory, 'Scrape_Output.json');
-
-        if (!fs.existsSync(outputDirectory)) {
-            fs.mkdirSync(outputDirectory, { recursive: true });
-        }
-
-        fs.writeFileSync(outputPath, JSON.stringify(reviews, null, 2));
-        console.log(`Reviews saved to ${outputPath}`);
 
         // Send the JSON data to the React server on port 3000
         const reactServerUrl = 'http://localhost:3001/ai'; // Specify the correct endpoint for your React server
