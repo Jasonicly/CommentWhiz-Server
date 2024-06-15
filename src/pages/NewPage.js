@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
 import { Container } from "../components/Container";
@@ -8,30 +9,47 @@ import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 
 function NewPage() {
     const [showDetails, setShowDetails] = useState(false);
+    const [file, setFile] = useState(null);
     const [data, setData] = useState(null);
+    const [showAllReviews, setShowAllReviews] = useState(false);
+    const [showAllKeyTopics, setShowAllKeyTopics] = useState(false);
 
-    useEffect(() => {
-        const ws = new WebSocket('ws://localhost:8080');
+    const handleFileChange = (event) => {
+        setFile(event.target.files[0]);
+    };
 
-        ws.onmessage = (event) => {
-            const receivedData = JSON.parse(event.data);
-            setData(receivedData);
-        };
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        if (!file) return;
 
-        ws.onclose = () => {
-            console.log('WebSocket connection closed');
-        };
+        const formData = new FormData();
+        formData.append('file', file);
 
-        return () => {
-            ws.close();
-        };
-    }, []);
+        try {
+            const response = await axios.post('http://localhost:5000/process_reviews', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            setData(response.data);
+        } catch (error) {
+            console.error('Error uploading file:', error);
+        }
+    };
 
     const toggleDetails = () => {
         setShowDetails(!showDetails);
     };
 
-    const COLORS = ['#90EE90', '#F08080', '#ADD8E6'];
+    const toggleShowAllReviews = () => {
+        setShowAllReviews(!showAllReviews);
+    };
+
+    const toggleShowAllKeyTopics = () => {
+        setShowAllKeyTopics(!showAllKeyTopics);
+    };
+
+    const COLORS = ['#87c187', '#F08080', '#ffd966'];
 
     const renderReviewSections = () => {
         if (!data) return null;
@@ -45,69 +63,97 @@ function NewPage() {
         ];
 
         return (
-            <div className="container mx-auto p-4">
-                <div className="bg-gray-100 p-6 rounded-lg shadow-lg mb-6">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-2xl font-bold">Analysis Overview</h3>
+            <div className="bg-gray-200 container mx-auto">
+                <div className="bg-gray-200 p-0 rounded-lg mb-6">
+                    <div className="bg-white flex justify-between items-center mb-4">
+                        <h3 className="text-2xl font-bold pl-10 pr-10 text-center">Analysis Overview</h3>
                         <div className="flex">
-                            <div className="bg-gray-200 p-4 rounded-lg flex flex-col items-center justify-center mr-4">
-                                <h4 className="mb-2">Number of Reviews</h4>
+                            <div className="bg-gray-200 pt-4 pb-4 p-2 flex flex-col items-center justify-center">
+                                <h4 className="mb-2 text-center">Number of Reviews</h4>
                                 <span>{summary["Number of Reviews"]}</span>
                             </div>
-                            <div className="bg-gray-200 p-4 rounded-lg flex flex-col items-center justify-center mr-4">
-                                <h4 className="mb-2">Number of Positive Reviews</h4>
+                            <div className="bg-gray-300 pt-4 pb-4 p-2 flex flex-col items-center justify-center">
+                                <h4 className="mb-2 text-center">Number of Positive Reviews</h4>
                                 <span>{summary["Number of Positive Reviews"]}</span>
                             </div>
-                            <div className="bg-gray-200 p-4 rounded-lg flex flex-col items-center justify-center mr-4">
-                                <h4 className="mb-2">Number of Negative Reviews</h4>
+                            <div className="bg-gray-200 pt-4 pb-4 p-2 flex flex-col items-center justify-center">
+                                <h4 className="mb-2 text-center">Number of Negative Reviews</h4>
                                 <span>{summary["Number of Negative Reviews"]}</span>
                             </div>
-                            <div className="bg-gray-200 p-4 rounded-lg flex flex-col items-center justify-center">
-                                <h4 className="mb-2">Number of Neutral Reviews</h4>
+                            <div className="bg-gray-100 pt-4 pb-4 p-2 flex flex-col items-center justify-center">
+                                <h4 className="mb-2 text-center">Number of Neutral Reviews</h4>
                                 <span>{summary["Number of Neutral Reviews"]}</span>
                             </div>
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-center items-center">
-                        <div className="bg-white p-4 rounded-lg shadow-md text-center">
+                    <div className="flex w-full">
+                        <div className="bg-gray-300 p-4 m-2 rounded-lg shadow-md text-center border-1 border-black" style={{ flex: '2 1 0', minHeight: '200px'}}>
                             <h4 className="text-xl font-semibold mb-2">Summary</h4>
-                            <p>Here is a summary of key points.fffsdfsdfrethythyt hytrhthdh</p>
+                            <p>Here is a summary of key points. Here is a summary of key points...</p>
                         </div>
-                        <div className="bg-white p-4 rounded-lg shadow-md text-center flex flex-col justify-center items-center">
+                        <div className="bg-gray-300 p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center border-1 border-black" style={{ flex: '1 1 0', minHeight: '200px'}}>
                             <h4 className="text-xl font-semibold mb-2">Enhanced Rating</h4>
                             <div className="text-4xl font-bold">
                                 {summary["Enhanced Rating"]}
                             </div>
                         </div>
-                        <div className="bg-white p-4 rounded-lg shadow-md flex justify-center items-center">
-                            <div className="text-center">
-                                <h4 className="text-xl font-semibold mb-2">Review Distribution</h4>
-                                <PieChart width={300} height={300}>
-                                    <Pie
-                                        data={pieData}
-                                        cx={150}
-                                        cy={150}
-                                        labelLine={false}
-                                        outerRadius={100}
-                                        fill="#8884d8"
-                                        dataKey="value"
-                                        label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
-                                    >
-                                        {pieData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip />
-                                    <Legend />
-                                </PieChart>
-                            </div>
+                        <div className="bg-gray-300 p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center border-1 border-black" style={{ flex: '1 1 0', minHeight: '200px' }}>
+                        <h4 className="text-xl font-semibold mb-2">Sentiment Analysis</h4>
+                            <PieChart width={200} height={250}>
+                                <Pie
+                                    data={pieData}
+                                    cx={90}
+                                    cy={90}
+                                    labelLine={false}
+                                    outerRadius={50}
+                                    fill="#8884d8"
+                                    dataKey="value"
+                                    label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+                                >
+                                    {pieData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip />
+                                <Legend
+                                    wrapperStyle={{
+                                        paddingTop: '20px' // Add padding at the top of the legend
+                                    }}
+                                />
+                            </PieChart>
+                        </div>
+                        <div className="bg-gray-300 p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center border-1 border-black" style={{ flex: '1 1 0', minHeight: '200px'}}>
+                            <h4 className="text-xl font-semibold mb-2">Sarcasm Analysis</h4>
+                            <PieChart width={200} height={250}>
+                                <Pie
+                                    data={pieData}
+                                    cx={90}
+                                    cy={90}
+                                    labelLine={false}
+                                    outerRadius={50}
+                                    fill="#8884d8"
+                                    dataKey="value"
+                                    label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+                                >
+                                    {pieData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip />
+                                <Legend
+                                    wrapperStyle={{
+                                        paddingTop: '20px' // Add padding at the top of the legend
+                                    }}
+                                />
+                            </PieChart>
                         </div>
                     </div>
                 </div>
-                <div className="bg-gray-100 p-6 rounded-lg shadow-lg mb-6">
+
+                <div className="bg-gray-300 p-6 mb-6">
                     <h3 className="text-2xl font-bold mb-4">Reviews</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {reviews.map((review, index) => (
+                        {reviews.slice(0, showAllReviews ? reviews.length : 3).map((review, index) => (
                             <div key={index} className="bg-white p-4 rounded-lg shadow-md mb-4">
                                 <p>{review.title}</p>
                                 <p>{review.body}</p>
@@ -116,10 +162,17 @@ function NewPage() {
                             </div>
                         ))}
                     </div>
+                    {reviews.length > 3 && (
+                        <Button
+                            onClick={toggleShowAllReviews}
+                            text={showAllReviews ? 'Show Less' : 'Show More'}
+                            className="mt-4"
+                        />
+                    )}
                 </div>
-                <div className="bg-gray-100 p-6 rounded-lg shadow-lg mb-6">
+                <div className="bg-gray-300 p-6 mb-6">
                     <h3 className="text-2xl font-bold mb-4">Key Topics</h3>
-                    {Object.keys(key_topics).map((topic, index) => (
+                    {Object.keys(key_topics).slice(0, showAllKeyTopics ? Object.keys(key_topics).length : 3).map((topic, index) => (
                         <div key={index} className="bg-white p-4 rounded-lg shadow-md mb-4">
                             <h4 className="text-xl font-semibold">{topic}</h4>
                             <p><strong>Unique Comment Count:</strong> {key_topics[topic].unique_comment_count}</p>
@@ -134,6 +187,13 @@ function NewPage() {
                             </ul>
                         </div>
                     ))}
+                    {Object.keys(key_topics).length > 3 && (
+                        <Button
+                            onClick={toggleShowAllKeyTopics}
+                            text={showAllKeyTopics ? 'Show Less' : 'Show More'}
+                            className="mt-4"
+                        />
+                    )}
                 </div>
             </div>
         );
@@ -143,7 +203,7 @@ function NewPage() {
         <div>
             <Header />
             <SearchBar />
-            <Container.Outer customStyles={{ backgroundColor: '#53a079', padding: '20px', margin: '20px' }} showIcon={false} showHeader={false}>
+            <Container.Outer customStyles={{ padding: '20px', margin: '20px' }} showIcon={false} showHeader={false}>
                 <Container.Inner>
                     <div className="flex items-center mb-8">
                         <h1 className="text-xl font-bold text-white mr-2"><strong>Name of product</strong></h1>
@@ -168,6 +228,10 @@ function NewPage() {
                     )}
                 </Container.Inner>
             </Container.Outer>
+            <form onSubmit={handleSubmit} className="my-4 flex flex-col items-center">
+                <input type="file" onChange={handleFileChange} className="mb-2" />
+                <Button onClick={handleSubmit} text="Upload" />
+            </form>
             {renderReviewSections()}
             <Footer />
         </div>

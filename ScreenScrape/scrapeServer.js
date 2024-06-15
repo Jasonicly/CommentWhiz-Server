@@ -37,7 +37,7 @@ app.post('/scrape', async (req, res) => {
         console.log(`Reviews saved to ${outputPath}`);
 
         // Send the JSON data to the React server on port 3000
-        const reactServerUrl = 'http://localhost:3000/ai'; // Specify the correct endpoint for your React server
+        const reactServerUrl = 'http://localhost:3001/ai'; // Specify the correct endpoint for your React server
         console.log(`Sending scraped data to React server at ${reactServerUrl}`);
 
         const response = await axios.post(reactServerUrl, reviews, {
