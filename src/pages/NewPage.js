@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
 import { Container } from "../components/Container";
@@ -9,31 +8,24 @@ import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 
 function NewPage() {
     const [showDetails, setShowDetails] = useState(false);
-    const [file, setFile] = useState(null);
     const [data, setData] = useState(null);
 
-    const handleFileChange = (event) => {
-        setFile(event.target.files[0]);
-    };
+    useEffect(() => {
+        const ws = new WebSocket('ws://localhost:8080');
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        if (!file) return;
+        ws.onmessage = (event) => {
+            const receivedData = JSON.parse(event.data);
+            setData(receivedData);
+        };
 
-        const formData = new FormData();
-        formData.append('file', file);
+        ws.onclose = () => {
+            console.log('WebSocket connection closed');
+        };
 
-        try {
-            const response = await axios.post('http://localhost:5000/process_reviews', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            setData(response.data);
-        } catch (error) {
-            console.error('Error uploading file:', error);
-        }
-    };
+        return () => {
+            ws.close();
+        };
+    }, []);
 
     const toggleDetails = () => {
         setShowDetails(!showDetails);
@@ -96,7 +88,7 @@ function NewPage() {
                                         cx={150}
                                         cy={150}
                                         labelLine={false}
-                                        outerRadius={100} // Adjust outerRadius as needed
+                                        outerRadius={100}
                                         fill="#8884d8"
                                         dataKey="value"
                                         label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
@@ -176,10 +168,6 @@ function NewPage() {
                     )}
                 </Container.Inner>
             </Container.Outer>
-            <form onSubmit={handleSubmit} className="my-4 flex flex-col items-center">
-                <input type="file" onChange={handleFileChange} className="mb-2" />
-                <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">Upload</button>
-            </form>
             {renderReviewSections()}
             <Footer />
         </div>

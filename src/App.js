@@ -12,10 +12,10 @@ function App() {
             <div className="App">
                 <Routes>
                     {/* Update each Route with the element prop */}
-                    <Route path="/" element={<NewPage />} />
+                    <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Register />} />
-                    <Route path="/home" element={<Home />} />
+                    <Route path="/report" element={<NewPage />} />
                     {/* Add more routes here if needed */}
                 </Routes>
             </div>

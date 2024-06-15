@@ -2,11 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\example_text_output_input",
-    "\\ScreenScrape",
     "\\src",
-    "\\src\\components",
     "\\src\\pages"
   ],
-  "SelectedNode": "\\example_text_output_input\\output.json",
+  "SelectedNode": "\\example_text_output_input\\URL_test.json",
   "PreviewInSolutionExplorer": false
 }
