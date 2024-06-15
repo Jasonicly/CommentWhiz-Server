@@ -4,7 +4,7 @@ import SearchBar from "../components/SearchBar";
 import { Container } from "../components/Container";
 import { Button } from "../components/Button";
 import Footer from "../components/Footer";
-import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 function NewPage() {
     const [showDetails, setShowDetails] = useState(false);
@@ -76,6 +76,17 @@ function NewPage() {
             { name: 'Negative', value: summary["Percentage of Negative Reviews"] },
             { name: 'Neutral', value: summary["Percentage of Neutral Reviews"] },
         ];
+
+        const barData = [
+            { name: 'Joy', value: summary["Number of Joy Emotions"], color: '#FFD700' },
+            { name: 'Anger', value: summary["Number of Anger Emotions"], color: '#FF4500' },
+            { name: 'Neutral', value: summary["Number of Neutral Emotions"], color: '#808080' },
+            { name: 'Sadness', value: summary["Number of Sadness Emotions"], color: '#1E90FF' },
+            { name: 'Disgust', value: summary["Number of Disgust Emotions"], color: '#32CD32' },
+            { name: 'Surprise', value: summary["Number of Surprise Emotions"], color: '#FFA500' }
+        ];
+
+        const topEmotion = barData.reduce((prev, current) => (prev.value > current.value) ? prev : current);
 
         return (
             <div className="bg-gray-200 container mx-auto">
@@ -162,6 +173,22 @@ function NewPage() {
                                 />
                             </PieChart>
                         </div>
+
+                    </div>
+                    <div className="bg-gray-300 p-4 m-2 rounded-lg shadow-md text-center border-1 border-black" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '200px' }}>
+                        <h4 className="text-xl font-semibold mb-2">Emotion Analysis</h4>
+                        <BarChart width={600} height={300} data={barData} style={{ display: 'flex', justifyContent: 'center' }}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip />
+                            <Bar dataKey="value" fill="#82ca9d">
+                                {barData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                            </Bar>
+                        </BarChart>
+                        <h5 className="text-lg font-semibold mt-4">Top Emotion: {topEmotion.name}</h5>
                     </div>
                 </div>
 
