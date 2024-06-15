@@ -57,6 +57,12 @@ app.post('/ai', async (req, res) => {
     const reviews = req.body;
 
     try {
+        // Dynamically import the 'open' module
+        const open = await import('open').then(mod => mod.default);
+
+        // Open the URL in the default browser before processing
+        await open('http://localhost:3000/report');
+
         // Forward the reviews to another service running on localhost:5000
         const response = await axios.post('http://localhost:5000/process_reviews', reviews);
         console.log('Response from AI:', response.data);
