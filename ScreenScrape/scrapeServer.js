@@ -9,7 +9,7 @@ const scrapeReviews = require('./scrapeReviews');
 
 const app = express();
 const port = 6000; // The port for your scraping server
-
+const maxComments = 100; // Set the maximum number of comments to scrape
 app.use(bodyParser.json());
 
 app.post('/scrape', async (req, res) => {
@@ -22,7 +22,7 @@ app.post('/scrape', async (req, res) => {
         console.log(`Received URL: ${url}`);
 
         // Scrape the reviews from the provided URL
-        const reviews = await scrapeReviews(url, 100);
+        const reviews = await scrapeReviews(url, maxComments);
         console.log('Scraping completed successfully.');
 
         // Send the JSON data to the React server on port 3000

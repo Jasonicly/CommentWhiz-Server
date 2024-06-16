@@ -1,156 +1,25 @@
 {
-  "key_topics": {
-    "begin": {
-      "comments": [
-        {
-          "AI-rating": 3.5,
-          "body": "Quality seems to be deteriorating. 3-plu feels like single ply, and the beginning of the roll was disintegrating even before use!",
-          "sentiment": "Positive",
-          "title": "1.0 out of 5 stars\n Poor quality"
-        }
-      ],
-      "unique_comment_count": 1
-    },
-    "deal": {
-      "comments": [
-        {
-          "AI-rating": 4.3,
-          "body": "Great deal to purchase it from Amazon Sg",
-          "sentiment": "Positive",
-          "title": "5.0 out of 5 stars\n Great Deal for renowned toilet tissue brand"
-        },
-        {
-          "AI-rating": 4.3,
-          "body": "Great deal to purchase it from Amazon Sg",
-          "sentiment": "Positive",
-          "title": "5.0 out of 5 stars\n Great Deal for renowned toilet tissue brand"
-        }
-      ],
-      "unique_comment_count": 1
-    },
-    "great": {
-      "comments": [
-        {
-          "AI-rating": 4.3,
-          "body": "Great deal to purchase it from Amazon Sg",
-          "sentiment": "Positive",
-          "title": "5.0 out of 5 stars\n Great Deal for renowned toilet tissue brand"
-        }
-      ],
-      "unique_comment_count": 1
-    },
-    "item": {
-      "comments": [
-        {
-          "AI-rating": 3.4,
-          "body": "Item received. Thank you.",
-          "sentiment": "Positive",
-          "title": "5.0 out of 5 stars\n Kleenex Ultra Soft Toilet rolls"
-        }
-      ],
-      "unique_comment_count": 1
-    },
-    "plu": {
-      "comments": [
-        {
-          "AI-rating": 3.5,
-          "body": "Quality seems to be deteriorating. 3-plu feels like single ply, and the beginning of the roll was disintegrating even before use!",
-          "sentiment": "Positive",
-          "title": "1.0 out of 5 stars\n Poor quality"
-        }
-      ],
-      "unique_comment_count": 1
-    },
-    "ply": {
-      "comments": [
-        {
-          "AI-rating": 3.5,
-          "body": "Quality seems to be deteriorating. 3-plu feels like single ply, and the beginning of the roll was disintegrating even before use!",
-          "sentiment": "Positive",
-          "title": "1.0 out of 5 stars\n Poor quality"
-        },
-        {
-          "AI-rating": 3.5,
-          "body": "Quality seems to be deteriorating. 3-plu feels like single ply, and the beginning of the roll was disintegrating even before use!",
-          "sentiment": "Positive",
-          "title": "1.0 out of 5 stars\n Poor quality"
-        }
-      ],
-      "unique_comment_count": 1
-    },
-    "quality": {
-      "comments": [
-        {
-          "AI-rating": 3.5,
-          "body": "Quality seems to be deteriorating. 3-plu feels like single ply, and the beginning of the roll was disintegrating even before use!",
-          "sentiment": "Positive",
-          "title": "1.0 out of 5 stars\n Poor quality"
-        }
-      ],
-      "unique_comment_count": 1
-    },
-    "roll": {
-      "comments": [
-        {
-          "AI-rating": 3.5,
-          "body": "Quality seems to be deteriorating. 3-plu feels like single ply, and the beginning of the roll was disintegrating even before use!",
-          "sentiment": "Positive",
-          "title": "1.0 out of 5 stars\n Poor quality"
-        }
-      ],
-      "unique_comment_count": 1
-    },
-    "single": {
-      "comments": [
-        {
-          "AI-rating": 3.5,
-          "body": "Quality seems to be deteriorating. 3-plu feels like single ply, and the beginning of the roll was disintegrating even before use!",
-          "sentiment": "Positive",
-          "title": "1.0 out of 5 stars\n Poor quality"
-        }
-      ],
-      "unique_comment_count": 1
-    },
-    "use": {
-      "comments": [
-        {
-          "AI-rating": 3.5,
-          "body": "Quality seems to be deteriorating. 3-plu feels like single ply, and the beginning of the roll was disintegrating even before use!",
-          "sentiment": "Positive",
-          "title": "1.0 out of 5 stars\n Poor quality"
-        }
-      ],
-      "unique_comment_count": 1
-    }
-  },
+  "productName": "Kleenex Ultra Soft Bath Tissue, 200ct ,(Pack of 20) (packaging may vary)",
   "reviews": [
     {
-      "AI-rating": 3.4,
-      "body": "Item received. Thank you.",
-      "sentiment": "Positive",
-      "title": "5.0 out of 5 stars\n Kleenex Ultra Soft Toilet rolls"
+      "title": "5.0 out of 5 stars\n Just the right texture",
+      "body": "Just the right texture and value for money."
     },
     {
-      "AI-rating": 3.5,
-      "body": "Quality seems to be deteriorating. 3-plu feels like single ply, and the beginning of the roll was disintegrating even before use!",
-      "sentiment": "Positive",
-      "title": "1.0 out of 5 stars\n Poor quality"
+      "title": "5.0 out of 5 stars\n Good 😊",
+      "body": "👍"
     },
     {
-      "AI-rating": 4.3,
-      "body": "Great deal to purchase it from Amazon Sg",
-      "sentiment": "Positive",
-      "title": "5.0 out of 5 stars\n Great Deal for renowned toilet tissue brand"
+      "title": "5.0 out of 5 stars\n Good buy",
+      "body": "Good product"
+    },
+    {
+      "title": "4.0 out of 5 stars\n Good quality, but a bit pricey",
+      "body": "Good quality, but a bit pricey"
+    },
+    {
+      "title": "5.0 out of 5 stars\n Fast delivery. Good product.",
+      "body": "The tissues are good. Delivery is fast."
     }
-  ],
-  "summary": {
-    "Enhanced Rating": 3.7,
-    "Number of Negative Reviews": 0,
-    "Number of Neutral Reviews": 0,
-    "Number of Positive Reviews": 3,
-    "Number of Reviews": 3,
-    "Percentage of Negative Reviews": 0.0,
-    "Percentage of Neutral Reviews": 0.0,
-    "Percentage of Positive Reviews": 100.0
-  }
+  ]
 }

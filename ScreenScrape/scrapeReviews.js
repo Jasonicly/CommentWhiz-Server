@@ -1,4 +1,6 @@
 const puppeteer = require('puppeteer');
+//const fs = require('fs');
+//const path = require('path');
 
 async function scrapeReviews(initialUrl, maxComments) {
     const browser = await puppeteer.launch({
@@ -10,6 +12,7 @@ async function scrapeReviews(initialUrl, maxComments) {
 
     const results = [];
     let currentPageUrl = initialUrl;
+    //let productName = 'Unknown Product';
 
     console.log("Navigating to the product home page:", currentPageUrl);
     await page.goto(currentPageUrl, { waitUntil: 'domcontentloaded' });
@@ -26,7 +29,7 @@ async function scrapeReviews(initialUrl, maxComments) {
     });
 
     try {
-        //waits for the a[data-hook="see-all-reviews-link-foot"] element and clicks on it
+        // Wait for and click the link to the reviews page
         await page.waitForSelector('a[data-hook="see-all-reviews-link-foot"]', { timeout: 15000 });
         const reviewsPageUrl = await page.evaluate(() => {
             const reviewLink = document.querySelector('a[data-hook="see-all-reviews-link-foot"]');
@@ -37,6 +40,14 @@ async function scrapeReviews(initialUrl, maxComments) {
             console.log("Navigating to reviews page:", reviewsPageUrl);
             await page.goto(reviewsPageUrl, { waitUntil: 'domcontentloaded' });
             currentPageUrl = page.url();
+
+             // Extract the product name after entering the reviews page
+             //   productName = await page.evaluate(() => {
+             //       const productTitleElement = document.querySelector('a[data-hook="product-link"]');
+             //       return productTitleElement ? productTitleElement.innerText.trim() : null;
+             //   });
+
+             //   console.log("Product Name:", productName);
         }
     } catch (error) {
         console.error("Error navigating to reviews page:", error);
@@ -61,7 +72,7 @@ async function scrapeReviews(initialUrl, maxComments) {
 
         results.push(...reviewsOnPage);
 
-        //looks for a.a-last[href] to find the next page link and ensures it’s not disabled before proceeding
+        // Navigate to the next page of reviews if it exists
         const nextPageLink = await page.evaluate(() => {
             const nextButton = document.querySelector('.a-pagination .a-last a');
             return nextButton && !nextButton.parentElement.classList.contains('a-disabled') ? nextButton.href : null;

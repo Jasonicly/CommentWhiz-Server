@@ -3,7 +3,7 @@ import { FaSearch } from "react-icons/fa";
 
 function SearchBar() {
     return (
-        <div className="search-bar-container bg-custom-darkgreen text-white flex items-center justify-between p-4 m-4 rounded-lg border-1 border-brown">
+        <div className="search-bar-container bg-custom-darkgreen text-white flex items-center justify-between p-4 mt-5 rounded-lg border-1 border-brown mx-auto" style={{ width: '100%', maxWidth: '1400px'}}>
             <h2 className="text-xl font-bold mr-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
                 Comment Whiz
             </h2>

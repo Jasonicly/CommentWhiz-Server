@@ -6,14 +6,14 @@ const OuterContainer = forwardRef(function OuterContainer(
     ref
 ) {
     return (
-        <div ref={ref} className={clsx("sm:px-8", className)} style={customStyles} {...props}>
+        <div ref={ref} className={clsx("sm:px-8 flex flex-col items-center", className)} style={customStyles} {...props}>
             {showIcon && (
                 <img src={process.env.PUBLIC_URL + '/ext-icon.png'} alt="logo" className="w-20 h-20 mx-auto" />
             )}
             {showHeader && (
                 <h1 className="text-center text-5xl font-bold">{headerText || "CommentWhiz"}</h1>
             )}
-            <div className="m-3 rounded">{children}</div>
+            <div className="m-3 rounded flex items-center justify-center">{children}</div>
         </div>
     );
 });
@@ -26,7 +26,7 @@ const InnerContainer = forwardRef(function InnerContainer(
     return (
         <div
             ref={ref}
-            className={clsx(`flex ${flexDirection} m-3 space-y-5 min-w-[400px]`, className)}
+            className={clsx(`flex ${flexDirection} m-3 space-y-5 min-w-[400px] className="mx-auto"`, className)}
             style={customStyles}
             {...props}
         >
