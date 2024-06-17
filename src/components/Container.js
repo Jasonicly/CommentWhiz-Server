@@ -6,7 +6,7 @@ const OuterContainer = forwardRef(function OuterContainer(
     ref
 ) {
     return (
-        <div ref={ref} className={clsx("sm:px-8 flex flex-col items-center", className)} style={customStyles} {...props}>
+        <div ref={ref} className={clsx("flex justify-center", className)} style={customStyles} {...props}>
             {showIcon && (
                 <img src={process.env.PUBLIC_URL + '/ext-icon.png'} alt="logo" className="w-20 h-20 mx-auto" />
             )}
