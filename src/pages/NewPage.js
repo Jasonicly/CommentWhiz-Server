@@ -196,7 +196,6 @@ function NewPage() {
                 <div className="bg-custom-white p-6 mb-6 m-2 rounded-lg shadow-md">
                     <h3 className="text-2xl font-bold mb-4">Reviews</h3>
                     <div className="flex items-center mb-4">
-                        <h2 className="text-xl font-semibold">Reviews</h2>
                         <button onClick={() => setFilter('Positive')} className={`ml-4 p-2 rounded ${filter === 'Positive' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}>Positive</button>
                         <button onClick={() => setFilter('Negative')} className={`ml-2 p-2 rounded ${filter === 'Negative' ? 'bg-red-500 text-white' : 'bg-gray-200'}`}>Negative</button>
                         <button onClick={() => setFilter('Neutral')} className={`ml-2 p-2 rounded ${filter === 'Neutral' ? 'bg-yellow-500 text-white' : 'bg-gray-200'}`}>Neutral</button>
