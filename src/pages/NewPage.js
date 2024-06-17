@@ -208,6 +208,7 @@ function NewPage() {
                             <div key={index} className="bg-white p-4 rounded-lg shadow-md mb-4">
                                 <p>{review.title}</p>
                                 <p>{review.body}</p>
+                                <p><strong>Emotion:</strong> {review.emotions}</p>
                                 <p><strong>Sentiment:</strong> {review.sentiment}</p>
                                 <p><strong>AI Rating:</strong> {review["AI-rating"]}</p>
                             </div>

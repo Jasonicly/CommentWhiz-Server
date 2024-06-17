@@ -1,7 +1,11 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\example_text_output_input",
+    "\\ScreenScrape",
+    "\\src",
+    "\\src\\pages"
   ],
-  "SelectedNode": "\\C:\\Users\\weili\\Downloads\\web4",
+  "SelectedNode": "\\example_text_output_input\\output.json",
   "PreviewInSolutionExplorer": false
 }
