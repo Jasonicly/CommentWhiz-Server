@@ -4,6 +4,18 @@ const bodyParser = require('body-parser'); // Middleware to parse incoming reque
 const cors = require('cors'); // Middleware to enable Cross-Origin Resource Sharing
 const axios = require('axios'); // Promise-based HTTP client for making requests
 const WebSocket = require('ws'); // WebSocket library for real-time communication
+const fs = require('fs'); // File system module for reading files
+const path = require('path'); // Path module for working with file paths
+const https = require('https'); // HTTPS module for creating secure servers
+
+
+// SSL options
+const options = {
+    key: fs.readFileSync(path.resolve(__dirname, 'localhost-key.pem')),
+    cert: fs.readFileSync(path.resolve(__dirname, 'localhost.pem')),
+    secureProtocol: 'TLSv1_2_method', // Ensure at least TLS 1.2
+  };
+
 
 // Create an Express application
 const app = express();
@@ -19,7 +31,7 @@ app.use(cors());
 app.post('/scrape', async (req, res) => {
     // Extract the URL from the request body
     const { url } = req.body;
-
+    console.log('recieved url from Extension:', url);
     // Check if URL is provided, if not, send a 400 Bad Request response
     if (!url) {
         return res.status(400).send('URL is required');
@@ -27,7 +39,11 @@ app.post('/scrape', async (req, res) => {
 
     try {
         // Forward the URL to another service running on localhost:6000
-        const response = await axios.post('http://localhost:6000/scrape', { url });
+        const response = await axios.post('https://localhost:6000/scrape', { url }, {
+            httpsAgent: new https.Agent({
+              rejectUnauthorized: false, // This will allow self-signed certificates (Without this line, YOU WILL GET a certificate error!!!!!!)
+            }),
+          });
         // Send the response data back to the client
         res.send(response.data);
     } catch (error) {
@@ -61,10 +77,14 @@ app.post('/ai', async (req, res) => {
         const open = await import('open').then(mod => mod.default);
 
         // Open the URL in the default browser before processing
-        await open('http://localhost:3000/report');
+        await open('https://localhost:3000/report');
 
-        // Forward the reviews to another service running on localhost:5000
-        const response = await axios.post('http://localhost:5000/process_reviews', reviews);
+        // Forward the reviews to AI server on localhost:5000
+        const response = await axios.post('https://localhost:5000/process_reviews', reviews, {
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false, // This will allow self-signed certificates
+            }),
+        });
         console.log('Response from AI:', response.data);
 
         // Broadcast response to all connected WebSocket clients
@@ -90,7 +110,7 @@ app.post('/ai', async (req, res) => {
     }
 });
 
-// Start the Express server
-app.listen(port, () => {
-    console.log(`Server.js running on port ${port}`);
-});
+// Start the Express server with HTTPS
+https.createServer(options, app).listen(port, () => {
+    console.log(`Server.js running on https://localhost:${port}`);
+  });

@@ -65,3 +65,24 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### if `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+### Set up SSL and HTTPS 
+1) mkcert -install (if installed already don't need but use this command to check)
+
+2) mkcert localhost
+
+This command does two things:
+
+Generates a certificate for the hostname you've specified.
+Lets mkcert sign the certificate.
+
+3) Move the generated certificates to the correct directory:
+
+mv localhost.pem path/to/your/project
+mv localhost-key.pem path/to/your/project
+
+or do it some other way. Note that YOUR LOCALHOST.PEM WILL NOT WORK WITH OTHER MACHINES, ONLY YOUR LOCAL ONE.
+
+
+By following these steps, each developer can generate their own SSL certificates and ensure that their local development environment is properly configured for HTTPS.
