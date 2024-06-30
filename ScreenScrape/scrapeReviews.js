@@ -1,6 +1,4 @@
 const puppeteer = require('puppeteer');
-//const fs = require('fs');
-//const path = require('path');
 
 async function scrapeReviews(initialUrl, maxComments) {
     const browser = await puppeteer.launch({
@@ -12,7 +10,8 @@ async function scrapeReviews(initialUrl, maxComments) {
 
     const results = [];
     let currentPageUrl = initialUrl;
-    //let productName = 'Unknown Product';
+    let productName = 'Unknown Product';
+    let productDetails = [];
 
     console.log("Navigating to the product home page:", currentPageUrl);
     await page.goto(currentPageUrl, { waitUntil: 'domcontentloaded' });
@@ -29,6 +28,21 @@ async function scrapeReviews(initialUrl, maxComments) {
     });
 
     try {
+        // Scrape product name
+        productName = await page.evaluate(() => {
+            const productTitleElement = document.querySelector('#productTitle');
+            return productTitleElement ? productTitleElement.innerText.trim() : null;
+        });
+
+        // Scrape product details
+        productDetails = await page.evaluate(() => {
+            const details = [];
+            document.querySelectorAll('#feature-bullets .a-list-item').forEach(detail => {
+                details.push(detail.innerText.trim());
+            });
+            return details.join(', ');
+        });
+
         // Wait for and click the link to the reviews page
         await page.waitForSelector('a[data-hook="see-all-reviews-link-foot"]', { timeout: 15000 });
         const reviewsPageUrl = await page.evaluate(() => {
@@ -40,22 +54,18 @@ async function scrapeReviews(initialUrl, maxComments) {
             console.log("Navigating to reviews page:", reviewsPageUrl);
             await page.goto(reviewsPageUrl, { waitUntil: 'domcontentloaded' });
             currentPageUrl = page.url();
-
-             // Extract the product name after entering the reviews page
-             //   productName = await page.evaluate(() => {
-             //       const productTitleElement = document.querySelector('a[data-hook="product-link"]');
-             //       return productTitleElement ? productTitleElement.innerText.trim() : null;
-             //   });
-
-             //   console.log("Product Name:", productName);
         }
     } catch (error) {
         console.error("Error navigating to reviews page:", error);
         await browser.close();
-        return results;
+        return {
+            productName,
+            productDetails,
+            reviews: results
+        };
     }
 
-    // uses the .a-section.review.aok-relative selector to find and extract review elements
+    // Uses the .a-section.review.aok-relative selector to find and extract review elements
     while (currentPageUrl && results.length < maxComments) {
         console.log("Scraping reviews from:", currentPageUrl);
         await page.waitForSelector('.a-section.review.aok-relative', { timeout: 15000 });
@@ -88,7 +98,18 @@ async function scrapeReviews(initialUrl, maxComments) {
     }
 
     await browser.close();
-    return results.slice(0, maxComments);
+    
+    // Create the result JSON
+    const resultJson = {
+        productName,
+        productDetails,
+        reviews: results.slice(0, maxComments)
+    };
+    
+    // Log the result JSON
+    console.log(JSON.stringify(resultJson, null, 2));
+    
+    return resultJson;
 }
 
 module.exports = scrapeReviews;
