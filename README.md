@@ -68,19 +68,28 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 
 ### Set up SSL and HTTPS 
-1) mkcert -install (if installed already don't need but use this command to check)
+Run cmd as admin and run the following commands
 
-2) mkcert localhost
+1) To install choco: 
+
+@"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command " [System.Net.ServicePointManager]::SecurityProtocol = 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))" && SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
+ 
+2) choco install mkcert 
+
+3) mkcert -install (if installed already don't need but use this command to check)
+
+4) mkcert localhost
 
 This command does two things:
 
 Generates a certificate for the hostname you've specified.
 Lets mkcert sign the certificate.
 
-3) Move the generated certificates to the correct directory:
+5) Move the generated certificates to the project directory:
 
-mv localhost.pem path/to/your/project
-mv localhost-key.pem path/to/your/project
+move localhost.pem path/to/your/project
+
+move localhost-key.pem path/to/your/project
 
 or do it some other way. Note that YOUR LOCALHOST.PEM WILL NOT WORK WITH OTHER MACHINES, ONLY YOUR LOCAL ONE.
 
