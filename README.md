@@ -87,6 +87,7 @@ Lets mkcert sign the certificate.
 5) Move the generated certificates to the project directory:
 
 move localhost.pem path/to/your/project
+
 move localhost-key.pem path/to/your/project
 
 or do it some other way. Note that YOUR LOCALHOST.PEM WILL NOT WORK WITH OTHER MACHINES, ONLY YOUR LOCAL ONE.
