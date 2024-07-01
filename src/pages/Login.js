@@ -37,7 +37,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:3001/login', { email, password });
+            const response = await axios.post('https://localhost:3001/login', { email, password });
             if (response.status === 200) {
                 setMessage('Login successful');
                 setMessageType('success');

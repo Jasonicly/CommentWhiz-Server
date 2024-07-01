@@ -29,7 +29,7 @@ const Register = () => {
         } else {
             setErrorMessage(''); // Clear error message if registration is successful
             try {
-                const response = await axios.post('http://localhost:3001/register', {
+                const response = await axios.post('https://localhost:3001/register', {
                     email,
                     password
                 });
