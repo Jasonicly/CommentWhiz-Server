@@ -6,6 +6,12 @@ const path = require('path');
 const axios = require('axios');
 const FormData = require('form-data');
 const scrapeReviews = require('./scrapeReviews');
+const https = require('https');
+
+const options = {
+    key: fs.readFileSync('../localhost-key.pem'),
+    cert: fs.readFileSync('../localhost.pem'),
+  };
 
 const app = express();
 const port = 6000; // The port for your scraping server
@@ -26,10 +32,13 @@ app.post('/scrape', async (req, res) => {
         console.log('Scraping completed successfully.');
 
         // Send the JSON data to the React server on port 3000
-        const reactServerUrl = 'http://localhost:3001/ai'; // Specify the correct endpoint for your React server
+        const reactServerUrl = 'https://localhost:3001/ai'; // Specify the correct endpoint for your React server
         console.log(`Sending scraped data to React server at ${reactServerUrl}`);
 
         const response = await axios.post(reactServerUrl, reviews, {
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false, // This will allow self-signed certificates (Without this line, YOU WILL GET a certificate error!!!!!!)
+            }),
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -57,6 +66,6 @@ app.post('/scrape', async (req, res) => {
     }
 });
 
-app.listen(port, () => {
+https.createServer(options, app).listen(port, () => {
     console.log(`Scraping server running on port ${port}`);
 });

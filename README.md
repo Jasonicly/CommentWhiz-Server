@@ -65,3 +65,33 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### if `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+### Set up SSL and HTTPS 
+Run cmd as admin and run the following commands
+
+1) To install choco: 
+
+@"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command " [System.Net.ServicePointManager]::SecurityProtocol = 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))" && SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
+ 
+2) choco install mkcert 
+
+3) mkcert -install (if installed already don't need but use this command to check)
+
+4) mkcert localhost
+
+This command does two things:
+
+Generates a certificate for the hostname you've specified.
+Lets mkcert sign the certificate.
+
+5) Move the generated certificates to the project directory:
+
+move localhost.pem path/to/your/project
+
+move localhost-key.pem path/to/your/project
+
+or do it some other way. Note that YOUR LOCALHOST.PEM WILL NOT WORK WITH OTHER MACHINES, ONLY YOUR LOCAL ONE.
+
+
+By following these steps, each developer can generate their own SSL certificates and ensure that their local development environment is properly configured for HTTPS.

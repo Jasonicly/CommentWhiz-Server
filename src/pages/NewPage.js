@@ -13,6 +13,7 @@ function NewPage() {
     const [showAllKeyTopics, setShowAllKeyTopics] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [filter, setFilter] = useState('All');
+    const [selectedPhrase, setSelectedPhrase] = useState(null);
 
     useEffect(() => {
         const ws = new WebSocket('ws://localhost:8080');
@@ -37,6 +38,13 @@ function NewPage() {
         };
     }, []);
 
+    useEffect(() => {
+        if (data && data.key_topics && Object.keys(data.key_topics).length > 0) {
+            const firstKey = Object.keys(data.key_topics)[0];
+            setSelectedPhrase(firstKey);
+        }
+    }, [data]);
+
     const toggleDetails = () => {
         setShowDetails(!showDetails);
     };
@@ -47,6 +55,10 @@ function NewPage() {
 
     const toggleShowAllKeyTopics = () => {
         setShowAllKeyTopics(!showAllKeyTopics);
+    };
+
+    const handlePhraseClick = (phrase) => {
+        setSelectedPhrase(phrase);
     };
 
     const COLORS = ['#87c187', '#F08080', '#ffd966'];
@@ -75,7 +87,7 @@ function NewPage() {
     const renderReviewSections = () => {
         if (!data) return null;
 
-        const { summary, reviews, key_topics } = data;
+        const { summary, key_topics } = data;
 
         const pieData = [
             { name: 'Positive', value: summary["Percentage of Positive Reviews"] },
@@ -94,42 +106,47 @@ function NewPage() {
 
         const topEmotion = barData.reduce((prev, current) => (prev.value > current.value) ? prev : current);
 
+        const sortedKeyTopics = Object.keys(key_topics)
+    .sort((a, b) => key_topics[b].unique_comment_count - key_topics[a].unique_comment_count)
+    .slice(0, 5);
+
+
         return (
-            <div className="bg-gray-200 container mx-auto" style={{ maxWidth: '1400px', margin: '32px 0' }}>
-                <div className="bg-gray-300 p-0 rounded-lg mb-6">
-                    <div className="bg-white flex justify-between items-center mb-4">
+            <div className="bg-custom-gray container mx-auto border border-black p-4" style={{ maxWidth: '1400px', margin: '32px 0' }}>
+                <div className="bg-custom-gray p-0 rounded-lg mb-6">
+                    <div className="bg-custom-gray flex justify-between items-center mb-4">
                         <h3 className="text-2xl font-bold pl-10 pr-10 text-center">Analysis Overview</h3>
                         <div className="flex">
-                            <div className="bg-gray-200 pt-4 pb-4 p-2 flex flex-col items-center justify-center">
+                            <div className="bg-gray-200 pt-4 pb-4 p-2 mt-5 mb-5 flex flex-col items-center justify-center border border-black">
                                 <h4 className="mb-2 text-center">Number of Reviews</h4>
                                 <span>{summary["Number of Reviews"]}</span>
                             </div>
-                            <div className="bg-gray-300 pt-4 pb-4 p-2 flex flex-col items-center justify-center">
+                            <div className="bg-gray-300 pt-4 pb-4 p-2 mt-5 mb-5 flex flex-col items-center justify-center border border-black">
                                 <h4 className="mb-2 text-center">Number of Positive Reviews</h4>
                                 <span>{summary["Number of Positive Reviews"]}</span>
                             </div>
-                            <div className="bg-gray-200 pt-4 pb-4 p-2 flex flex-col items-center justify-center">
+                            <div className="bg-gray-200 pt-4 pb-4 p-2 mt-5 mb-5 flex flex-col items-center justify-center border border-black">
                                 <h4 className="mb-2 text-center">Number of Negative Reviews</h4>
                                 <span>{summary["Number of Negative Reviews"]}</span>
                             </div>
-                            <div className="bg-gray-100 pt-4 pb-4 p-2 flex flex-col items-center justify-center">
+                            <div className="bg-gray-100 pt-4 pb-4 p-2 mt-5 mb-5 mr-5 flex flex-col items-center justify-center border border-black">
                                 <h4 className="mb-2 text-center">Number of Neutral Reviews</h4>
                                 <span>{summary["Number of Neutral Reviews"]}</span>
                             </div>
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="bg-custom-white p-4 m-2 rounded-lg shadow-md text-center border-1 border-black">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+                        <div className="bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center">
                             <h4 className="text-xl font-semibold mb-2">Summary</h4>
                             <p>Here is a summary of key points. Here is a summary of key points...</p>
                         </div>
-                        <div className="bg-custom-white p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center border-1 border-black">
+                        <div className="bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center">
                             <h4 className="text-xl font-semibold mb-2">Enhanced Rating</h4>
                             <div className="text-4xl font-bold">
                                 {summary["Enhanced Rating"]}
                             </div>
                         </div>
-                        <div className="bg-custom-white p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center border-1 border-black">
+                        <div className="bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center">
                             <h4 className="text-xl font-semibold mb-2">Sentiment Analysis</h4>
                             <PieChart width={200} height={250}>
                                 <Pie
@@ -153,7 +170,7 @@ function NewPage() {
                                 />
                             </PieChart>
                         </div>
-                        <div className="bg-custom-white p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center border-1 border-black">
+                        <div className="bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center">
                             <h4 className="text-xl font-semibold mb-2">Sarcasm Analysis</h4>
                             <PieChart width={200} height={250}>
                                 <Pie
@@ -178,74 +195,111 @@ function NewPage() {
                             </PieChart>
                         </div>
                     </div>
-                    <div className="bg-custom-white p-4 m-2 rounded-lg shadow-md text-center border-1 border-black flex flex-col items-center justify-center">
-                        <h4 className="text-xl font-semibold mb-2">Emotion Analysis</h4>
-                        <BarChart width={600} height={300} data={barData} style={{ display: 'flex', justifyContent: 'center' }}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip />
-                            <Bar dataKey="value" fill="#82ca9d">
-                                {barData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry.color} />
-                                ))}
-                            </Bar>
-                        </BarChart>
-                        <h5 className="text-lg font-semibold mt-4">Top Emotion: {topEmotion.name}</h5>
-                    </div>
-                </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-1">
+                        <div className="bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center border-1 border-black flex flex-col items-center justify-center">
+                            <h4 className="text-xl font-semibold mb-2">Emotion Analysis</h4>
+                            <BarChart width={550} height={300} data={barData} style={{ display: 'flex', justifyContent: 'center' }}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="name" />
+                                <YAxis />
+                                <Tooltip />
+                                <Bar dataKey="value" fill="#82ca9d">
+                                    {barData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                            <h5 className="text-lg font-semibold mt-4">Top Emotion: {topEmotion.name}</h5>
+                        </div>
 
-                <div className="bg-custom-white p-6 mb-6 m-2 rounded-lg shadow-md">
-                    <h3 className="text-2xl font-bold mb-4">Reviews</h3>
-                    <div className="flex items-center mb-4">
-                        <button onClick={() => setFilter('Positive')} className={`ml-4 p-2 rounded ${filter === 'Positive' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}>Positive</button>
-                        <button onClick={() => setFilter('Negative')} className={`ml-2 p-2 rounded ${filter === 'Negative' ? 'bg-red-500 text-white' : 'bg-gray-200'}`}>Negative</button>
-                        <button onClick={() => setFilter('Neutral')} className={`ml-2 p-2 rounded ${filter === 'Neutral' ? 'bg-yellow-500 text-white' : 'bg-gray-200'}`}>Neutral</button>
-                        <button onClick={() => setFilter('All')} className={`ml-2 p-2 rounded ${filter === 'All' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>All</button>
+                        <div className="bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center border-1 border-black flex flex-col items-center justify-center">
+                            <h4 className="text-xl font-semibold mb-2">Key Topics</h4>
+                            <div className="grid grid-cols-2" style={{ width: '100%' }}>
+                                <div className="w-full flex flex-col justify-around" style={{ minHeight: '400px' }}>
+                                    {sortedKeyTopics.map((phrase, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => handlePhraseClick(phrase)}
+                                            className={`mb-2 w-10/12 mx-auto py-4 text-center ${selectedPhrase === phrase ? 'bg-custom-gray text-black' : 'bg-gray-500 text-white'}`}
+                                        >
+                                            {phrase}
+                                        </button>
+                                    ))}
+                                </div>
+                                <div className="w-full overflow-auto" style={{ maxHeight: '400px' }}>
+                                    {selectedPhrase && (
+                                        <div className="bg-white p-4 rounded-lg shadow-md mb-4 w-10/12 mx-auto" style={{ minHeight: '400px' }}>
+                                            <h4 className="text-xl font-semibold">{selectedPhrase}</h4>
+                                            <p><strong>Comment Count:</strong> {key_topics[selectedPhrase].unique_comment_count}</p>
+                                            <ul className="list-disc list-inside">
+                                                {key_topics[selectedPhrase].comments.map((comment, idx) => (
+                                                    <li key={idx}>
+                                                        <p>{comment.body}</p>
+                                                        {/* <p><strong>Sentiment:</strong> {comment.sentiment}</p> */}
+                                                        {/* <p><strong>AI Rating:</strong> {comment["AI-rating"]}</p> */}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {filteredReviews.slice(0, showAllReviews ? filteredReviews.length : 3).map((review, index) => (
+
+                    <div className="bg-custom-beige p-6 mb-6 m-2 rounded-lg shadow-md">
+                        <h3 className="text-2xl font-bold mb-4">Reviews</h3>
+                        <div className="flex items-center mb-4">
+                            <button onClick={() => setFilter('Positive')} className={`ml-2 p-2 rounded ${filter === 'Positive' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}>Positive</button>
+                            <button onClick={() => setFilter('Negative')} className={`ml-2 p-2 rounded ${filter === 'Negative' ? 'bg-red-500 text-white' : 'bg-gray-200'}`}>Negative</button>
+                            <button onClick={() => setFilter('Neutral')} className={`ml-2 p-2 rounded ${filter === 'Neutral' ? 'bg-yellow-500 text-white' : 'bg-gray-200'}`}>Neutral</button>
+                            <button onClick={() => setFilter('All')} className={`ml-2 p-2 rounded ${filter === 'All' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>All</button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {filteredReviews.slice(0, showAllReviews ? filteredReviews.length : 3).map((review, index) => (
+                                <div key={index} className="bg-white p-4 rounded-lg shadow-md mb-4">
+                                    <p>{review.title}</p>
+                                    <p>{review.body}</p>
+                                    <p><strong>Emotion:</strong> {review.emotions}</p>
+                                    <p><strong>Sentiment:</strong> {review.sentiment}</p>
+                                    <p><strong>AI Rating:</strong> {review["AI-rating"]}</p>
+                                </div>
+                            ))}
+                        </div>
+                        {filteredReviews.length > 4 && (
+                            <Button
+                                onClick={toggleShowAllReviews}
+                                text={showAllReviews ? 'Show Less' : 'Show More'}
+                                className="mt-4"
+                            />
+                        )}
+                    </div>
+                    <div className="bg-custom-beige p-6 mb-6 m-2 rounded-lg shadow-md">
+                        <h3 className="text-2xl font-bold mb-4">Key Topics</h3>
+                        {Object.keys(key_topics).slice(0, showAllKeyTopics ? Object.keys(key_topics).length : 3).map((topic, index) => (
                             <div key={index} className="bg-white p-4 rounded-lg shadow-md mb-4">
-                                <p>{review.title}</p>
-                                <p>{review.body}</p>
-                                <p><strong>Emotion:</strong> {review.emotions}</p>
-                                <p><strong>Sentiment:</strong> {review.sentiment}</p>
-                                <p><strong>AI Rating:</strong> {review["AI-rating"]}</p>
+                                <h4 className="text-xl font-semibold">{topic}</h4>
+                                <p><strong>Unique Comment Count:</strong> {key_topics[topic].unique_comment_count}</p>
+                                <ul className="list-disc list-inside">
+                                    {key_topics[topic].comments.map((comment, idx) => (
+                                        <li key={idx}>
+                                            <p>{comment.body}</p>
+                                            <p><strong>Sentiment:</strong> {comment.sentiment}</p>
+                                            <p><strong>AI Rating:</strong> {comment["AI-rating"]}</p>
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
                         ))}
+                        {Object.keys(key_topics).length > 4 && (
+                            <Button
+                                onClick={toggleShowAllKeyTopics}
+                                text={showAllKeyTopics ? 'Show Less' : 'Show More'}
+                                className="mt-4"
+                            />
+                        )}
                     </div>
-                    {filteredReviews.length > 3 && (
-                        <Button
-                            onClick={toggleShowAllReviews}
-                            text={showAllReviews ? 'Show Less' : 'Show More'}
-                            className="mt-4"
-                        />
-                    )}
-                </div>
-                <div className="bg-custom-white p-6 mb-6 m-2 rounded-lg shadow-md">
-                    <h3 className="text-2xl font-bold mb-4">Key Topics</h3>
-                    {Object.keys(key_topics).slice(0, showAllKeyTopics ? Object.keys(key_topics).length : 3).map((topic, index) => (
-                        <div key={index} className="bg-white p-4 rounded-lg shadow-md mb-4">
-                            <h4 className="text-xl font-semibold">{topic}</h4>
-                            <p><strong>Unique Comment Count:</strong> {key_topics[topic].unique_comment_count}</p>
-                            <ul className="list-disc list-inside">
-                                {key_topics[topic].comments.map((comment, idx) => (
-                                    <li key={idx}>
-                                        <p>{comment.body}</p>
-                                        <p><strong>Sentiment:</strong> {comment.sentiment}</p>
-                                        <p><strong>AI Rating:</strong> {comment["AI-rating"]}</p>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    ))}
-                    {Object.keys(key_topics).length > 3 && (
-                        <Button
-                            onClick={toggleShowAllKeyTopics}
-                            text={showAllKeyTopics ? 'Show Less' : 'Show More'}
-                            className="mt-4"
-                        />
-                    )}
                 </div>
             </div>
         );
@@ -275,7 +329,7 @@ function NewPage() {
             <Container.Outer className="absolute left-1/2 transform -translate-x-1/2" customStyles={{ padding: '20px', margin: '20px', width: '100%', maxWidth: '1400px'}} showIcon={false} showHeader={false}>
                 <Container.Inner className="w-full mx-auto">
                     <div className="flex items-center justify-center mb-8">
-                        <h1 className="text-xl font-bold text-white mr-2 text-custom-blue"><strong>Kleenex Ultra Soft Bath Tissue, 200ct ,(Pack of 20) (packaging may vary)</strong></h1>
+                        <h1 className="text-xl font-bold text-black mr-2"><strong>Kleenex Ultra Soft Bath Tissue, 200ct ,(Pack of 20) (packaging may vary)</strong></h1>
                         {!showDetails && (
                             <Button
                                 onClick={toggleDetails}
