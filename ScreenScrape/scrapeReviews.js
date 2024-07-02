@@ -12,6 +12,7 @@ async function scrapeReviews(initialUrl, maxComments) {
     let currentPageUrl = initialUrl;
     let productName = 'Unknown Product';
     let productDetails = [];
+    let productDescription = [];
 
     console.log("Navigating to the product home page:", currentPageUrl);
     await page.goto(currentPageUrl, { waitUntil: 'domcontentloaded' });
@@ -34,11 +35,24 @@ async function scrapeReviews(initialUrl, maxComments) {
             return productTitleElement ? productTitleElement.innerText.trim() : null;
         });
 
+        // Scrape product description
+        //  productDescription = await page.evaluate(() => {
+        //      const description = [];
+        //      document.querySelectorAll('#feature-bullets .a-list-item').forEach(detail => {
+        //          details.push(detail.innerText.trim());
+        //      });
+        //      return details.join(', ');
+        //  });
+
         // Scrape product details
         productDetails = await page.evaluate(() => {
             const details = [];
-            document.querySelectorAll('#feature-bullets .a-list-item').forEach(detail => {
-                details.push(detail.innerText.trim());
+            document.querySelectorAll('.a-normal.a-spacing-micro tr').forEach(detailRow => {
+                const keyElement = detailRow.querySelector('td.a-span3 .a-text-bold');
+                const valueElement = detailRow.querySelector('td.a-span9');
+                if (keyElement && valueElement) {
+                    details.push(`${keyElement.innerText.trim()}: ${valueElement.innerText.trim()}`);
+                }
             });
             return details.join(', ');
         });
@@ -103,6 +117,7 @@ async function scrapeReviews(initialUrl, maxComments) {
     const resultJson = {
         productName,
         productDetails,
+        //productDescription,
         reviews: results.slice(0, maxComments)
     };
     
