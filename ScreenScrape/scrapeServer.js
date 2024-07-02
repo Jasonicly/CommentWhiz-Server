@@ -15,7 +15,7 @@ const options = {
 
 const app = express();
 const port = 6000; // The port for your scraping server
-const maxComments = 10; // Set the maximum number of comments to scrape
+const maxComments = 20; // Set the maximum number of comments to scrape
 app.use(bodyParser.json());
 
 app.post('/scrape', async (req, res) => {
