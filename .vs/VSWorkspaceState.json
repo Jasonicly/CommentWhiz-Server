@@ -1,9 +1,11 @@
 {
   "ExpandedNodes": [
     "",
+    "\\example_text_output_input",
+    "\\ScreenScrape",
     "\\src",
     "\\src\\pages"
   ],
-  "SelectedNode": "\\src\\pages\\Login.js",
+  "SelectedNode": "\\server.js",
   "PreviewInSolutionExplorer": false
 }
