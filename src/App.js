@@ -6,12 +6,12 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import NotFoundPage from './pages/NotFoundPage';
-import Report-list from './pages/Report-list';
+import ReportList from './pages/ReportList'; 
 
 function App() {
     return (
         <Router>
-            
+
             <div className="App">
                 <Routes>
                     {/* Update each Route with the element prop */}
