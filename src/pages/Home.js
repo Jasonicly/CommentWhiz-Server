@@ -1,14 +1,17 @@
 // src/pages/Home.js
 import React from 'react';
 import Header from '../components/Header'; // Adjust the path if necessary
+import HomeBanner from '../components/HomeBanner';
+import HomeContainer from '../components/HomeContainer';
+import Download from '../components/Download';
 
 const Home = () => {
     return (
-        <div className="bg-custom-green min-h-screen">
+        <div className="bg-custom-gray min-h-screen">
             <Header />
-            <main className="flex flex-col items-center justify-center h-full">
-                <h1 className="text-3xl font-bold text-white">Welcome to the Home Page</h1>
-            </main>
+            <HomeBanner />
+            <HomeContainer />
+            <Download />
         </div>
     );
 };
