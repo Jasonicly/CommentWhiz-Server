@@ -1,11 +1,17 @@
-// src/pages/Register.js
 import React, { useState } from 'react';
+import axios from 'axios';
 import Header from "../components/Header";
 
 const Register = () => {
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+
+    const handleEmailChange = (e) => {
+        setEmail(e.target.value);
+    };
 
     const handlePasswordChange = (e) => {
         setPassword(e.target.value);
@@ -15,15 +21,36 @@ const Register = () => {
         setConfirmPassword(e.target.value);
     };
 
-    const validateForm = (e) => {
+    const validateForm = async (e) => {
         e.preventDefault();
         if (password !== confirmPassword) {
+            setSuccessMessage(''); // Clear success message if there's an error
             setErrorMessage('Passwords do not match');
         } else {
-            setErrorMessage('');
-            // Handle successful registration, e.g., send data to server
-            console.log('Form submitted');
+            setErrorMessage(''); // Clear error message if registration is successful
+            try {
+                const response = await axios.post('https://localhost:3001/register', {
+                    email,
+                    password
+                });
+                if (response.status === 201) {
+                    setErrorMessage(''); // Clear error message on success
+                    setSuccessMessage('User registered successfully');
+                }
+            } catch (error) {
+                setSuccessMessage(''); // Clear success message if there's an error
+                setErrorMessage('An error occurred during registration, maybe the email already have been used');
+                console.error('Error:', error);
+            }
         }
+    };
+
+    const resetForm = () => {
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+        setErrorMessage('');
+        setSuccessMessage('');
     };
 
     // Define styles
@@ -45,6 +72,10 @@ const Register = () => {
             color: 'red',
             display: 'block',
         },
+        successMessage: {
+            color: 'green',
+            display: 'block',
+        },
     };
 
     return (
@@ -64,17 +95,19 @@ const Register = () => {
                             <input
                                 type="email"
                                 id="email"
-                                name="_id"
+                                name="email"
                                 placeholder="Email"
                                 required
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-gray-400 hover:border-green-500 transition duration-200 ease-in-out"
+                                value={email}
+                                onChange={handleEmailChange}
                             />
 
                             <label htmlFor="password" className="sr-only">Password</label>
                             <input
                                 type="password"
                                 id="password"
-                                name="password_hash"
+                                name="password"
                                 placeholder="Password"
                                 required
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-gray-400 hover:border-green-500 transition duration-200 ease-in-out"
@@ -95,9 +128,10 @@ const Register = () => {
                             />
 
                             {errorMessage && <div id="error-message" style={styles.errorMessage}>{errorMessage}</div>}
+                            {successMessage && <div id="success-message" style={styles.successMessage}>{successMessage}</div>}
 
                             <div className="flex justify-end space-x-4 mt-6">
-                                <button type="button" aria-label="Cancel registration" className="px-5 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition duration-200 ease-in-out">
+                                <button type="button" aria-label="Cancel registration" className="px-5 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition duration-200 ease-in-out" onClick={resetForm}>
                                     Cancel
                                 </button>
                                 <input type="submit" value="Register" className="px-5 py-2 bg-green-700 text-white rounded-lg cursor-pointer hover:bg-green-800 transition duration-200 ease-in-out" />
