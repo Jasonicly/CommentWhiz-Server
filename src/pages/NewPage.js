@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
 import { Container } from "../components/Container";
