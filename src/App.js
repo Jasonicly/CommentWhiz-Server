@@ -5,6 +5,7 @@ import NewPage from './pages/NewPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
+import ReportList from './pages/ReportList';
 
 function App() {
     return (
@@ -15,7 +16,9 @@ function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Register />} />
-                    <Route path="/report" element={<NewPage />} />
+                    <Route path="/report" element={<ReportList />} />
+                    <Route path="/report/:reportID" element={<NewPage />} />
+                    <Route path="*" element={<NotFoundPage />} />
                     {/* Add more routes here if needed */}
                 </Routes>
             </div>
