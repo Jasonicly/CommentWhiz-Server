@@ -66,9 +66,8 @@ wss.on('connection', ws => {
 });
 
 // Define a route to check for URL and get the latest report
-app.get('/checkreport/:url', async (req, res) => {
-    const encodedUrl = req.params.url;
-    const url = decodeURIComponent(encodedUrl);
+app.get('/checkDatabase/:url', async (req, res) => {
+    const url = req.params.url;
 
     try {
         const db = client.db(dbName);
@@ -77,54 +76,32 @@ app.get('/checkreport/:url', async (req, res) => {
         // Check if a document with the given URL as _id exists
         const existingDoc = await analysesCollection.findOne({ _id: url });
 
-        if (existingDoc && existingDoc.reports && existingDoc.reports.length > 0) {
-            const latestReport = existingDoc.reports[0];
-            wss.clients.forEach(client => {
-                if (client.readyState === WebSocket.OPEN) {
-                    client.send(JSON.stringify(latestReport));
-                }
-            });
-
+        if (existingDoc) {  
             // Send the latest report and a script to close the tab
-            return res.status(200).send(`
-                <html>
-                    <body>
-                        <pre>${JSON.stringify(latestReport, null, 2)}</pre>
-                        <script>
-                            window.close();
-                        </script>
-                    </body>
-                </html>
-            `);
+            return res.status(200).send(existingDoc);
         } else {
             // Send a 404 response and a script to close the tab
-            return res.status(404).send(`
-                <html>
-                    <body>
-                        <p>No reports found for the given URL</p>
-                        <script>
-                            window.close();
-                        </script>
-                    </body>
-                </html>
-            `);
+            return res.status(200).send(null);
         }
     } catch (error) {
         console.error('Error checking the URL:', error.message);
 
         // Send a 500 response and a script to close the tab
-        return res.status(500).send(`
-            <html>
-                <body>
-                    <p>An error occurred while checking the URL</p>
-                    <script>
-                        window.close();
-                    </script>
-                </body>
-            </html>
-        `);
+        return res.status(500).send(2);
     }
 });
+
+
+// if user opens report via link  https://localhost:3000/report/https://www.amazon.com/dp/B07VGRJDFY - this route will be called
+//      Define a route to get the report for a specific URL separate endpoint in server 
+// if they press open report on the extension: scan first and store in DB, then open report 
+
+// 
+// if they search in the website
+//    reload the page with url they search
+
+// if open via history,,,,
+
 
 // Define a POST route for scraping
 app.post('/scrape', async (req, res) => {
@@ -146,19 +123,6 @@ app.post('/scrape', async (req, res) => {
         if (existingDoc) {
             
             const Report = existingDoc;
-            // Dynamically import the 'open' module
-            const open = await import('open').then(mod => mod.default);
-
-            // Open the URL in the default browser before processing
-            await open('https://localhost:3000/report');
-
-            // Broadcast response to all connected WebSocket clients
-            wss.clients.forEach(client => {
-                if (client.readyState === WebSocket.OPEN) {
-                    client.send(JSON.stringify(report));
-                }
-            });
-
             return res.status(200).send(Report);
 
         }
@@ -184,24 +148,12 @@ app.post('/ai', async (req, res) => {
     // Extract reviews data from the request body
     const reviews = req.body;
 
-    try {
-        // Dynamically import the 'open' module
-        const open = await import('open').then(mod => mod.default);
-
-        // Open the URL in the default browser before processing
-        await open('https://localhost:3000/report');
-      
+    try {      
         // Forward the reviews to AI server on localhost:5000
         const response = await axios.post('https://localhost:5000/process_reviews', reviews, {
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false, // This will allow self-signed certificates
             }),
-        });
-        // Broadcast response to all connected WebSocket clients
-        wss.clients.forEach(client => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify(response.data));
-            }
         });
         console.log('Response from AI:', response.data);
 
