@@ -21,31 +21,23 @@ function NewPage() {
     const [keyTopicsFilter, setKeyTopicsFilter] = useState('All Sentiments'); // State for filtering key topics by sentiment
     const [showKeyTopicsFilterOptions, setShowKeyTopicsFilterOptions] = useState(false); // State for showing key topics filter options
     const [expandedTopics, setExpandedTopics] = useState({}); // State for expanded key topics for more comments
+    //when they enter url from the website, ie they type: https://localhost:3000/report/1234
+    const { reportId } = useParams(); // Get unique link for report  
 
+
+    const isAmazonProductPage = /^https?:\/\/(www\.)?amazon\.[a-z\.]{2,6}(\/d\/|\/dp\/|\/gp\/product\/)/.test(reportId);
     
+    if (isAmazonProductPage) {
+        const encodedReportId = btoa(encodeURIComponent(reportId));
+        axios.post(`https://localhost:3001/checkDatabase/${encodedReportId}`).then((response) => {
+            if (response.data) {
+                setData(response.data)}
+        }).catch((error) => {});    
+    }
 
-    useEffect(() => { // Establish WebSocket connection
-        const ws = new WebSocket('ws://localhost:8080');
 
-        ws.onopen = () => {
-            setIsLoading(true);
-        };
 
-        ws.onmessage = (event) => {
-            const receivedData = JSON.parse(event.data);
-            setData(receivedData);
-            setIsLoading(false);
-        };
 
-        ws.onclose = () => {
-            console.log('WebSocket connection closed');
-            setIsLoading(false);
-        };
-
-        return () => {
-            ws.close();
-        };
-    }, []);
 
     useEffect(() => { // Set selected phrase to first key topic phrase
         if (data && data.key_topics && Object.keys(data.key_topics).length > 0) {
@@ -451,35 +443,55 @@ function NewPage() {
             </div>
         );
     };
+    if (data !== null) {
+        return (
+            <div>
+                <style>{`
+                    .loading-icon-container {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        transform: translateY(-10%);
+                    }
+    
+                    .loading-icon {
+                        text-align: center;
+                    }
+                `}</style>
+                <Header />
+                <SearchBar />
+                <Container.Outer className="absolute left-1/2 transform -translate-x-1/2" customStyles={{ padding: '20px', margin: '20px', width: '100%', maxWidth: '1400px'}} showIcon={false} showHeader={false}>
+                    <Container.Inner className="w-full mx-auto">
+                    {isLoading ? renderLoading() : renderReviewSections()}
+                </Container.Inner>
+            </Container.Outer>
+            </div>
+        );
+    
+    }
+    else if (data === null) {
+        <html>
+        <body>
+            <p>No report was found for this URL: ${url}</p>
+        </body>
+    </html>
 
-    return (
-        <div>
-            <style>{`
-                .loading-icon-container {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    transform: translateY(-10%);
-                }
+    }
+    else {
+        <html>
+        <body>
+            <p>Error occured on our server, please try again later nigger</p>
+        </body>
+    </html>
 
-                .loading-icon {
-                    text-align: center;
-                }
-            `}</style>
-            <Header />
-            <SearchBar />
-            <Container.Outer className="absolute left-1/2 transform -translate-x-1/2" customStyles={{ padding: '20px', margin: '20px', width: '100%', maxWidth: '1400px'}} showIcon={false} showHeader={false}>
-                <Container.Inner className="w-full mx-auto">
-                {isLoading ? renderLoading() : renderReviewSections()}
-            </Container.Inner>
-        </Container.Outer>
-        </div>
-    );
+    }
+
 }
-
-export default NewPage;
+    
+    
+    export default NewPage;
