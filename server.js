@@ -11,6 +11,7 @@ const bcrypt = require('bcrypt'); // Library for hashing passwords
 const fs = require('fs'); // File system module for reading files
 const path = require('path'); // Path module for working with file paths
 const https = require('https'); // HTTPS module for creating secure servers
+const { report } = require('process');
 
 
 // SSL options
@@ -18,7 +19,7 @@ const options = {
     key: fs.readFileSync(path.resolve(__dirname, 'localhost-key.pem')),
     cert: fs.readFileSync(path.resolve(__dirname, 'localhost.pem')),
     secureProtocol: 'TLSv1_2_method', // Ensure at least TLS 1.2
-  };
+};
 
 
 
@@ -31,95 +32,6 @@ const port = 3001;
 app.use(bodyParser.json());
 // Use CORS middleware to allow cross-origin requests
 app.use(cors());
-
-// Define a POST route for scraping
-app.post('/scrape', async (req, res) => {
-    // Extract the URL from the request body
-    const { url } = req.body;
-    console.log('recieved url from Extension:', url);
-    // Check if URL is provided, if not, send a 400 Bad Request response
-    if (!url) {
-        return res.status(400).send('URL is required');
-    }
-
-    try {
-        // Forward the URL to another service running on localhost:6000
-        const response = await axios.post('https://localhost:6000/scrape', { url }, {
-            httpsAgent: new https.Agent({
-              rejectUnauthorized: false, // This will allow self-signed certificates (Without this line, YOU WILL GET a certificate error!!!!!!)
-            }),
-          });
-        // Send the response data back to the client
-        res.send(response.data);
-    } catch (error) {
-        // Log the error message to the console
-        console.error('Error forwarding the URL:', error.message);
-        // Send a 500 Internal Server Error response
-        res.status(500).send('Error forwarding the URL');
-    }
-});
-
-// Create a WebSocket server on port 8080
-const wss = new WebSocket.Server({ port: 8080 });
-
-// Handle WebSocket connection
-wss.on('connection', ws => {
-    console.log('Client connected');
-
-    // Log when a client disconnects
-    ws.on('close', () => {
-        console.log('Client disconnected');
-    });
-});
-
-// Define a POST route for AI processing
-app.post('/ai', async (req, res) => {
-    // Extract reviews data from the request body
-    const reviews = req.body;
-
-    try {
-        // Dynamically import the 'open' module
-        const open = await import('open').then(mod => mod.default);
-
-        // Open the URL in the default browser before processing
-        await open('https://localhost:3000/report');
-
-        // Forward the reviews to AI server on localhost:5000
-        const response = await axios.post('https://localhost:5000/process_reviews', reviews, {
-            httpsAgent: new https.Agent({
-                rejectUnauthorized: false, // This will allow self-signed certificates
-            }),
-        });
-        console.log('Response from AI:', response.data);
-
-        // Broadcast response to all connected WebSocket clients
-        wss.clients.forEach(client => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify(response.data));
-            }
-        });
-
-        // Store the AI response in MongoDB
-        const db = client.db(dbName);
-        const analysesCollection = db.collection('analyses');
-        await analysesCollection.insertOne(response.data);
-
-        // Send the AI response back to the client
-        res.status(response.status).send(response.data);
-    } catch (error) {
-        // Log the error message to the console
-        console.error('Error forwarding the reviews:', error.message);
-        if (error.response) {
-            // Log and send specific error response if available
-            console.error('Response data:', error.response.data);
-            res.status(error.response.status).send(error.response.data);
-        } else {
-            // Send a generic 500 Internal Server Error response
-            res.status(500).send('An error occurred while forwarding the reviews');
-        }
-    }
-});
-
 
 // MongoDB connection URL and database name
 const mongoUrl = 'mongodb://localhost:27017';
@@ -139,6 +51,189 @@ async function connectToMongoDB() {
 
 // Connect to MongoDB
 connectToMongoDB();
+
+// Create a WebSocket server on port 8080
+const wss = new WebSocket.Server({ port: 8080 });
+
+// Handle WebSocket connection
+wss.on('connection', ws => {
+    console.log('Client connected');
+
+    // Log when a client disconnects
+    ws.on('close', () => {
+        console.log('Client disconnected');
+    });
+});
+
+// Define a route to check for URL and get the latest report
+app.get('/checkreport/:url', async (req, res) => {
+    const encodedUrl = req.params.url;
+    const url = decodeURIComponent(encodedUrl);
+
+    try {
+        const db = client.db(dbName);
+        const analysesCollection = db.collection('analyses');
+
+        // Check if a document with the given URL as _id exists
+        const existingDoc = await analysesCollection.findOne({ _id: url });
+
+        if (existingDoc && existingDoc.reports && existingDoc.reports.length > 0) {
+            const latestReport = existingDoc.reports[0];
+            wss.clients.forEach(client => {
+                if (client.readyState === WebSocket.OPEN) {
+                    client.send(JSON.stringify(latestReport));
+                }
+            });
+
+            // Send the latest report and a script to close the tab
+            return res.status(200).send(`
+                <html>
+                    <body>
+                        <pre>${JSON.stringify(latestReport, null, 2)}</pre>
+                        <script>
+                            window.close();
+                        </script>
+                    </body>
+                </html>
+            `);
+        } else {
+            // Send a 404 response and a script to close the tab
+            return res.status(404).send(`
+                <html>
+                    <body>
+                        <p>No reports found for the given URL</p>
+                        <script>
+                            window.close();
+                        </script>
+                    </body>
+                </html>
+            `);
+        }
+    } catch (error) {
+        console.error('Error checking the URL:', error.message);
+
+        // Send a 500 response and a script to close the tab
+        return res.status(500).send(`
+            <html>
+                <body>
+                    <p>An error occurred while checking the URL</p>
+                    <script>
+                        window.close();
+                    </script>
+                </body>
+            </html>
+        `);
+    }
+});
+
+// Define a POST route for scraping
+app.post('/scrape', async (req, res) => {
+    // Extract the URL from the request body
+    const { url } = req.body;
+    console.log('Received URL from Extension:', url);
+    // Check if URL is provided, if not, send a 400 Bad Request response
+    if (!url) {
+        return res.status(400).send('URL is required');
+    }
+
+    try {
+        const db = client.db(dbName);
+        const analysesCollection = db.collection('analyses');
+
+        // Check if a document with the given URL as _id exists
+        const existingDoc = await analysesCollection.findOne({ _id: url });
+
+        if (existingDoc) {
+            
+            const Report = existingDoc;
+            // Dynamically import the 'open' module
+            const open = await import('open').then(mod => mod.default);
+
+            // Open the URL in the default browser before processing
+            await open('https://localhost:3000/report');
+
+            // Broadcast response to all connected WebSocket clients
+            wss.clients.forEach(client => {
+                if (client.readyState === WebSocket.OPEN) {
+                    client.send(JSON.stringify(report));
+                }
+            });
+
+            return res.status(200).send(Report);
+
+        }
+
+        // Forward the URL to another service running on localhost:6000
+        const response = await axios.post('https://localhost:6000/scrape', { url }, {
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false, // This will allow self-signed certificates (Without this line, YOU WILL GET a certificate error!!!!!!)
+            }),
+        });
+        // Send the response data back to the client
+        res.send(response.data);
+    } catch (error) {
+        // Log the error message to the console
+        console.error('Error forwarding the URL:', error.message);
+        // Send a 500 Internal Server Error response
+        res.status(500).send('Error forwarding the URL');
+    }
+});
+
+// Define a POST route for AI processing
+app.post('/ai', async (req, res) => {
+    // Extract reviews data from the request body
+    const reviews = req.body;
+
+    try {
+        // Dynamically import the 'open' module
+        const open = await import('open').then(mod => mod.default);
+
+        // Open the URL in the default browser before processing
+        await open('https://localhost:3000/report');
+      
+        // Forward the reviews to AI server on localhost:5000
+        const response = await axios.post('https://localhost:5000/process_reviews', reviews, {
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false, // This will allow self-signed certificates
+            }),
+        });
+        // Broadcast response to all connected WebSocket clients
+        wss.clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(JSON.stringify(response.data));
+            }
+        });
+        console.log('Response from AI:', response.data);
+
+        // Store the AI response in MongoDB
+        const db = client.db(dbName); // Access the database
+        const analysesCollection = db.collection('analyses'); // Select the collection
+
+        const productUrl = response.data.summary['Product Url']; // Extract the Product Url from the AI response
+
+        // Update or insert the document directly with the new AI response
+        await analysesCollection.updateOne(
+            { _id: productUrl },
+            { $set: response.data },
+            { upsert: true } // Create a new document if it does not exist
+        );
+
+        // Send the AI response back to the client
+        res.status(response.status).send(response.data);
+    } catch (error) {
+        // Log the error message to the console
+        console.error('Error forwarding the reviews:', error.message);
+        if (error.response) {
+            // Log and send specific error response if available
+            console.error('Response data:', error.response.data);
+            res.status(error.response.status).send(error.response.data);
+        } else {
+            // Send a generic 500 Internal Server Error response
+            res.status(500).send('An error occurred while forwarding the reviews');
+        }
+    }
+});
+
 
 // Define a POST route for user registration
 app.post('/register', async (req, res) => {
@@ -211,8 +306,6 @@ app.post('/login', async (req, res) => {
         res.status(500).send('An error occurred while logging in');
     }
 });
-
-
 
 // Start the Express server with HTTPS
 https.createServer(options, app).listen(port, () => {

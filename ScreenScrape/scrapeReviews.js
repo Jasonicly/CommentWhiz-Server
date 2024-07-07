@@ -73,6 +73,7 @@ async function scrapeReviews(initialUrl, maxComments) {
         console.error("Error navigating to reviews page:", error);
         await browser.close();
         return {
+            initialUrl, 
             productName,
             productDetails,
             reviews: results
@@ -115,6 +116,7 @@ async function scrapeReviews(initialUrl, maxComments) {
     
     // Create the result JSON
     const resultJson = {
+        initialUrl,  
         productName,
         productDetails,
         //productDescription,
