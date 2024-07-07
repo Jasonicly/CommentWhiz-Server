@@ -11,6 +11,7 @@ const bcrypt = require('bcrypt'); // Library for hashing passwords
 const fs = require('fs'); // File system module for reading files
 const path = require('path'); // Path module for working with file paths
 const https = require('https'); // HTTPS module for creating secure servers
+const { report } = require('process');
 
 
 // SSL options
@@ -144,8 +145,22 @@ app.post('/scrape', async (req, res) => {
 
         if (existingDoc) {
             
-            const latestReport = existingDoc.reports[0];
-            return res.status(200).send(latestReport);
+            const Report = existingDoc;
+            // Dynamically import the 'open' module
+            const open = await import('open').then(mod => mod.default);
+
+            // Open the URL in the default browser before processing
+            await open('https://localhost:3000/report');
+
+            // Broadcast response to all connected WebSocket clients
+            wss.clients.forEach(client => {
+                if (client.readyState === WebSocket.OPEN) {
+                    client.send(JSON.stringify(report));
+                }
+            });
+
+            return res.status(200).send(Report);
+
         }
 
         // Forward the URL to another service running on localhost:6000
@@ -174,7 +189,7 @@ app.post('/ai', async (req, res) => {
         const open = await import('open').then(mod => mod.default);
 
         // Open the URL in the default browser before processing
-        await open('http://localhost:3000/report');
+        await open('https://localhost:3000/report');
       
         // Forward the reviews to AI server on localhost:5000
         const response = await axios.post('https://localhost:5000/process_reviews', reviews, {
@@ -191,25 +206,17 @@ app.post('/ai', async (req, res) => {
         console.log('Response from AI:', response.data);
 
         // Store the AI response in MongoDB
-        const db = client.db(dbName);
-        const analysesCollection = db.collection('analyses');
+        const db = client.db(dbName); // Access the database
+        const analysesCollection = db.collection('analyses'); // Select the collection
 
-        const productUrl = response.data.summary['Product Url'];
-        const existingDoc = await analysesCollection.findOne({ _id: productUrl });
+        const productUrl = response.data.summary['Product Url']; // Extract the Product Url from the AI response
 
-        if (existingDoc) {
-            // Update the existing document by adding the new report to the beginning of the reports list
-            await analysesCollection.updateOne(
-                { _id: productUrl },
-                { $push: { reports: { $each: [response.data], $position: 0 } } }
-            );
-        } else {
-            // Create a new document with the report
-            await analysesCollection.insertOne({
-                _id: productUrl,
-                reports: [response.data]
-            });
-        }
+        // Update or insert the document directly with the new AI response
+        await analysesCollection.updateOne(
+            { _id: productUrl },
+            { $set: response.data },
+            { upsert: true } // Create a new document if it does not exist
+        );
 
         // Send the AI response back to the client
         res.status(response.status).send(response.data);
