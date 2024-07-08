@@ -12,6 +12,7 @@ const fs = require('fs'); // File system module for reading files
 const path = require('path'); // Path module for working with file paths
 const https = require('https'); // HTTPS module for creating secure servers
 const { report } = require('process');
+const { decode } = require('punycode');
 
 
 // SSL options
@@ -52,22 +53,11 @@ async function connectToMongoDB() {
 // Connect to MongoDB
 connectToMongoDB();
 
-// Create a WebSocket server on port 8080
-const wss = new WebSocket.Server({ port: 8080 });
-
-// Handle WebSocket connection
-wss.on('connection', ws => {
-    console.log('Client connected');
-
-    // Log when a client disconnects
-    ws.on('close', () => {
-        console.log('Client disconnected');
-    });
-});
 
 // Define a route to check for URL and get the latest report
 app.get('/checkDatabase/:url', async (req, res) => {
-    const url = req.params.url;
+    const Encodedurl = req.params.url;
+    const url = decodeURIComponent(Encodedurl);
 
     try {
         const db = client.db(dbName);

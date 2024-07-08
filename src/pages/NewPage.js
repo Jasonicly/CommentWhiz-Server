@@ -6,6 +6,7 @@ import { Container } from "../components/Container";
 import { Button } from "../components/Button";
 import Footer from "../components/Footer";
 import { PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import axios from 'axios';
 
 function NewPage() {
     const [showDetails, setShowDetails] = useState(false); // State for showing product details
@@ -23,13 +24,13 @@ function NewPage() {
     const [expandedTopics, setExpandedTopics] = useState({}); // State for expanded key topics for more comments
     //when they enter url from the website, ie they type: https://localhost:3000/report/1234
     const { reportId } = useParams(); // Get unique link for report  
-
+    console.log(reportId);
 
     const isAmazonProductPage = /^https?:\/\/(www\.)?amazon\.[a-z\.]{2,6}(\/d\/|\/dp\/|\/gp\/product\/)/.test(reportId);
     
     if (isAmazonProductPage) {
-        const encodedReportId = btoa(encodeURIComponent(reportId));
-        axios.post(`https://localhost:3001/checkDatabase/${encodedReportId}`).then((response) => {
+        const encodeUrl = encodeURIComponent(reportId);
+        axios.get(`https://localhost:3001/checkDatabase/${encodeUrl}`).then((response) => {
             if (response.data) {
                 setData(response.data)}
         }).catch((error) => {});    
@@ -477,7 +478,7 @@ function NewPage() {
     else if (data === null) {
         <html>
         <body>
-            <p>No report was found for this URL: ${url}</p>
+            <p>No report was found</p>
         </body>
     </html>
 

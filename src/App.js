@@ -9,7 +9,7 @@ import Home from './pages/Home';
 import ReportList from './pages/ReportList';
 
 import NotFoundPage from './pages/NotFoundPage';
-import ReportList from './pages/ReportList'; 
+
 
 function App() {
     return (
@@ -23,7 +23,7 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Register />} />
                     <Route path="/report" element={<ReportList />} />
-                    <Route path="/report/:reportID" element={<NewPage />} />
+                    <Route path="/report/:reportId" element={<NewPage />} />
                     <Route path="*" element={<NotFoundPage />} />
                     {/* Add more routes here if needed */}
                 </Routes>
