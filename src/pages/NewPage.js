@@ -27,17 +27,24 @@ function NewPage() {
     console.log(reportId);
 
     const isAmazonProductPage = /^https?:\/\/(www\.)?amazon\.[a-z\.]{2,6}(\/d\/|\/dp\/|\/gp\/product\/)/.test(reportId);
-    
-    if (isAmazonProductPage) {
-        const encodeUrl = encodeURIComponent(reportId);
-        axios.get(`https://localhost:3001/checkDatabase/${encodeUrl}`).then((response) => {
-            if (response.data) {
-                setData(response.data)}
-        }).catch((error) => {});    
-    }
 
+    const encodedUrl = encodeURIComponent(reportId);
 
+    useEffect(() => {
+        if (isAmazonProductPage) {
+            setIsLoading(true);
+            axios.get(`https://localhost:3001/checkDatabase/${encodedUrl}`)
+                .then((response) => {
+                    setData(response.data);
+                    setIsLoading(false);
+                })
+                .catch((error) => {
+                    console.error('Error fetching data:', error);
+                    setIsLoading(false);
+                });
+        }
 
+    }, [encodedUrl, isAmazonProductPage]);
 
 
     useEffect(() => { // Set selected phrase to first key topic phrase
@@ -476,20 +483,26 @@ function NewPage() {
     
     }
     else if (data === null) {
-        <html>
-        <body>
-            <p>No report was found</p>
-        </body>
-    </html>
-
+        <div>
+            <Header />
+            <SearchBar />
+            <Container.Outer className="absolute left-1/2 transform -translate-x-1/2" customStyles={{ padding: '20px', margin: '20px', width: '100%', maxWidth: '1400px' }} showIcon={false} showHeader={false}>
+                <Container.Inner className="w-full mx-auto">
+                    {data ? renderReviewSections() : <p>No report was found</p>}
+                </Container.Inner>
+            </Container.Outer>
+        </div>
     }
     else {
-        <html>
-        <body>
-            <p>Error occured on our server, please try again later nigger</p>
-        </body>
-    </html>
-
+        <div>
+            <Header />
+            <SearchBar />
+            <Container.Outer className="absolute left-1/2 transform -translate-x-1/2" customStyles={{ padding: '20px', margin: '20px', width: '100%', maxWidth: '1400px' }} showIcon={false} showHeader={false}>
+                <Container.Inner className="w-full mx-auto">
+                    {data ? renderReviewSections() : <p>Our server had not responded</p>}
+                </Container.Inner>
+            </Container.Outer>
+        </div>
     }
 
 }
