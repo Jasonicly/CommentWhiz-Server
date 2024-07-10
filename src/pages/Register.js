@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import Header from "../components/Header";
+import Footer from '../components/Footer';
 
 const Register = () => {
     const [email, setEmail] = useState('');
@@ -150,6 +151,7 @@ const Register = () => {
                     </div>
                 </div>
             </div>
+            <Footer />
         </div>
     );
 };
