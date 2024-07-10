@@ -1,15 +1,20 @@
 // src/pages/Login.js
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import Header from "../components/Header";
 import axios from 'axios';
+import { useToken } from '../auth/useToken';
 import Footer from '../components/Footer';
+
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [messageType, setMessageType] = useState(''); // 'error' or 'success'
+    const [token, setToken] = useToken();
 
+    const history = useHistory();
     // Define your styles as JavaScript objects
     const styles = {
         customGradient: {
@@ -42,6 +47,10 @@ const Login = () => {
             if (response.status === 200) {
                 setMessage('Login successful');
                 setMessageType('success');
+
+                const { token } = response.data;
+                setToken(token);
+                history.push('/');
             }
             if (response.status === 404) {
                 setMessage('Invalid email or password');
