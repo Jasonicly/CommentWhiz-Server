@@ -4,6 +4,8 @@ import { useHistory } from 'react-router-dom';
 import Header from "../components/Header";
 import axios from 'axios';
 import { useToken } from '../auth/useToken';
+import Footer from '../components/Footer';
+
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -68,7 +70,7 @@ const Login = () => {
     };
 
     return (
-        <div className="bg-custom-green justify-center items-center h-screen relative">
+        <div className="bg-custom-green justify-center items-center relative">
             <Header />
             <div className="flex justify-center items-center h-screen relative">
                 <div className="flex bg-white rounded-2xl shadow-2xl overflow-visible max-w-4xl w-full relative">
@@ -134,6 +136,7 @@ const Login = () => {
                     </div>
                 </div>
             </div>
+            <Footer />
         </div>
     );
 };
