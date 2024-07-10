@@ -10,7 +10,7 @@ function Header() {
 
     return (
         <div className="header-container">
-            <header className="bg-custom-melon text-black flex items-center justify-between px-8 py-4">
+            <header className="bg-custom-gray text-black flex items-center justify-between px-8 py-4">
                 <div className="flex items-center">
                     <img src={process.env.PUBLIC_URL + '../images/logoPlain.png'} alt="logo" className="w-10 h-10 mx-auto mr-4" />
                     <h1 className="text-2xl font-bold tracking-wide" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -31,14 +31,14 @@ function Header() {
                     <a href="/signup" className="hidden md:inline-block bg-custom-blue text-white px-4 py-2 rounded hover:bg-black hover:text-custom-lightblue">
                         Sign Up
                     </a>
-                    <button onClick={toggleMenu} className="md:hidden text-white focus:outline-none">
+                    <button onClick={toggleMenu} className="md:hidden text-black focus:outline-none">
                         {menuOpen ? <FaTimes size="24" /> : <FaBars size="24" />}
                     </button>
                 </div>
             </header>
             <div className="border-b-2 border-black mx-0"></div>
             {menuOpen && (
-                <nav className="md:hidden bg-custom-melon text-white px-4 py-2 border-b-2 border-black">
+                <nav className="md:hidden bg-custom-gray text-white px-4 py-2 border-b-2 border-black">
                     <ul className="space-y-4">
                         <li><a href="#" className="block text-black hover:text-gray-500">HOME</a></li>
                         <li><a href="#" className="block text-black hover:text-gray-500">FEATURES</a></li>
