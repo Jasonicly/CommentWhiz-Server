@@ -23,7 +23,7 @@ function App() {
                     <Route path="/home" element={<Home />} />
                     <PrivateAuthRoute path="/login" element={<Login />} />
                     <PrivateAuthRoute path="/signup" element={<Register />} />
-                    <PrivateAuthRoute path="/Account" element={<UserInfo />} />
+                    <PrivateAuthRoute path="/user/:userId" element={<UserInfo />} />
                     <Route path="/report" element={<ReportList />} />
                     <Route path="/report/:reportId" element={<NewPage />} />
                     <Route path="*" element={<NotFoundPage />} />
