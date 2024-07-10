@@ -19,7 +19,7 @@ function App() {
             <div className="App">
                 <Routes>
                     {/* Update each Route with the element prop */}
-                    <Route path="/" element={<Home />} />
+                    <Route path="/" exact element={<Home />} />
                     <Route path="/home" element={<Home />} />
                     <PrivateAuthRoute path="/login" element={<Login />} />
                     <PrivateAuthRoute path="/signup" element={<Register />} />
