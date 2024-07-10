@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import Header from "../components/Header";
+import { useToken } from '../auth/useToken';
 
 const Register = () => {
     const [email, setEmail] = useState('');
@@ -8,6 +10,9 @@ const Register = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+
+    const [token, setToken] = useToken();
+    const history = useHistory();
 
     const handleEmailChange = (e) => {
         setEmail(e.target.value);
@@ -36,6 +41,10 @@ const Register = () => {
                 if (response.status === 201) {
                     setErrorMessage(''); // Clear error message on success
                     setSuccessMessage('User registered successfully');
+
+                    const { token } = response.data;
+                    setToken(token);
+                    history.push('/')
                 }
             } catch (error) {
                 setSuccessMessage(''); // Clear success message if there's an error

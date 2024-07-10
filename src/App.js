@@ -7,8 +7,9 @@ import Register from './pages/Register';
 import Home from './pages/Home';
 
 import ReportList from './pages/ReportList';
-
+import { PrivateAuthRoute } from './auth/PrivateAuthRoute';
 import NotFoundPage from './pages/NotFoundPage';
+import UserInfo from './pages/UserInfo';
 
 
 function App() {
@@ -20,8 +21,9 @@ function App() {
                     {/* Update each Route with the element prop */}
                     <Route path="/" element={<Home />} />
                     <Route path="/home" element={<Home />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<Register />} />
+                    <PrivateAuthRoute path="/login" element={<Login />} />
+                    <PrivateAuthRoute path="/signup" element={<Register />} />
+                    <PrivateAuthRoute path="/Account" element={<UserInfo />} />
                     <Route path="/report" element={<ReportList />} />
                     <Route path="/report/:reportId" element={<NewPage />} />
                     <Route path="*" element={<NotFoundPage />} />
