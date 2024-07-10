@@ -22,7 +22,7 @@ function App() {
                     <Route path="/" exact element={<Home />} />
                     <Route path="/home" element={<Home />} />
                     <PrivateAuthRoute path="/login" element={<Login />} />
-                    <PrivateAuthRoute path="/signup" element={<Register />} />
+                    <Route path="/signup" element={<Register />} />
                     <PrivateAuthRoute path="/user/:userId" element={<UserInfo />} />
                     <Route path="/report" element={<ReportList />} />
                     <Route path="/report/:reportId" element={<NewPage />} />
