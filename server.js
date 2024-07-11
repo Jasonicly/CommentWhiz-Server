@@ -58,8 +58,8 @@ connectToMongoDB();
 
 // Define a route to check for URL and get the latest report
 app.get('/checkDatabase/:url', async (req, res) => {
-    const Encodedurl = req.params.url;
-    const url = decodeURIComponent(Encodedurl);
+    const encodedUrl = req.params.url;
+    const url = decodeURIComponent(encodedUrl);
 
     try {
         const db = client.db(dbName);
@@ -93,6 +93,46 @@ app.get('/checkDatabase/:url', async (req, res) => {
 //    reload the page with url they search
 
 // if open via history,,,,
+
+app.post('/api/scrape', async (req, res) => {
+    // Extract the URL from the request body
+    const { url } = req.body;
+    console.log('Received URL from Extension:', url);
+    // Check if URL is provided, if not, send a 400 Bad Request response
+    if (!url) {
+        return res.status(400).send('URL is required');
+    }
+
+    try {
+        const db = client.db(dbName);
+        const analysesCollection = db.collection('analyses');
+
+        // Check if a document with the given URL as _id exists
+        const existingDoc = await analysesCollection.findOne({ _id: url });
+
+        if (existingDoc) {
+            
+            const Report = existingDoc;
+            return res.status(200);
+
+        }
+
+        // Forward the URL to another service running on localhost:6000
+        const response = await axios.post('https://localhost:6000/scrape', { url }, {
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false, // This will allow self-signed certificates (Without this line, YOU WILL GET a certificate error!!!!!!)
+            }),
+        });
+        // Send the response data back to the client
+        res.send(response.data);
+    } catch (error) {
+        // Log the error message to the console
+        console.error('Error forwarding the URL:', error.message);
+        // Send a 500 Internal Server Error response
+        res.status(500).send('Error forwarding the URL');
+    }
+});
+
 
 
 // Define a POST route for scraping
@@ -196,7 +236,7 @@ app.post('/register', async (req, res) => {
         const password_hash = await bcrypt.hash(password, saltRounds);
         
         const  startingReport = {
-            favourtie: '',
+            favourite: '',
         };
         // Create a new user document
         const newUser = {
@@ -223,10 +263,8 @@ app.post('/register', async (req, res) => {
             if (err) {
                 return res.status(500).send(err);
             }
-            res.status(200).json({token});
+            res.status(201).json({token});
         });
-        // Send a success response
-        res.status(201).send('User registered successfully');
     } catch (error) {
         // Log the error message to the console
         console.error('Error registering user:', error.message);
@@ -287,7 +325,7 @@ app.post('/login', async (req, res) => {
 
 
 // update User Info page 
-app.put.updateUserInfo('/user/:userId', async (req, res) => {
+app.put('/user/:userId', async (req, res) => {
     const {authorization} = req.headers;
     const {userId} = req.params;
 

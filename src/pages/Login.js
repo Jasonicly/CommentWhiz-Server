@@ -48,7 +48,7 @@ const Login = () => {
 
                 const { token } = response.data;
                 setToken(token);
-                navigate('/');
+                navigate('/home');
             }
             if (response.status === 404) {
                 setMessage('Invalid email or password');

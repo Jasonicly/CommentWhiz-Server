@@ -46,7 +46,7 @@ const Register = () => {
 
                     const { token } = response.data;
                     setToken(token);
-                    navigate('/')
+                    navigate('/home');
                 }
             } catch (error) {
                 setSuccessMessage(''); // Clear success message if there's an error
