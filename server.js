@@ -384,4 +384,3 @@ app.put('/user/:userId', async (req, res) => {
 https.createServer(options, app).listen(port, () => {
     console.log(`Server.js running on https://localhost:${port}`);
   });
-

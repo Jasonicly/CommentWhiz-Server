@@ -90,7 +90,9 @@ async function scrapeReviews(initialUrl, maxComments) {
             document.querySelectorAll('.a-section.review.aok-relative').forEach(review => {
                 const title = review.querySelector('a[data-hook="review-title"]')?.innerText.trim();
                 const body = review.querySelector('span[data-hook="review-body"]')?.innerText.trim();
-                reviews.push({ title, body });
+                const rawTime = review.querySelector('span[data-hook="review-date"]')?.innerText.trim();
+                const time = rawTime ? rawTime.replace(/^.*on\s/, '') : ''; // Extract just the date part
+                reviews.push({ title, body, time });
             });
             return reviews;
         });
