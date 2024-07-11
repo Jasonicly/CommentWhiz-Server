@@ -1,12 +1,10 @@
-import {Redirect, Route} from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useUser } from "./useUser";
-export const PrivateAuthRoute = props => {
+
+const PrivateAuthRoute = ({ element: Component }) => {
     const user = useUser();
 
-    if (!user) {
-        return <Redirect to="/login" />;
+    return user ? Component : <Navigate to="/login" replace />;
+};
 
-    }
-
-    return <Route {...props} />;
-}
+export default PrivateAuthRoute;

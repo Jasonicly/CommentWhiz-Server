@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Header from "../components/Header";
 import { useToken } from '../auth/useToken';
@@ -14,7 +14,7 @@ const Register = () => {
     const [successMessage, setSuccessMessage] = useState('');
 
     const [token, setToken] = useToken();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const handleEmailChange = (e) => {
         setEmail(e.target.value);
@@ -46,7 +46,7 @@ const Register = () => {
 
                     const { token } = response.data;
                     setToken(token);
-                    history.push('/')
+                    navigate('/')
                 }
             } catch (error) {
                 setSuccessMessage(''); // Clear success message if there's an error

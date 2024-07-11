@@ -5,8 +5,17 @@ export const useUser = () => {
     const [token] = useToken();
     
     const getPayloadFromToken = token => {
-        const encodedPayload = token.split(".")[1];
-        return JSON.parse(atob(encodedPayload));
+        try {
+            const encodedPayload = token.split(".")[1];
+            if (!encodedPayload) {
+                console.error("Token is not in the expected format.");
+                return null;
+            }
+            return JSON.parse(atob(encodedPayload));
+        } catch (error) {
+            console.error("Error decoding token:", error);
+            return null;
+        }
     }
 
     const [user, setUser] = useState(() => {

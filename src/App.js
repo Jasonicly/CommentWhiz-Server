@@ -5,29 +5,28 @@ import NewPage from './pages/NewPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
-
 import ReportList from './pages/ReportList';
-import { PrivateAuthRoute } from './auth/PrivateAuthRoute';
+import PrivateAuthRoute from './auth/PrivateAuthRoute'; // Ensure correct import without braces if default exported
 import NotFoundPage from './pages/NotFoundPage';
 import UserInfo from './pages/UserInfo';
-
 
 function App() {
     return (
         <Router>
-
             <div className="App">
                 <Routes>
-                    {/* Update each Route with the element prop */}
-                    <Route path="/" exact element={<Home />} />
+                    <Route path="/" element={<Home />} />
                     <Route path="/home" element={<Home />} />
-                    <PrivateAuthRoute path="/login" element={<Login />} />
+                    <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Register />} />
-                    <PrivateAuthRoute path="/user/:userId" element={<UserInfo />} />
                     <Route path="/report" element={<ReportList />} />
                     <Route path="/report/:reportId" element={<NewPage />} />
                     <Route path="*" element={<NotFoundPage />} />
-                    {/* Add more routes here if needed */}
+                    <Route element={<PrivateAuthRoute />}>
+                        <Route path="/user/:userId" element={<UserInfo />} />
+                        {/* Some kinds of routes can be private content, data management like the pages, or dashboard, history */}
+                        {/* Any other routes you want to protect would also go here as children */}
+                    </Route>
                 </Routes>
             </div>
         </Router>

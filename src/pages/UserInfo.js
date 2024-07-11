@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useToken } from '../auth/useToken';
 import { useUser } from '../auth/useUser';
 
-export const UserInfo = () => {
+const UserInfo = () => {
     const user = useUser();
     const [token, setToken] = useToken();
 
@@ -12,7 +12,7 @@ export const UserInfo = () => {
 
     // We'll use the history to navigate the user
     // programmatically later on (we're not using it yet)
-    const history = useHistory();
+    const navigate = useNavigate();
 
     // These states are bound to the values of the text inputs
     // on the page (see JSX below). 
@@ -54,7 +54,7 @@ export const UserInfo = () => {
 
     const logOut = () => {
         localStorage.removeItem('token');
-        history.push('/login');
+        navigate('/login');
     }
     
     const resetValues = () => {
@@ -80,3 +80,5 @@ export const UserInfo = () => {
         </div>
     );
 }
+
+export default UserInfo;
