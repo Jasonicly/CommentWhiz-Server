@@ -14,6 +14,7 @@
     "concurrently": "^8.2.2",
     "cors": "^2.8.5",
     "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.7.0",
     "open": "^10.1.0",
     "react": "^18.2.0",
@@ -27,13 +28,12 @@
     "ws": "^8.17.0"
   },
   "scripts": {
-    "start": "concurrently \"npm run react\" \"node server.js\" \"cd ScreenScrape && node scrapeServer.js\"",
+    "start": "concurrently \"npm run react\" \"node -r dotenv/config server.js\" \"cd ScreenScrape && node scrapeServer.js\"",
     "react": "cross-env HTTPS=true SSL_CRT_FILE=localhost.pem SSL_KEY_FILE=localhost-key.pem react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-
   "eslintConfig": {
     "extends": [
       "react-app",

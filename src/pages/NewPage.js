@@ -21,10 +21,12 @@ function NewPage() {
     const [showKeyTopicsFilterOptions, setShowKeyTopicsFilterOptions] = useState(false); // State for showing key topics filter options
     const [expandedTopics, setExpandedTopics] = useState({}); // State for expanded key topics for more comments
     //when they enter url from the website, ie they type: https://localhost:3000/report/1234
+
     const { reportId } = useParams(); // Get unique link for report  
     console.log(reportId);
 
     const isAmazonProductPage = /^https?:\/\/(www\.)?amazon\.[a-z\.]{2,6}(\/d\/|\/dp\/|\/gp\/product\/)/.test(reportId);
+
 
     const encodedUrl = encodeURIComponent(reportId);
 
@@ -62,7 +64,7 @@ function NewPage() {
 
 
     const toggleShowMoreComments = (topic) => { // Toggle show more comments for key topic
-        setExpandedTopics(prev => ({
+         setExpandedTopics(prev => ({
             ...prev,
             [topic]: !prev[topic]
         }));
@@ -399,7 +401,6 @@ function NewPage() {
             </Container.Outer>
         </div>
     }
-
 }
     
     
