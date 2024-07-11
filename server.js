@@ -82,6 +82,46 @@ app.get('/checkDatabase/:url', async (req, res) => {
 });
 
 
+app.post('/api/scrape', async (req, res) => {
+    // Extract the URL from the request body
+    const { url } = req.body;
+    console.log('Received URL from Extension:', url);
+    // Check if URL is provided, if not, send a 400 Bad Request response
+    if (!url) {
+        return res.status(400).send('URL is required');
+    }
+
+    try {
+        const db = client.db(dbName);
+        const analysesCollection = db.collection('analyses');
+
+        // Check if a document with the given URL as _id exists
+        const existingDoc = await analysesCollection.findOne({ _id: url });
+
+        if (existingDoc) {
+
+            const Report = existingDoc;
+            return res.status(200);
+
+        } else {
+
+            // Forward the URL to another service running on localhost:6000
+            const response = await axios.post('https://localhost:6000/scrape', { url }, {
+                httpsAgent: new https.Agent({
+                    rejectUnauthorized: false, // This will allow self-signed certificates (Without this line, YOU WILL GET a certificate error!!!!!!)
+                }),
+            });
+            // Send the response data back to the client
+            res.send(response.data);
+        }
+    } catch (error) {
+        // Log the error message to the console
+        console.error('Error forwarding the URL:', error.message);
+        // Send a 500 Internal Server Error response
+        res.status(500).send('Error forwarding the URL');
+    }
+});
+
 // if user opens report via link  https://localhost:3000/report/https://www.amazon.com/dp/B07VGRJDFY - this route will be called
 //      Define a route to get the report for a specific URL separate endpoint in server 
 // if they press open report on the extension: scan first and store in DB, then open report 
@@ -302,7 +342,7 @@ app.post('/login', async (req, res) => {
         }
         else {
             // Send a success response
-            res.status(200).send('Login successful');
+            res.status(200).json({});
         }
     } catch (error) {
         // Log the error message to the console
