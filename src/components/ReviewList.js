@@ -57,21 +57,21 @@ const ReviewList = ({ reviews }) => {
                 </button>
             {showFilterOptions && (
                 <div className="bg-gray-100 p-4 border border-black mb-4 rounded">
-                    <div className="border-2 border-black p-4 mb-5 rounded-lg text-center">
+                    <div className="border border-black p-4 mb-5 rounded-lg text-center">
                         <h2 className="text-lg font-semibold mb-4">Filter Options</h2>
                         <div className="flex items-center justify-center mb-4">
-                            <button onClick={() => setFilterType('Sentiment')} className={`mx-2 p-2 rounded border-2 border-black ${activeFilter === 'Sentiment' ? 'bg-blue-500 text-white' : 'bg-custom-gray'}`}>Sentiment</button>
-                            <button onClick={() => setFilterType('Emotion')} className={`mx-2 p-2 rounded border-2 border-black ${activeFilter === 'Emotion' ? 'bg-blue-500 text-white' : 'bg-custom-gray'}`}>Emotion</button>
-                            <button onClick={() => setFilterType('AI Rating')} className={`mx-2 p-2 rounded border-2 border-black ${activeFilter === 'AI Rating' ? 'bg-blue-500 text-white' : 'bg-custom-gray'}`}>AI Rating</button>
+                            <button onClick={() => setFilterType('Sentiment')} className={`mx-2 p-2 rounded border border-black ${activeFilter === 'Sentiment' ? 'bg-blue-500 text-white' : 'bg-custom-gray'}`}>Sentiment</button>
+                            <button onClick={() => setFilterType('Emotion')} className={`mx-2 p-2 rounded border border-black ${activeFilter === 'Emotion' ? 'bg-blue-500 text-white' : 'bg-custom-gray'}`}>Emotion</button>
+                            <button onClick={() => setFilterType('AI Rating')} className={`mx-2 p-2 rounded border border-black ${activeFilter === 'AI Rating' ? 'bg-blue-500 text-white' : 'bg-custom-gray'}`}>AI Rating</button>
                         </div>
                     </div>
 
                     {activeFilter === 'Sentiment' && (
                         <div className="flex items-center justify-center mb-4">
-                            <button onClick={() => handleSentimentClick('Positive')} className={`mx-2 p-2 rounded border-2 border-black ${selectedSentiments.includes('Positive') ? 'bg-green-500 text-white' : 'bg-custom-gray'}`}>Positive</button>
-                            <button onClick={() => handleSentimentClick('Negative')} className={`mx-2 p-2 rounded border-2 border-black ${selectedSentiments.includes('Negative') ? 'bg-red-500 text-white' : 'bg-custom-gray'}`}>Negative</button>
-                            <button onClick={() => handleSentimentClick('Neutral')} className={`mx-2 p-2 rounded border-2 border-black ${selectedSentiments.includes('Neutral') ? 'bg-yellow-500 text-white' : 'bg-custom-gray'}`}>Neutral</button>
-                            <button onClick={() => handleSentimentClick('All Sentiments')} className={`mx-2 p-2 rounded border-2 border-black ${selectedSentiments.includes('All Sentiments') ? 'bg-blue-500 text-white' : 'bg-custom-gray'}`}>All Sentiments</button>
+                            <button onClick={() => handleSentimentClick('Positive')} className={`mx-2 p-2 rounded border border-black ${selectedSentiments.includes('Positive') ? 'bg-green-500 text-white' : 'bg-custom-gray'}`}>Positive</button>
+                            <button onClick={() => handleSentimentClick('Negative')} className={`mx-2 p-2 rounded border border-black ${selectedSentiments.includes('Negative') ? 'bg-red-500 text-white' : 'bg-custom-gray'}`}>Negative</button>
+                            <button onClick={() => handleSentimentClick('Neutral')} className={`mx-2 p-2 rounded border border-black ${selectedSentiments.includes('Neutral') ? 'bg-yellow-500 text-white' : 'bg-custom-gray'}`}>Neutral</button>
+                            <button onClick={() => handleSentimentClick('All Sentiments')} className={`mx-2 p-2 rounded border border-black ${selectedSentiments.includes('All Sentiments') ? 'bg-blue-500 text-white' : 'bg-custom-gray'}`}>All Sentiments</button>
                         </div>
                     )}
 
@@ -108,13 +108,13 @@ const ReviewList = ({ reviews }) => {
                                     <button
                                         key={index}
                                         onClick={() => handleEmotionClick(emotion.toLowerCase())}
-                                        className={`mx-2 p-2 rounded border-2 border-black ${bgColor} text-black`}
+                                        className={`mx-2 p-2 rounded border border-black ${bgColor} text-black`}
                                     >
                                         {emotion}
                                     </button>
                                 );
                             })}
-                            <button onClick={() => handleEmotionClick('All Emotions')} className={`mx-2 p-2 rounded border-2 border-black ${selectedEmotions.includes('All Emotions') ? 'bg-blue-500 text-white' : 'bg-custom-gray'}`}>All Emotions</button>
+                            <button onClick={() => handleEmotionClick('All Emotions')} className={`mx-2 p-2 rounded border border-black ${selectedEmotions.includes('All Emotions') ? 'bg-blue-500 text-white' : 'bg-custom-gray'}`}>All Emotions</button>
                         </div>
                     )}
 
@@ -132,7 +132,7 @@ const ReviewList = ({ reviews }) => {
                                     <path d="M9.049.927C9.433.292 10.567.292 10.951.927l2.364 4.787 5.288.768c.663.097.93.912.448 1.379L15.949 11.5l.898 5.24c.113.657-.578 1.154-1.157.846L10 15.347l-4.69 2.46c-.579.308-1.27-.189-1.157-.846l.898-5.24-3.843-3.64c-.483-.467-.215-1.282.448-1.38l5.288-.767L9.049.927z" />
                                 </svg>
                             ))}
-                            <button onClick={() => setSelectedRating(null)} className={`mx-2 p-2 rounded border-2 border-black ${selectedRating === null ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>All AI Ratings</button>
+                            <button onClick={() => setSelectedRating(null)} className={`mx-2 p-2 rounded border border-black ${selectedRating === null ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>All AI Ratings</button>
                         </div>
                     )}
                 </div>
@@ -140,7 +140,7 @@ const ReviewList = ({ reviews }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {filteredReviews.slice(0, showAllReviews ? filteredReviews.length : 4).map((review, index) => (
-                    <div key={index} className="bg-white p-4 rounded-lg shadow-md mb-4">
+                    <div key={index} className="p-4 rounded-lg border-black border shadow-md mb-4">
                         <p>{review.title}</p>
                         <p>{review.body}</p>
                         <p><strong>Emotion:</strong> {review.emotions}</p>

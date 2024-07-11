@@ -38,7 +38,7 @@ const EnhancedRating = ({ originalRating, enhancedRating }) => {
     const arrowColor = getArrowColor(originalRating, enhancedRating);
 
     return (
-        <div className="col-span-1 bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center">
+        <div className="col-span-1 bg-white p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center border-black border">
             <h4 className="text-xl font-semibold mb-2">Positivity Rating</h4>
             <div className="text-4xl font-bold flex items-center">
                 {originalRating}

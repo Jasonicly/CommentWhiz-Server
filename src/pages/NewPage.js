@@ -122,7 +122,7 @@ function NewPage() {
         return ( 
             <div>
                 <div>
-                    <div className="flex items-center justify-center p-8 mb-4 rounded-lg bg-custom-gray border-t border-l border-r border-black">
+                    <div className="bg-custom-lightgray flex items-center justify-center p-8 mb-4 rounded-lg border-t border-l border-r border-black border">
                         <div className="flex text-4xl font-bold text-black max-w-6xl">
                             {summary["Product Name"]}
                         </div>
@@ -133,8 +133,8 @@ function NewPage() {
                         />
                     </div>
                     {showDetails && (
-                        <div className="flex items-center justify-center -mt-6 mb-4 pt-2 bg-custom-gray border-b border-l border-r border-black rounded-b-lg">
-                            <div className="w-full bg-custom-beige p-4 mb-8 rounded-xl shadow-md mx-auto" style={{ maxWidth: '900px' }}>
+                        <div className="flex items-center justify-center -mt-6 mb-4 pt-2 bg-custom-lightgray border-b border-l border-r border-black border-1 rounded-b-lg">
+                            <div className="w-full bg-white p-4 mb-8 rounded-xl shadow-md mx-auto" style={{ maxWidth: '900px' }}>
                                 <ul className="list-disc list-inside">
                                     {summary["Product Details"].split(', ').map((detail, index) => (
                                         <li key={index} className="text-1xl mb-1">
@@ -147,11 +147,11 @@ function NewPage() {
                     )}
                 </div>
 
-                <div className="bg-custom-gray container mx-auto border border-black p-4 rounded-lg">
-                    <div className="bg-gray-100 p-2 rounded border-2 border-black">
+                <div className="bg-custom-lightgray container mx-auto border border-black p-4 rounded-lg">
+                    <div className="bg-gray-100 p-2 rounded border border-black">
                         <h3 className="text-2xl font-bold text-center">Analysis Overview</h3>
                     </div>
-                    <div className="bg-custom-gray flex justify-between items-center">
+                    <div className="bg-custom-lightgray flex justify-between items-center">
                         <div className="flex flex-wrap justify-center mx-auto">
                             <div className="bg-gray-100 pt-4 pb-4 p-2 my-5 mx-2 min-w-[250px] flex flex-col items-center justify-center border border-black rounded-full">
                                 <h4 className="mb-2 text-center">Number of Reviews</h4>
@@ -172,14 +172,14 @@ function NewPage() {
                         </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                        <div className="col-span-2 bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center min-h-[150px]">
+                        <div className="col-span-2 bg-white p-4 m-2 rounded-lg shadow-md text-center min-h-[150px] border-black border">
                             <h4 className="text-xl font-semibold mb-2">AI Generated Summary</h4>
                             <p>Here is a summary of key points. Here is a summary of key points...</p>
                         </div>
                         <EnhancedRating originalRating={2.1} enhancedRating={summary["Enhanced Rating"]} />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                        <div className="bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center">
+                        <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center border-black border">
                             <h4 className="text-xl font-semibold mb-2">Sentiment Analysis</h4>
                             <PieChart width={200} height={250}>
                                 <Pie
@@ -203,7 +203,7 @@ function NewPage() {
                                 />
                             </PieChart>
                         </div>
-                        <div className="bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center">
+                        <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center border-black border">
                             <h4 className="text-xl font-semibold mb-2">Sarcasm Analysis</h4>
                             <PieChart width={200} height={250}>
                                 <Pie
@@ -227,7 +227,7 @@ function NewPage() {
                                 />
                             </PieChart>
                         </div>
-                        <div className="bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center">
+                        <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center border-black border">
                             <h4 className="text-xl font-semibold mb-2">Bots Detected</h4>
                             <PieChart width={200} height={250}>
                                 <Pie
@@ -254,7 +254,7 @@ function NewPage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-1">
-                        <div className="bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center border-1 border-black flex flex-col items-center justify-center min-w-[550px]">
+                        <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center border-1 border-black flex flex-col items-center justify-center min-w-[550px] border-black border">
                             <h4 className="text-xl font-semibold mb-2">Emotion Analysis</h4>
                             <BarChart width={550} height={300} data={barData} style={{ display: 'flex', justifyContent: 'center' }}>
                                 <CartesianGrid strokeDasharray="3 3" />
@@ -275,11 +275,11 @@ function NewPage() {
 
                     </div>
 
-                    <div className="bg-custom-beige p-6 mb-6 m-2 rounded-lg shadow-md">
+                    <div className="bg-white p-6 mb-6 m-2 rounded-lg shadow-md border-black border">
                         <ReviewList reviews={data.reviews} />
                     </div>
 
-                    <div className="bg-custom-beige p-6 mb-6 m-2 rounded-lg shadow-md">
+                    <div className="bg-white p-6 mb-6 m-2 rounded-lg shadow-md border-black border">
                         <h3 className="text-2xl font-bold mb-4">Key Topics</h3>
 
                         <button onClick={toggleKeyTopicsFilterOptions} className="mb-4 p-2 bg-custom-gray border border-black rounded">
@@ -306,7 +306,7 @@ function NewPage() {
                             })
                             .slice(0, showAllKeyTopics ? Object.keys(key_topics).length : 4)
                             .map((topic, index) => (
-                                <div key={index} className="bg-white p-4 rounded-lg shadow-md mb-4">
+                                <div key={index} className="bg-white border-black border p-4 rounded-lg shadow-md mb-4">
                                     <h4 className="text-xl font-semibold">{topic}</h4>
                                     <p><strong>Unique Comment Count:</strong> {key_topics[topic].unique_comment_count}</p>
                                     <ul className="list-disc list-inside">
@@ -363,7 +363,7 @@ function NewPage() {
                 `}</style>
                 <Header />
                 <SearchBar />
-                <Container.Outer className="absolute left-1/2 transform -translate-x-1/2" customStyles={{width: '100%', maxWidth: '1400px'}} showIcon={false} showHeader={false}>
+                <Container.Outer className="absolute left-1/2 transform -translate-x-1/2" customStyles={{width: '100%', maxWidth: '1600px'}} showIcon={false} showHeader={false}>
                     <Container.Inner className="w-full mx-auto">
                     {isLoading ? renderLoading() : renderReviewSections()}
                 </Container.Inner>
