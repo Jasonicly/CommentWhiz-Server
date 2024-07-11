@@ -133,6 +133,65 @@ app.post('/scrape', async (req, res) => {
     }
 });
 
+
+// Process review data to calculate monthly average ratings and append this rating history back to the AI response data
+function processReviews(data) {
+    try {
+        const parsedData = JSON.parse(data);
+        if (!parsedData || !parsedData.reviews || !Array.isArray(parsedData.reviews)) {
+            throw new Error("Invalid reviews data");
+        }
+
+        const monthlyRatings = {};
+
+        // Iterate through the reviews
+        parsedData.reviews.forEach(review => {
+            if (review.time && review['AI-rating'] !== undefined) {
+                const date = new Date(review.time);
+                if (!isNaN(date)) {
+                    const year = date.getFullYear();
+                    const month = date.getMonth() + 1;
+
+                    const key = `${year}-${month}`;
+
+                    if (!monthlyRatings[key]) {
+                        monthlyRatings[key] = {
+                            year: year,
+                            month: month,
+                            totalRating: 0,
+                            count: 0
+                        };
+                    }
+
+                    monthlyRatings[key].totalRating += review['AI-rating'];
+                    monthlyRatings[key].count += 1;
+                }
+            }
+        });
+
+        const monthlyRatingsArray = Object.values(monthlyRatings).map(entry => ({
+            year: entry.year,
+            month: entry.month,
+            averageRating: entry.totalRating / entry.count
+        }));
+
+        // Sort the array by year and month
+        monthlyRatingsArray.sort((a, b) => {
+            if (a.year === b.year) {
+                return a.month - b.month;
+            }
+            return a.year - b.year;
+        });
+
+        parsedData.monthlyRatings = monthlyRatingsArray;
+
+        return parsedData;
+    } catch (error) {
+        console.error('Error processing reviews:', error.message);
+        throw error;
+    }
+}
+
 // Define a POST route for AI processing
 app.post('/ai', async (req, res) => {
     // Extract reviews data from the request body
@@ -147,21 +206,24 @@ app.post('/ai', async (req, res) => {
         });
         console.log('Response from AI:', response.data);
 
+        // Process the AI response to add the timeline list
+        const processedAIResponse = processReviews(JSON.stringify(response.data));
+        
         // Store the AI response in MongoDB
         const db = client.db(dbName); // Access the database
         const analysesCollection = db.collection('analyses'); // Select the collection
 
-        const productUrl = response.data.summary['Product Url']; // Extract the Product Url from the AI response
+        const productUrl = processedAIResponse.summary['Product Url']; // Extract the Product Url from the AI response
 
         // Update or insert the document directly with the new AI response
         await analysesCollection.updateOne(
             { _id: productUrl },
-            { $set: response.data },
+            { $set: processedAIResponse },
             { upsert: true } // Create a new document if it does not exist
         );
 
         // Send the AI response back to the client
-        res.status(response.status).send(response.data);
+        res.status(response.status).send(processedAIResponse);
     } catch (error) {
         // Log the error message to the console
         console.error('Error forwarding the reviews:', error.message);

@@ -5,7 +5,7 @@ import SearchBar from "../components/SearchBar";
 import { Container } from "../components/Container";
 import { Button } from "../components/Button";
 import Footer from "../components/Footer";
-import { PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid, AreaChart, Area, Label } from 'recharts';
 import axios from 'axios';
 import EnhancedRating from '../components/EnhancedRating';
 import ReviewList from '../components/ReviewList';
@@ -93,7 +93,7 @@ function NewPage() {
     const renderReviewSections = () => { // Render review section
         if (!data) return null;
 
-        const { summary, key_topics } = data; // Destructure data
+        const { summary, key_topics, monthlyRatings } = data; // Destructure data
 
         const pieData = [ // Data for PieChart
             { name: 'Positive', value: summary["Percentage of Positive Reviews"] },
@@ -272,6 +272,23 @@ function NewPage() {
 
                         <TrendingCommentTopics keyTopics={data.key_topics} />
 
+                        <div className="bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center border-1 border-black flex flex-col items-center justify-center min-w-[550px]">
+                            <h4 className="text-xl font-semibold mb-2">Average Postivity Ratings</h4>
+                            <AreaChart width={550} height={300} data={monthlyRatings}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis
+                                    dataKey="month"
+                                    tick={false}
+                                >
+                                    <Label value="Timeline" offset={-5} position="insideBottom" />
+                                </XAxis>
+                                <YAxis domain={[0, 5]}>
+                                    <Label value="Positivity Rating" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
+                                </YAxis>
+                                <Tooltip />
+                                <Area type="monotone" dataKey="averageRating" stroke="#8884d8" fill="#8884d8" />
+                            </AreaChart>
+                        </div>
 
                     </div>
 
