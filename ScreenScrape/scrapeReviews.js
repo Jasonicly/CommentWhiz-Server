@@ -1,4 +1,6 @@
 const puppeteer = require('puppeteer');
+const axios = require('axios');
+const fs = require('fs').promises;
 
 async function scrapeReviews(initialUrl, maxComments) {
     const browser = await puppeteer.launch({
@@ -13,6 +15,7 @@ async function scrapeReviews(initialUrl, maxComments) {
     let productName = 'Unknown Product';
     let productDetails = [];
     let productDescription = [];
+    let productImageBase64 = '';
 
     console.log("Navigating to the product home page:", currentPageUrl);
     await page.goto(currentPageUrl, { waitUntil: 'domcontentloaded' });
@@ -28,21 +31,18 @@ async function scrapeReviews(initialUrl, maxComments) {
         }
     });
 
+    async function downloadImageToBase64(url) {
+        const response = await axios.get(url, { responseType: 'arraybuffer' });
+        const buffer = Buffer.from(response.data, 'binary');
+        return buffer.toString('base64');
+    }
+
     try {
         // Scrape product name
         productName = await page.evaluate(() => {
             const productTitleElement = document.querySelector('#productTitle');
             return productTitleElement ? productTitleElement.innerText.trim() : null;
         });
-
-        // Scrape product description
-        //  productDescription = await page.evaluate(() => {
-        //      const description = [];
-        //      document.querySelectorAll('#feature-bullets .a-list-item').forEach(detail => {
-        //          details.push(detail.innerText.trim());
-        //      });
-        //      return details.join(', ');
-        //  });
 
         // Scrape product details
         productDetails = await page.evaluate(() => {
@@ -56,6 +56,16 @@ async function scrapeReviews(initialUrl, maxComments) {
             });
             return details.join(', ');
         });
+
+        // Scrape product image
+        const productImageUrl = await page.evaluate(() => {
+            const imageElement = document.querySelector('#landingImage');
+            return imageElement ? imageElement.src : null;
+        });
+
+        if (productImageUrl) {
+            productImageBase64 = await downloadImageToBase64(productImageUrl);
+        }
 
         // Wait for and click the link to the reviews page
         await page.waitForSelector('a[data-hook="see-all-reviews-link-foot"]', { timeout: 15000 });
@@ -73,9 +83,10 @@ async function scrapeReviews(initialUrl, maxComments) {
         console.error("Error navigating to reviews page:", error);
         await browser.close();
         return {
-            initialUrl, 
+            initialUrl,
             productName,
             productDetails,
+            productImageBase64,
             reviews: results
         };
     }
@@ -113,19 +124,19 @@ async function scrapeReviews(initialUrl, maxComments) {
     }
 
     await browser.close();
-    
+
     // Create the result JSON
     const resultJson = {
-        initialUrl,  
+        initialUrl,
         productName,
         productDetails,
-        //productDescription,
+        productImageBase64,
         reviews: results.slice(0, maxComments)
     };
-    
+
     // Log the result JSON
     console.log(JSON.stringify(resultJson, null, 2));
-    
+
     return resultJson;
 }
 

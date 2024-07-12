@@ -1,4 +1,5 @@
 import React from 'react';
+import { Tooltip } from 'react-tooltip';
 
 const getArrowColor = (original, enhanced) => {
     if (enhanced > original) return 'text-green-500';
@@ -39,17 +40,23 @@ const EnhancedRating = ({ originalRating, enhancedRating }) => {
 
     return (
         <div className="col-span-1 bg-white p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center border-black border">
-            <h4 className="text-xl font-semibold mb-2">Positivity Rating</h4>
+            <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Montserrat', sans-serif" }}>Positivity Rating</h4>
             <div className="text-4xl font-bold flex items-center">
-                {originalRating}
+                <span data-tooltip-id="original-rating-tooltip">{originalRating}</span>
                 <svg className={`w-12 h-12 mx-2 ${arrowColor}`} fill="currentColor" viewBox="-2 -2 20 20">
                     <path d="M10 0L8.59 1.41 13.17 6H0v2h13.17l-4.58 4.59L10 14l7-7-7-7z" />
                 </svg>
-                {enhancedRating}
+                <span data-tooltip-id="enhanced-rating-tooltip">{enhancedRating}</span>
             </div>
             <div className="flex mt-2">
                 {renderStars(enhancedRating)}
             </div>
+            <Tooltip id="original-rating-tooltip" effect="solid" delayShow={0} place="left">
+                Original Rating
+            </Tooltip>
+            <Tooltip id="enhanced-rating-tooltip" effect="solid" delayShow={0} place="right">
+                Enhanced AI Rating
+            </Tooltip>
         </div>
     );
 };
