@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useToken } from '../auth/useToken';
-import { useUser } from '../auth/useUser';
+import { useToken } from '../../auth/useToken';
+import { useUser } from '../../auth/useUser';
 
 const UserInfo = () => {
     const user = useUser();

@@ -110,12 +110,7 @@ app.post('/api/scrape', async (req, res) => {
         // Check if a document with the given URL as _id exists
         const existingDoc = await analysesCollection.findOne({ _id: url });
 
-        if (existingDoc) {
-            
-            const Report = existingDoc;
-            return res.status(200);
-
-        }
+        if (existingDoc) return res.status(200);
 
         // Forward the URL to another service running on localhost:6000
         const response = await axios.post('https://localhost:6000/scrape', { url }, {
