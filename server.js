@@ -4,8 +4,8 @@ const bodyParser = require('body-parser'); // Middleware to parse incoming reque
 const cors = require('cors'); // Middleware to enable Cross-Origin Resource Sharing
 const axios = require('axios'); // Promise-based HTTP client for making requests
 const WebSocket = require('ws'); // WebSocket library for real-time communication
-
-const { MongoClient } = require('mongodb'); // MongoDB client for connecting to MongoDB
+const jwt = require('jsonwebtoken'); // JSON Web Token library for creating and verifying tokens
+const { MongoClient, ObjectId } = require('mongodb'); // MongoDB client for connecting to MongoDB
 const bcrypt = require('bcrypt'); // Library for hashing passwords
 
 const fs = require('fs'); // File system module for reading files
@@ -13,6 +13,8 @@ const path = require('path'); // Path module for working with file paths
 const https = require('https'); // HTTPS module for creating secure servers
 const { report } = require('process');
 const { decode } = require('punycode');
+const { JsonWebTokenError } = require('jsonwebtoken');
+const { start } = require('repl');
 
 
 // SSL options
@@ -56,8 +58,8 @@ connectToMongoDB();
 
 // Define a route to check for URL and get the latest report
 app.get('/checkDatabase/:url', async (req, res) => {
-    const Encodedurl = req.params.url;
-    const url = decodeURIComponent(Encodedurl);
+    const encodedUrl = req.params.url;
+    const url = decodeURIComponent(encodedUrl);
 
     try {
         const db = client.db(dbName);
@@ -98,22 +100,17 @@ app.post('/api/scrape', async (req, res) => {
         // Check if a document with the given URL as _id exists
         const existingDoc = await analysesCollection.findOne({ _id: url });
 
-        if (existingDoc) {
+        if (existingDoc) return res.status(200);
 
-            const Report = existingDoc;
-            return res.status(200);
-
-        } else {
 
             // Forward the URL to another service running on localhost:6000
-            const response = await axios.post('https://localhost:6000/scrape', { url }, {
-                httpsAgent: new https.Agent({
-                    rejectUnauthorized: false, // This will allow self-signed certificates (Without this line, YOU WILL GET a certificate error!!!!!!)
-                }),
-            });
-            // Send the response data back to the client
-            res.send(response.data);
-        }
+        const response = await axios.post('https://localhost:6000/scrape', { url }, {
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false, // This will allow self-signed certificates (Without this line, YOU WILL GET a certificate error!!!!!!)
+            }),
+        });
+        // Send the response data back to the client
+        res.send(response.data);
     } catch (error) {
         // Log the error message to the console
         console.error('Error forwarding the URL:', error.message);
@@ -294,18 +291,37 @@ app.post('/register', async (req, res) => {
         // Hash the password
         const saltRounds = 10;
         const password_hash = await bcrypt.hash(password, saltRounds);
-
+        
+        const  startingReport = {
+            favourite: '',
+        };
         // Create a new user document
         const newUser = {
             _id: email,
-            password_hash
+            password_hash,
+            isVerified: false,
+            favouriteReport: startingReport,
         };
 
         // Insert the new user into the users collection
         await usersCollection.insertOne(newUser);
-
-        // Send a success response
-        res.status(201).send('User registered successfully');
+        
+        // Send back a json web token
+        jwt.sign({
+            id : email,
+            isVerified: false, 
+            favouriteReport: startingReport,
+        },
+        process.env.JWT_SECRET,
+        {
+            expiresIn: '7d'
+        },
+        (err, token) => {
+            if (err) {
+                return res.status(500).send(err);
+            }
+            res.status(201).json({token});
+        });
     } catch (error) {
         // Log the error message to the console
         console.error('Error registering user:', error.message);
@@ -341,14 +357,84 @@ app.post('/login', async (req, res) => {
             return res.status(404).send('Incorrect password');
         }
         else {
-            // Send a success response
-            res.status(200).json({});
-        }
-    } catch (error) {
-        // Log the error message to the console
-        console.error('Error logging in:', error.message);
-        res.status(500).send('An error occurred while logging in');
+            const { _id: id, isVerified, favouriteReport } = user;
+            // Send back a json web token
+            jwt.sign({
+                id,
+                isVerified, 
+                favouriteReport,
+            }, process.env.JWT_SECRET,
+            {
+                expiresIn: '7d'
+            }, (err, token) => {
+                if (err) {
+                    return res.status(500).send(err);
+                }
+                res.status(200).send('Login Successful').json({token});
+                });
+    } 
+}catch (error) {
+    // Log the error message to the console
+    console.error('Error logging in:', error.message);
+    res.status(500).send('An error occurred while logging in');
+}
+});
+
+
+// update User Info page 
+app.put('/user/:userId', async (req, res) => {
+    const {authorization} = req.headers;
+    const {userId} = req.params;
+
+    const updates = (({
+        favouriteReport,
+    }) => ({
+        favouriteReport,
+    }))(req.body);
+
+    if (!authorization) {
+        return res.status(401).json({ message: 'Unauthorized' });
     }
+    //Bearer lkj:adfas.adf.asdf
+    const token = authorization.split(' ')[1];
+
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+        if (err) {
+            return res.status(401).json({ message: 'Unable to verify token' });
+        }
+
+        const { id } = decoded;
+
+        if (id !== userId) {
+            return res.status(403).json({ message: 'No access allowed' });
+        }
+        const db = client.db(dbName);
+        
+        const result = await db.collection('users').fineOneAndUpdate(
+            { _id: ObjectId(id) }, 
+            { $set: { favouriteReport: updates } },
+            { returnOriginal: false }
+        );
+
+        const { isVerified, favouriteReport } = result.value;
+
+        jwt.sign({
+            id,
+            isVerified,
+            favouriteReport
+        },
+        process.env.JWT_SECRET,
+        {
+            expiresIn: '7d'
+        },
+        (err, token) => {
+            if (err) {
+                return res.status(200).send(err);
+        }
+        res.status(200).json({ token });
+    }
+    );
+    });
 });
 
 // Start the Express server with HTTPS
