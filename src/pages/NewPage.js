@@ -10,6 +10,7 @@ import axios from 'axios';
 import EnhancedRating from '../components/EnhancedRating';
 import ReviewList from '../components/ReviewList';
 import TrendingCommentTopics from '../components/TrendingCommentTopics';
+import AveragePositivityRatings from '../components/AveragePositivityRatings'; // Import the new component
 
 function NewPage() {
     const [showDetails, setShowDetails] = useState(false); // State for showing product details
@@ -95,7 +96,7 @@ function NewPage() {
     const renderReviewSections = () => { // Render review section
         if (!data) return null;
 
-        const { summary, key_topics } = data; // Destructure data
+        const { summary, key_topics, monthlyRatings } = data; // Destructure data
 
         const pieData = [ // Data for PieChart
             { name: 'Positive', value: summary["Percentage of Positive Reviews"] },
@@ -275,6 +276,10 @@ function NewPage() {
                         <TrendingCommentTopics keyTopics={data.key_topics} />
 
 
+                    </div>
+
+                    <div className="bg-custom-beige p-6 mb-6 m-2 rounded-lg shadow-md">
+                        <AveragePositivityRatings monthlyRatings={monthlyRatings} />
                     </div>
 
                     <div className="bg-custom-beige p-6 mb-6 m-2 rounded-lg shadow-md">
