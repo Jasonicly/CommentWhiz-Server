@@ -1,9 +1,38 @@
 import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import axios from "axios";
+import {useNavigate} from "react-router-dom";
 import { Loader } from "./Loader"; // Import the Loader component
 
+
+function cleanAmazonUrl(url) {
+    try {
+        // Create a URL object
+        let urlObj = new URL(url);
+
+        // Extract the path parts
+        let pathParts = urlObj.pathname.split('/');
+
+        // Find the ASIN (usually after "/dp/")
+        let asinIndex = pathParts.indexOf('dp');
+        if (asinIndex === -1 || asinIndex + 1 >= pathParts.length) {
+            throw new Error("ASIN not found");
+        }
+
+        let asin = pathParts[asinIndex + 1];
+
+        // Construct the clean URL
+        let cleanUrl = `${urlObj.origin}/dp/${asin}`;
+
+        return cleanUrl;
+    } catch (error) {
+        console.error(error.message);
+        return url;  // Return the original URL if an error occurs
+    }
+}
+
 function SearchBar() {
+    const navigate = useNavigate();
     const [url, setUrl] = useState("");
     const [isLoading, setIsLoading] = useState(false); // State for loading
 
@@ -16,9 +45,13 @@ function SearchBar() {
         if (url) {
             setIsLoading(true); // Set loading state to true
             try {
-                const response = await axios.post("https://localhost:3001/scrape", { url });
+                const cleanUrl = cleanAmazonUrl(url);
+                const response = await axios.post("https://localhost:3001/scrape", { url: cleanUrl });
                 console.log("Response from server:", response.data);
-                setUrl(""); // Clear the search field
+                
+                setTimeout(() => {
+                    navigate(`/report/${encodeURIComponent(cleanUrl)}`);
+                }, 100); // 1000 milliseconds = 1 second
             } catch (error) {
                 console.error("Error sending URL to server:", error);
             } finally {
