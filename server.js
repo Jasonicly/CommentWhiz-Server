@@ -278,10 +278,10 @@ app.post('/ai', async (req, res) => {
 
 // Define a POST route for user registration
 app.post('/register', async (req, res) => {
-    const { email, password } = req.body;
+    const { name, username, email, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).send('Email and password are required');
+    if (!name || !username || !email || !password) {
+        return res.status(400).send('Name, username, email, and password are required');
     }
 
     try {
@@ -298,6 +298,8 @@ app.post('/register', async (req, res) => {
         // Create a new user document
         const newUser = {
             _id: email,
+            name,
+            username,
             password_hash,
             isVerified: false,
             favouriteReport: startingReport,
