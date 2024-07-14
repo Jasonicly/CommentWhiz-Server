@@ -7,6 +7,8 @@ import Footer from '../components/Footer';
 
 
 const Register = () => {
+    const [name, setName] = useState('');
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -15,6 +17,14 @@ const Register = () => {
 
     const [token, setToken] = useToken();
     const navigate = useNavigate();
+
+    const handleNameChange = (e) => {
+        setName(e.target.value);
+    };
+
+    const handleUsernameChange = (e) => {
+        setUsername(e.target.value);
+    };
 
     const handleEmailChange = (e) => {
         setEmail(e.target.value);
@@ -37,6 +47,8 @@ const Register = () => {
             setErrorMessage(''); // Clear error message if registration is successful
             try {
                 const response = await axios.post('https://localhost:3001/register', {
+                    name,
+                    username,
                     email,
                     password
                 });
@@ -102,6 +114,30 @@ const Register = () => {
                     <div className="flex-1 p-8 bg-gray-100 rounded-r-2xl" style={styles.formContainer}>
                         <h2 className="text-4xl font-semibold text-center mb-6 text-green-800">Register</h2>
                         <form id="registerForm" onSubmit={validateForm} className="space-y-6">
+                            <label htmlFor="name" className="sr-only">Name</label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                placeholder="Name"
+                                required
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-gray-400 hover:border-green-500 transition duration-200 ease-in-out"
+                                value={name}
+                                onChange={handleNameChange}
+                            />
+
+                            <label htmlFor="username" className="sr-only">Username</label>
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                placeholder="Username"
+                                required
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-gray-400 hover:border-green-500 transition duration-200 ease-in-out"
+                                value={username}
+                                onChange={handleUsernameChange}
+                            />
+
                             <label htmlFor="email" className="sr-only">Email</label>
                             <input
                                 type="email"
