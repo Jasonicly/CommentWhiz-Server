@@ -13,6 +13,7 @@ module.exports = {
                 'custom-melon': '#507255',
                 'custom-beige': '#EDF5E1',
                 'custom-brown': '#413620',
+                'custom-lightgray': '#e4edea',
             },
         },
     },
