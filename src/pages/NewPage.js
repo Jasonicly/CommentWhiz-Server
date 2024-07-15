@@ -17,6 +17,8 @@ import ProductImage from '../components/ProductImage';
 import ProductInfo from '../components/ProductInfo';
 import KeyTopics from '../components/KeyTopics';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import AveragePositivityRatings from '../components/AveragePositivityRatings'; // Import the new component
+
 
 function NewPage() {
     const [showDetails, setShowDetails] = useState(false); // State for showing product details

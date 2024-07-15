@@ -68,7 +68,7 @@ app.get('/checkDatabase/:url', async (req, res) => {
         // Check if a document with the given URL as _id exists
         const existingDoc = await analysesCollection.findOne({ _id: url });
 
-        if (existingDoc) {  
+        if (existingDoc) {
             // Send the latest report and a script to close the tab
             return res.status(200).send(existingDoc);
         } else {
@@ -83,16 +83,6 @@ app.get('/checkDatabase/:url', async (req, res) => {
     }
 });
 
-
-// if user opens report via link  https://localhost:3000/report/https://www.amazon.com/dp/B07VGRJDFY - this route will be called
-//      Define a route to get the report for a specific URL separate endpoint in server 
-// if they press open report on the extension: scan first and store in DB, then open report 
-
-// 
-// if they search in the website
-//    reload the page with url they search
-
-// if open via history,,,,
 
 app.post('/api/scrape', async (req, res) => {
     // Extract the URL from the request body
@@ -110,14 +100,10 @@ app.post('/api/scrape', async (req, res) => {
         // Check if a document with the given URL as _id exists
         const existingDoc = await analysesCollection.findOne({ _id: url });
 
-        if (existingDoc) {
-            
-            const Report = existingDoc;
-            return res.status(200);
+        if (existingDoc) return res.status(200);
 
-        }
 
-        // Forward the URL to another service running on localhost:6000
+            // Forward the URL to another service running on localhost:6000
         const response = await axios.post('https://localhost:6000/scrape', { url }, {
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false, // This will allow self-signed certificates (Without this line, YOU WILL GET a certificate error!!!!!!)
@@ -133,6 +119,15 @@ app.post('/api/scrape', async (req, res) => {
     }
 });
 
+// if user opens report via link  https://localhost:3000/report/https://www.amazon.com/dp/B07VGRJDFY - this route will be called
+//      Define a route to get the report for a specific URL separate endpoint in server 
+// if they press open report on the extension: scan first and store in DB, then open report 
+
+// 
+// if they search in the website
+//    reload the page with url they search
+
+// if open via history,,,,
 
 
 // Define a POST route for scraping
@@ -153,7 +148,7 @@ app.post('/scrape', async (req, res) => {
         const existingDoc = await analysesCollection.findOne({ _id: url });
 
         if (existingDoc) {
-            
+
             const Report = existingDoc;
             return res.status(200).send(Report);
 
@@ -175,12 +170,71 @@ app.post('/scrape', async (req, res) => {
     }
 });
 
+
+// Process review data to calculate monthly average ratings and append this rating history back to the AI response data
+function processReviews(data) {
+    try {
+        const parsedData = JSON.parse(data);
+        if (!parsedData || !parsedData.reviews || !Array.isArray(parsedData.reviews)) {
+            throw new Error("Invalid reviews data");
+        }
+
+        const monthlyRatings = {};
+
+        // Iterate through the reviews
+        parsedData.reviews.forEach(review => {
+            if (review.time && review['AI-rating'] !== undefined) {
+                const date = new Date(review.time);
+                if (!isNaN(date)) {
+                    const year = date.getFullYear();
+                    const month = date.getMonth() + 1;
+
+                    const key = `${year}-${month}`;
+
+                    if (!monthlyRatings[key]) {
+                        monthlyRatings[key] = {
+                            year: year,
+                            month: month,
+                            totalRating: 0,
+                            count: 0
+                        };
+                    }
+
+                    monthlyRatings[key].totalRating += review['AI-rating'];
+                    monthlyRatings[key].count += 1;
+                }
+            }
+        });
+
+        const monthlyRatingsArray = Object.values(monthlyRatings).map(entry => ({
+            year: entry.year,
+            month: entry.month,
+            averageRating: entry.totalRating / entry.count
+        }));
+
+        // Sort the array by year and month
+        monthlyRatingsArray.sort((a, b) => {
+            if (a.year === b.year) {
+                return a.month - b.month;
+            }
+            return a.year - b.year;
+        });
+
+        parsedData.monthlyRatings = monthlyRatingsArray;
+
+        return parsedData;
+    } catch (error) {
+        console.error('Error processing reviews:', error.message);
+        throw error;
+    }
+}
+
 // Define a POST route for AI processing
 app.post('/ai', async (req, res) => {
     // Extract reviews data from the request body
     const reviews = req.body;
 
-    try {      
+    try {
         // Forward the reviews to AI server on localhost:5000
         const response = await axios.post('https://localhost:5000/process_reviews', reviews, {
             httpsAgent: new https.Agent({
@@ -189,21 +243,24 @@ app.post('/ai', async (req, res) => {
         });
         console.log('Response from AI:', response.data);
 
+        // Process the AI response to add the timeline list
+        const processedAIResponse = processReviews(JSON.stringify(response.data));
+
         // Store the AI response in MongoDB
         const db = client.db(dbName); // Access the database
         const analysesCollection = db.collection('analyses'); // Select the collection
 
-        const productUrl = response.data.summary['Product Url']; // Extract the Product Url from the AI response
+        const productUrl = processedAIResponse.summary['Product Url']; // Extract the Product Url from the AI response
 
         // Update or insert the document directly with the new AI response
         await analysesCollection.updateOne(
             { _id: productUrl },
-            { $set: response.data },
+            { $set: processedAIResponse },
             { upsert: true } // Create a new document if it does not exist
         );
 
         // Send the AI response back to the client
-        res.status(response.status).send(response.data);
+        res.status(response.status).send(processedAIResponse);
     } catch (error) {
         // Log the error message to the console
         console.error('Error forwarding the reviews:', error.message);
@@ -221,10 +278,10 @@ app.post('/ai', async (req, res) => {
 
 // Define a POST route for user registration
 app.post('/register', async (req, res) => {
-    const { email, password } = req.body;
+    const { name, username, email, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).send('Email and password are required');
+    if (!name || !username || !email || !password) {
+        return res.status(400).send('Name, username, email, and password are required');
     }
 
     try {
@@ -241,6 +298,8 @@ app.post('/register', async (req, res) => {
         // Create a new user document
         const newUser = {
             _id: email,
+            name,
+            username,
             password_hash,
             isVerified: false,
             favouriteReport: startingReport,
@@ -383,5 +442,4 @@ app.put('/user/:userId', async (req, res) => {
 // Start the Express server with HTTPS
 https.createServer(options, app).listen(port, () => {
     console.log(`Server.js running on https://localhost:${port}`);
-  });
-
+});
