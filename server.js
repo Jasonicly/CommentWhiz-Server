@@ -275,6 +275,19 @@ app.post('/ai', async (req, res) => {
     }
 });
 
+app.post('/api/databasequery', async (req, res) => {
+    const db = client.db(dbName);
+    const analysesCollection = db.collection('analyses');
+
+    // Extract all the analyses from the database
+    const analyses = await analysesCollection.find().toArray();
+    // const analyses = await analysesCollection.find({ count: { $gt: 10 } }).toArray(); // Find analyses with count greater than 10 
+    // Map through analyses to only return the summary field
+    const summaries = analyses.map(analysis => ({
+        summary: analysis.summary
+    }));
+    res.send(summaries);
+});
 
 // Define a POST route for user registration
 app.post('/register', async (req, res) => {
