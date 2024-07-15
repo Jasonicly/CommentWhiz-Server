@@ -109,7 +109,10 @@ function NewPage() {
     
         return (
             <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
-                <ProductInfo summary={summary} className="xl:col-span-1" />
+                {/* Right-side container for larger screens, moves above the main content on smaller screens */}
+                <ProductInfo summary={summary} className="xl:col-span-1"/>
+        
+                {/* Main content container */}
                 <div className="xl:col-span-4 bg-custom-lightgray container mx-auto border border-black p-4 rounded-lg">
                     <div className="bg-gray-100 p-2 rounded border border-black flex items-center justify-between">
                         <FaArrowLeft className="cursor-pointer" onClick={handlePrev} />
@@ -138,11 +141,12 @@ function NewPage() {
                         </>
                     )}
                     {currentPhase === 1 && (
-                        <div className="bg-white p-6 mb-6 m-2 rounded-lg shadow-md border-black border">
+                        <div className="bg-white p-6 mb-6 m-2 rounded-lg shadow-md border-black border overflow-auto">
                             <ReviewList reviews={data.reviews} />
                         </div>
                     )}
                     {currentPhase === 2 && (
+                        <div className="bg-white p-6 mb-6 mt-2 rounded-lg shadow-md border-black border overflow-auto">
                             <KeyTopics
                                 keyTopics={data.key_topics}
                                 keyTopicsFilter={keyTopicsFilter}
@@ -154,6 +158,7 @@ function NewPage() {
                                 toggleShowMoreComments={toggleShowMoreComments}
                                 toggleShowAllKeyTopics={toggleShowAllKeyTopics}
                             />
+                        </div>
                     )}
                 </div>
                 <div className="col-span-full order-last">
@@ -161,8 +166,7 @@ function NewPage() {
                 </div>
             </div>
         );
-    };
-    
+    };    
 
     if (data !== null) {
         return (

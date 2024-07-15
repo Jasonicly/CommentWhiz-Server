@@ -13,7 +13,7 @@ const KeyTopics = ({
     toggleShowAllKeyTopics,
 }) => {
     return (
-        <div className="bg-white p-6 mb-6 m-2 rounded-lg shadow-md border-black border">
+        <div className="bg-white">
             <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: "'Montserrat', sans-serif" }}>Key Topics</h3>
 
             <button onClick={toggleKeyTopicsFilterOptions} className="mb-4 p-2 bg-custom-gray border border-black rounded">
