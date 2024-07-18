@@ -26,7 +26,7 @@ const SentimentAnalysisPieChart = ({ summary }) => {
 
     return (
         <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center border-black border">
-            <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Montserrat', sans-serif" }}>Sentiment Analysis</h4>
+            <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>Sentiment Analysis</h4>
             <PieChart width={200} height={250}>
                 <Pie
                     data={pieData}
