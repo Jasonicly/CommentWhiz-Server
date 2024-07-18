@@ -22,8 +22,13 @@ const renderStars = (rating) => {
             ))}
             {halfStar && (
                 <svg className="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049.927C9.433.292 10.567.292 10.951.927l2.364 4.787 5.288.768c.663.097.93.912.448 1.379L15.949 11.5l.898 5.24c.113.657-.578 1.154-1.157.846L10 15.347l-4.69 2.46c-.579.308-1.27-.189-1.157-.846l.898-5.24-3.843-3.64c-.483-.467-.215-1.282.448-1.38l5.288-.767L9.049.927z" />
-                    <path d="M10 15.347V0.927L7.636 5.714l-5.288.768L6.364 11.5l-.898 5.24L10 15.347z" fill="gray" />
+                    <defs>
+                        <linearGradient id="half-grad">
+                            <stop offset="50%" stopColor="#ecb10d" />
+                            <stop offset="50%" stopColor="gray" stopOpacity="1" />
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#half-grad)" d="M9.049.927C9.433.292 10.567.292 10.951.927l2.364 4.787 5.288.768c.663.097.93.912.448 1.379L15.949 11.5l.898 5.24c.113.657-.578 1.154-1.157.846L10 15.347l-4.69 2.46c-.579.308-1.27-.189-1.157-.846l.898-5.24-3.843-3.64c-.483-.467-.215-1.282.448-1.38l5.288-.767L9.049.927z" />
                 </svg>
             )}
             {[...Array(emptyStars)].map((_, index) => (
@@ -40,7 +45,7 @@ const EnhancedRating = ({ originalRating, enhancedRating }) => {
 
     return (
         <div className="col-span-1 bg-white p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center border-black border">
-            <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Montserrat', sans-serif" }}>Positivity Rating</h4>
+            <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>Positivity Rating</h4>
             <div className="text-4xl font-bold flex items-center">
                 <span data-tooltip-id="original-rating-tooltip">{originalRating}</span>
                 <svg className={`w-12 h-12 mx-2 ${arrowColor}`} fill="currentColor" viewBox="-2 -2 20 20">
@@ -51,10 +56,10 @@ const EnhancedRating = ({ originalRating, enhancedRating }) => {
             <div className="flex mt-2">
                 {renderStars(enhancedRating)}
             </div>
-            <Tooltip id="original-rating-tooltip" effect="solid" delayShow={0} place="left">
+            <Tooltip id="original-rating-tooltip" className="custom-tooltip" effect="solid" delayShow={0} place="left">
                 Original Rating
             </Tooltip>
-            <Tooltip id="enhanced-rating-tooltip" effect="solid" delayShow={0} place="right">
+            <Tooltip id="enhanced-rating-tooltip" className="custom-tooltip" effect="solid" delayShow={0} place="right">
                 Enhanced AI Rating
             </Tooltip>
         </div>

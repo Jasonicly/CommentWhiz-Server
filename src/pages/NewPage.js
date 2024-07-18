@@ -126,7 +126,7 @@ function NewPage() {
                             <OverviewBlocks summary={summary} />
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                                 <div className="col-span-2 bg-white p-4 m-2 rounded-lg shadow-md text-center min-h-[150px] border-black border">
-                                    <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Montserrat', sans-serif" }}>AI Generated Summary</h4>
+                                    <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>AI Generated Summary</h4>
                                     <p>Here is a summary of key points. Here is a summary of key points...</p>
                                 </div>
                                 <EnhancedRating originalRating={2.1} enhancedRating={summary["Enhanced Rating"]} />
@@ -143,7 +143,7 @@ function NewPage() {
                         </>
                     )}
                     {currentPhase === 1 && (
-                        <div className="bg-white p-6 mb-6 m-2 rounded-lg shadow-md border-black border overflow-auto">
+                        <div className="bg-white p-6 mb-6 mt-2 rounded-lg shadow-md border-black border overflow-auto">
                             <ReviewList reviews={data.reviews} />
                         </div>
                     )}
@@ -163,42 +163,26 @@ function NewPage() {
                         </div>
                     )}
                 </div>
-                <div className="col-span-full order-last">
-                    <Footer />
-                </div>
             </div>
         );
     };    
 
     if (data !== null) {
         return (
-            <div>
-                <style>{`
-                    .loading-icon-container {
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        transform: translateY(-10%);
-                    }
-    
-                    .loading-icon {
-                        text-align: center;
-                    }
-                `}</style>
+            <div className="flex flex-col min-h-screen">
                 <Header />
                 <SearchBar />
-                <Container.Outer className="absolute left-1/2 transform -translate-x-1/2" customStyles={{width: '100%', maxWidth: '1580px'}} showIcon={false} showHeader={false}>
-                    <Container.Inner className="w-full">
-                    {isLoading ? renderLoading() : renderReviewSections()}
-                </Container.Inner>
-            </Container.Outer>
+                <div className="flex flex-col items-center flex-grow mt-8 relative"> {/* Added relative positioning */}
+                    <Container.Outer className="w-full max-w-[1580px] absolute-center" showIcon={false} showHeader={false}>
+                        <Container.Inner className="w-full">
+                            {isLoading ? renderLoading() : renderReviewSections()}
+                        </Container.Inner>
+                    </Container.Outer>
+                </div>
+                <Footer />
             </div>
         );
+        
     
     }
     else if (data === null) {

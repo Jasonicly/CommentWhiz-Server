@@ -8,14 +8,14 @@ const ProductInfo = ({ summary }) => {
 
     return (
         <div className="container mx-auto">
-            <div className="bg-custom-lightgray flex flex-col items-center justify-center p-8 mb-4 rounded-lg border-t border-l border-r border-black border">
+            <div className="bg-custom-lightgray flex flex-col items-center justify-center p-2 mb-4 rounded-lg border-t border-l border-r border-black border">
                 <ProductImage imageBase64={summary.productImageBase64} />
-                <div className="flex text-2xl font-bold text-black max-w-6xl items-center justify-center" style={{ fontFamily: "'Montserrat', sans-serif", textAlign: 'center' }}>
+                <div className="flex text-2xl font-bold text-black max-w-6xl items-center justify-center" style={{ fontFamily: "'Oswald', sans-serif", textAlign: 'center' }}>
                     {summary["Product Name"]}
                 </div>
                 <Button
                     onClick={toggleDetails}
-                    text={!showDetails ? "View Details" : "View Less"}
+                    text={!showDetails ? "Product Specifications" : "View Less"}
                     className="w-auto m-10 min-w-[125px]"
                 />
             </div>

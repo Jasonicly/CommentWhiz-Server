@@ -45,10 +45,36 @@ app.post('/scrape', async (req, res) => {
         });
         console.log('React server response received.');
 
+        // Assuming the 'reviews' variable holds the JSON data you want to save
+        const saveDataLocally = (data) => {
+            const filePath = path.join(__dirname, 'reviews.json');
+            fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8', (err) => {
+                if (err) {
+                    console.error('Error saving the JSON file:', err);
+                } else {
+                    console.log('JSON file saved successfully.');
+                }
+            });
+        };
+
+        // Call the function after receiving the response
+        console.log('React server response received.');
+        saveDataLocally(reviews);
+
         // Respond back to the client that the process is complete
         res.json({
             message: 'Scrape successful and data sent to React server',
             reactResponse: response.data
+        });
+
+        // Save the JSON response to a file
+        const filePath = path.join(__dirname, 'response.json');
+        fs.writeFile(filePath, JSON.stringify(response.data, null, 2), 'utf8', (err) => {
+            if (err) {
+                console.error('Error saving the JSON file:', err);
+            } else {
+                console.log('JSON file saved successfully.');
+            }
         });
 
     } catch (error) {

@@ -6,7 +6,7 @@ const ProductImage = ({ imageBase64 }) => {
             <img 
                 src={`data:image/jpeg;base64,${imageBase64}`} 
                 alt="Product" 
-                style={{ width: '200px', height: '200px', objectFit: 'contain' }} 
+                style={{ width: '250px', height: '250px', objectFit: 'contain' }} 
             />
         </div>
     );
