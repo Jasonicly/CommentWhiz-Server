@@ -10,7 +10,15 @@ import axios from 'axios';
 import EnhancedRating from '../components/EnhancedRating';
 import ReviewList from '../components/ReviewList';
 import TrendingCommentTopics from '../components/TrendingCommentTopics';
+import OverviewBlocks from '../components/OverviewBlocks';
+import SentimentAnalysisPieChart from '../components/SentimentAnalysisPieChart';
+import EmotionAnalysisGraph from '../components/EmotionAnalysisGraph';
+import ProductImage from '../components/ProductImage';
+import ProductInfo from '../components/ProductInfo';
+import KeyTopics from '../components/KeyTopics';
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import AveragePositivityRatings from '../components/AveragePositivityRatings'; // Import the new component
+
 
 function NewPage() {
     const [showDetails, setShowDetails] = useState(false); // State for showing product details
@@ -25,10 +33,13 @@ function NewPage() {
     const { reportId } = useParams(); // Get unique link for report  
     console.log(reportId);
 
-    const isAmazonProductPage = /^https?:\/\/(www\.)?amazon\.[a-z\.]{2,6}(\/d\/|\/dp\/|\/gp\/product\/)/.test(reportId);
-
-
-    const encodedUrl = encodeURIComponent(reportId);
+    const isAmazonProductPage = /^https?:\/\/(www\.)?amazon\.[a-z\.]{2,6}(\/d\/|\/dp\/|\/gp\/product\/)/.test(reportId); // Check if URL is Amazon product page
+    const encodedUrl = encodeURIComponent(reportId); // Encode URL for API request
+    const [currentPhase, setCurrentPhase] = useState(0); // State for current phase of report
+    const phases = ['Analysis Overview', 'Reviews', 'Key Topics']; // Phases of report
+    
+    const handleNext = () => setCurrentPhase((prev) => (prev + 1) % phases.length);
+    const handlePrev = () => setCurrentPhase((prev) => (prev - 1 + phases.length) % phases.length);
 
     useEffect(() => {
         if (isAmazonProductPage) {
@@ -93,297 +104,92 @@ function NewPage() {
         );
     };
 
-    const renderReviewSections = () => { // Render review section
+    const renderReviewSections = () => {
         if (!data) return null;
-
-        const { summary, key_topics, monthlyRatings } = data; // Destructure data
-
-        const pieData = [ // Data for PieChart
-            { name: 'Positive', value: summary["Percentage of Positive Reviews"] },
-            { name: 'Negative', value: summary["Percentage of Negative Reviews"] },
-            { name: 'Neutral', value: summary["Percentage of Neutral Reviews"] },
-        ];
-
-        const barData = [ // Data for BarChart
-            { name: 'Joy', value: summary["Number of Joy Emotions"], color: '#FFD700' },
-            { name: 'Anger', value: summary["Number of Anger Emotions"], color: '#FF4500' },
-            { name: 'Neutral', value: summary["Number of Neutral Emotions"], color: '#808080' },
-            { name: 'Sadness', value: summary["Number of Sadness Emotions"], color: '#1E90FF' },
-            { name: 'Disgust', value: summary["Number of Disgust Emotions"], color: '#32CD32' },
-            { name: 'Surprise', value: summary["Number of Surprise Emotions"], color: '#FFA500' }
-        ];
-
-        const topEmotion = barData.reduce((prev, current) => (prev.value > current.value) ? prev : current); // Culculation for emotion based on count
-
-        const emotions = ['Joy', 'Anger', 'Neutral', 'Sadness', 'Disgust', 'Surprise']; // Emotions array for filtering
-
-        const sortedKeyTopics = Object.keys(key_topics) // Sort key topics based on unique comment count
-    .sort((a, b) => key_topics[b].unique_comment_count - key_topics[a].unique_comment_count)
-    .slice(0, 5);
-
-
-        return ( 
-            <div>
-                <div>
-                    <div className="flex items-center justify-center p-8 mb-4 rounded-lg bg-custom-gray border-t border-l border-r border-black">
-                        <div className="flex text-4xl font-bold text-black max-w-6xl">
-                            {summary["Product Name"]}
-                        </div>
-                        <Button
-                            onClick={toggleDetails}
-                            text={!showDetails ? "View Details" : "View Less"}
-                            className="w-auto ml-4 min-w-[125px]"
-                        />
+    
+        const { summary, key_topics } = data;
+    
+        return (
+            <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
+                {/* Right-side container for larger screens, moves above the main content on smaller screens */}
+                <ProductInfo summary={summary} className="xl:col-span-1"/>
+        
+                {/* Main content container */}
+                <div className="xl:col-span-4 bg-custom-lightgray container mx-auto border border-black p-4 rounded-lg">
+                    <div className="bg-gray-100 p-2 rounded border border-black flex items-center justify-between">
+                        <FaArrowLeft className="cursor-pointer" onClick={handlePrev} />
+                        <h3 className="text-2xl font-bold text-center">{phases[currentPhase]}</h3>
+                        <FaArrowRight className="cursor-pointer" onClick={handleNext} />
                     </div>
-                    {showDetails && (
-                        <div className="flex items-center justify-center -mt-6 mb-4 pt-2 bg-custom-gray border-b border-l border-r border-black rounded-b-lg">
-                            <div className="w-full bg-custom-beige p-4 mb-8 rounded-xl shadow-md mx-auto" style={{ maxWidth: '900px' }}>
-                                <ul className="list-disc list-inside">
-                                    {summary["Product Details"].split(', ').map((detail, index) => (
-                                        <li key={index} className="text-1xl mb-1">
-                                            {detail}
-                                        </li>
-                                    ))}
-                                </ul>
+                    {currentPhase === 0 && (
+                        <>
+                            <OverviewBlocks summary={summary} />
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                <div className="col-span-2 bg-white p-4 m-2 rounded-lg shadow-md text-center min-h-[150px] border-black border">
+                                    <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>AI Generated Summary</h4>
+                                    <p>Here is a summary of key points. Here is a summary of key points...</p>
+                                </div>
+                                <EnhancedRating originalRating={2.1} enhancedRating={summary["Enhanced Rating"]} />
                             </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                <SentimentAnalysisPieChart summary={summary} />
+                                <SentimentAnalysisPieChart summary={summary} />
+                                <SentimentAnalysisPieChart summary={summary} />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-1">
+                                <EmotionAnalysisGraph summary={summary} />
+                                <TrendingCommentTopics keyTopics={data.key_topics} />
+                            </div>
+                        </>
+                    )}
+                    {currentPhase === 1 && (
+                        <div className="bg-white p-6 mb-6 mt-2 rounded-lg shadow-md border-black border overflow-auto">
+                            <ReviewList reviews={data.reviews} />
+                        </div>
+                    )}
+                    {currentPhase === 2 && (
+                        <div className="bg-white p-6 mb-6 mt-2 rounded-lg shadow-md border-black border overflow-auto">
+                            <KeyTopics
+                                keyTopics={data.key_topics}
+                                keyTopicsFilter={keyTopicsFilter}
+                                showKeyTopicsFilterOptions={showKeyTopicsFilterOptions}
+                                showAllKeyTopics={showAllKeyTopics}
+                                expandedTopics={expandedTopics}
+                                toggleKeyTopicsFilterOptions={toggleKeyTopicsFilterOptions}
+                                setKeyTopicsFilter={setKeyTopicsFilter}
+                                toggleShowMoreComments={toggleShowMoreComments}
+                                toggleShowAllKeyTopics={toggleShowAllKeyTopics}
+                            />
                         </div>
                     )}
                 </div>
-
-                <div className="bg-custom-gray container mx-auto border border-black p-4 rounded-lg">
-                    <div className="bg-gray-100 p-2 rounded border-2 border-black">
-                        <h3 className="text-2xl font-bold text-center">Analysis Overview</h3>
-                    </div>
-                    <div className="bg-custom-gray flex justify-between items-center">
-                        <div className="flex flex-wrap justify-center mx-auto">
-                            <div className="bg-gray-100 pt-4 pb-4 p-2 my-5 mx-2 min-w-[250px] flex flex-col items-center justify-center border border-black rounded-full">
-                                <h4 className="mb-2 text-center">Number of Reviews</h4>
-                                <span>{summary["Number of Reviews"]}</span>
-                            </div>
-                            <div className="bg-gray-100 pt-4 pb-4 p-2 my-5 mx-2 min-w-[250px] flex flex-col items-center justify-center border border-black rounded-full">
-                                <h4 className="mb-2 text-center">Number of Positive Reviews</h4>
-                                <span>{summary["Number of Positive Reviews"]}</span>
-                            </div>
-                            <div className="bg-gray-100 pt-4 pb-4 p-2 my-5 mx-2 min-w-[250px] flex flex-col items-center justify-center border border-black rounded-full">
-                                <h4 className="mb-2 text-center">Number of Negative Reviews</h4>
-                                <span>{summary["Number of Negative Reviews"]}</span>
-                            </div>
-                            <div className="bg-gray-100 pt-4 pb-4 p-2 my-5 mx-2 min-w-[250px] flex flex-col items-center justify-center border border-black rounded-full">
-                                <h4 className="mb-2 text-center">Number of Neutral Reviews</h4>
-                                <span>{summary["Number of Neutral Reviews"]}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                        <div className="col-span-2 bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center min-h-[150px]">
-                            <h4 className="text-xl font-semibold mb-2">AI Generated Summary</h4>
-                            <p>Here is a summary of key points. Here is a summary of key points...</p>
-                        </div>
-                        <EnhancedRating originalRating={2.1} enhancedRating={summary["Enhanced Rating"]} />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                        <div className="bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center">
-                            <h4 className="text-xl font-semibold mb-2">Sentiment Analysis</h4>
-                            <PieChart width={200} height={250}>
-                                <Pie
-                                    data={pieData}
-                                    cx={90}
-                                    cy={90}
-                                    labelLine={false}
-                                    outerRadius={50}
-                                    fill="#8884d8"
-                                    dataKey="value"
-                                >
-                                    {pieData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip />
-                                <Legend
-                                    wrapperStyle={{
-                                        paddingTop: '20px'
-                                    }}
-                                />
-                            </PieChart>
-                        </div>
-                        <div className="bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center">
-                            <h4 className="text-xl font-semibold mb-2">Sarcasm Analysis</h4>
-                            <PieChart width={200} height={250}>
-                                <Pie
-                                    data={pieData}
-                                    cx={90}
-                                    cy={90}
-                                    labelLine={false}
-                                    outerRadius={50}
-                                    fill="#8884d8"
-                                    dataKey="value"
-                                >
-                                    {pieData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip />
-                                <Legend
-                                    wrapperStyle={{
-                                        paddingTop: '20px'
-                                    }}
-                                />
-                            </PieChart>
-                        </div>
-                        <div className="bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center">
-                            <h4 className="text-xl font-semibold mb-2">Bots Detected</h4>
-                            <PieChart width={200} height={250}>
-                                <Pie
-                                    data={pieData}
-                                    cx={90}
-                                    cy={90}
-                                    labelLine={false}
-                                    outerRadius={50}
-                                    fill="#8884d8"
-                                    dataKey="value"
-                                >
-                                    {pieData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip />
-                                <Legend
-                                    wrapperStyle={{
-                                        paddingTop: '20px'
-                                    }}
-                                />
-                            </PieChart>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-1">
-                        <div className="bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center border-1 border-black flex flex-col items-center justify-center min-w-[550px]">
-                            <h4 className="text-xl font-semibold mb-2">Emotion Analysis</h4>
-                            <BarChart width={550} height={300} data={barData} style={{ display: 'flex', justifyContent: 'center' }}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                                <Tooltip />
-                                <Bar dataKey="value" fill="#82ca9d">
-                                    {barData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                    ))}
-                                </Bar>
-                            </BarChart>
-                            <h5 className="text-lg font-semibold mt-4">Top Emotion: {topEmotion.name}</h5>
-                        </div>
-
-                        <TrendingCommentTopics keyTopics={data.key_topics} />
-
-
-                    </div>
-
-                    <div className="bg-custom-beige p-6 mb-6 m-2 rounded-lg shadow-md">
-                        <AveragePositivityRatings monthlyRatings={monthlyRatings} />
-                    </div>
-
-                    <div className="bg-custom-beige p-6 mb-6 m-2 rounded-lg shadow-md">
-                        <ReviewList reviews={data.reviews} />
-                    </div>
-
-                    <div className="bg-custom-beige p-6 mb-6 m-2 rounded-lg shadow-md">
-                        <h3 className="text-2xl font-bold mb-4">Key Topics</h3>
-
-                        <button onClick={toggleKeyTopicsFilterOptions} className="mb-4 p-2 bg-custom-gray border border-black rounded">
-                            {showKeyTopicsFilterOptions ? 'Close Options' : 'Filter Options'}
-                        </button>
-
-                        {showKeyTopicsFilterOptions && (
-                            <div className="bg-custom-gray p-4 border border-black mb-4 rounded">
-                                <div className="flex items-center mb-4">
-                                    <button onClick={() => setKeyTopicsFilter('Positive')} className={`ml-2 p-2 rounded ${keyTopicsFilter === 'Positive' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}>Positive</button>
-                                    <button onClick={() => setKeyTopicsFilter('Negative')} className={`ml-2 p-2 rounded ${keyTopicsFilter === 'Negative' ? 'bg-red-500 text-white' : 'bg-gray-200'}`}>Negative</button>
-                                    <button onClick={() => setKeyTopicsFilter('Neutral')} className={`ml-2 p-2 rounded ${keyTopicsFilter === 'Neutral' ? 'bg-yellow-500 text-white' : 'bg-gray-200'}`}>Neutral</button>
-                                    <button onClick={() => setKeyTopicsFilter('All Sentiments')} className={`ml-2 p-2 rounded ${keyTopicsFilter === 'All Sentiments' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>All Sentiments</button>
-                                </div>
-                            </div>
-                        )}
-
-                        {Object.keys(key_topics)
-                            .sort((a, b) => key_topics[b].unique_comment_count - key_topics[a].unique_comment_count)
-                            .filter(topic => {
-                                if (keyTopicsFilter === 'All Sentiments') return true;
-
-                                return key_topics[topic].comments.some(comment => comment.sentiment === keyTopicsFilter);
-                            })
-                            .slice(0, showAllKeyTopics ? Object.keys(key_topics).length : 4)
-                            .map((topic, index) => (
-                                <div key={index} className="bg-white p-4 rounded-lg shadow-md mb-4">
-                                    <h4 className="text-xl font-semibold">{topic}</h4>
-                                    <p><strong>Unique Comment Count:</strong> {key_topics[topic].unique_comment_count}</p>
-                                    <ul className="list-disc list-inside">
-                                        {key_topics[topic].comments.slice(0, expandedTopics[topic] ? key_topics[topic].comments.length : 3).map((comment, idx) => (
-                                            <li key={idx}>
-                                                <p>{comment.body}</p>
-                                                <p><strong>Sentiment:</strong> {comment.sentiment}</p>
-                                                <p><strong>AI Rating:</strong> {comment["AI-rating"]}</p>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                    {key_topics[topic].comments.length > 3 && (
-                                        <Button
-                                            onClick={() => toggleShowMoreComments(topic)}
-                                            text={expandedTopics[topic] ? 'Collapse' : 'Expand'}
-                                            className="mt-2 p-2 text-sm"
-                                        />
-                                    )}
-
-                                </div>
-                        ))}
-                        {Object.keys(key_topics).length > 4 && (
-                            <Button
-                                onClick={toggleShowAllKeyTopics}
-                                text={showAllKeyTopics ? 'Show Less' : 'Show More'}
-                                className="mt-4"
-                            />
-                        )}
-                    </div>
-                </div>
-                <Footer/>
             </div>
         );
-    };
+    };    
+
     if (data !== null) {
         return (
-            <div>
-                <style>{`
-                    .loading-icon-container {
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        transform: translateY(-10%);
-                    }
-    
-                    .loading-icon {
-                        text-align: center;
-                    }
-                `}</style>
+            <div className="flex flex-col min-h-screen">
                 <Header />
                 <SearchBar />
-                <Container.Outer className="absolute left-1/2 transform -translate-x-1/2" customStyles={{width: '100%', maxWidth: '1400px'}} showIcon={false} showHeader={false}>
-                    <Container.Inner className="w-full mx-auto">
-                    {isLoading ? renderLoading() : renderReviewSections()}
-                </Container.Inner>
-            </Container.Outer>
+                <div className="flex flex-col items-center flex-grow mt-8 relative"> {/* Added relative positioning */}
+                    <Container.Outer className="w-full max-w-[1580px] absolute-center" showIcon={false} showHeader={false}>
+                        <Container.Inner className="w-full">
+                            {isLoading ? renderLoading() : renderReviewSections()}
+                        </Container.Inner>
+                    </Container.Outer>
+                </div>
+                <Footer />
             </div>
         );
+        
     
     }
     else if (data === null) {
         <div>
             <Header />
             <SearchBar />
-            <Container.Outer className="absolute left-1/2 transform -translate-x-1/2" customStyles={{ padding: '20px', margin: '20px', width: '100%', maxWidth: '1400px' }} showIcon={false} showHeader={false}>
+            <Container.Outer className="absolute left-1/2 transform -translate-x-1/2" customStyles={{ padding: '20px', margin: '20px', width: '100%', maxWidth: '1580px' }} showIcon={false} showHeader={false}>
                 <Container.Inner className="w-full mx-auto">
                     {data ? renderReviewSections() : <p>No report was found</p>}
                 </Container.Inner>
@@ -394,7 +200,7 @@ function NewPage() {
         <div>
             <Header />
             <SearchBar />
-            <Container.Outer className="absolute left-1/2 transform -translate-x-1/2" customStyles={{ padding: '20px', margin: '20px', width: '100%', maxWidth: '1400px' }} showIcon={false} showHeader={false}>
+            <Container.Outer className="absolute left-1/2 transform -translate-x-1/2" customStyles={{ padding: '20px', margin: '20px', width: '100%', maxWidth: '1580px' }} showIcon={false} showHeader={false}>
                 <Container.Inner className="w-full mx-auto">
                     {data ? renderReviewSections() : <p>Our server had not responded</p>}
                 </Container.Inner>

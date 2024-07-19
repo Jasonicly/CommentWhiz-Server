@@ -13,6 +13,11 @@ module.exports = {
                 'custom-melon': '#507255',
                 'custom-beige': '#EDF5E1',
                 'custom-brown': '#413620',
+                'custom-lightgray': '#e4edea',
+
+                //for home page
+                'custom-1': '#5ea0b7',
+                'custom-2': '#477a8f',
             },
         },
     },

@@ -1,15 +1,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@400;700&display=swap');
 
-body {
-  background-color: #379392;
+html, body {
+  background-color: #bde8d4;
   margin: 0;
   font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  margin: 0;
+}
+body.custom-scrollbar {
+  /* Apply the custom scrollbar to the entire page */
+  overflow-y: scroll;
+}
+
+h1, h2, h3, h4{
+  font-family: 'Oswald', sans-serif;
+}
+
+h5, h6  {
+  font-family: 'Montserrat', sans-serif;
 }
 
 /* Set Poppins as the default font for all elements */
@@ -21,4 +36,64 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Custom scrollbar styles */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 12px; /* Width of the entire scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Color of the scrollbar track */
+  border-radius: 10px; /* Rounded corners for the track */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #888; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Rounded corners for the thumb */
+  border: 3px solid #f1f1f1; /* Space around the thumb */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Color of the thumb when hovered */
+}
+
+/* Add this to your CSS file */
+.custom-tooltip {
+  background-color: white !important;
+  color: black !important;
+  border: 1px solid black !important;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2) !important;
+}
+
+.custom-tooltip-arrow::before {
+  background-color: white !important;
+  border: 1px solid black !important;
+  box-sizing: border-box;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+/* Add these styles to your CSS file */
+.fade-in {
+  opacity: 1;
+}
+
+.fade-out {
+  opacity: 0;
+}
+
+.transition-opacity {
+  transition: opacity 0.3s ease-in-out;
 }

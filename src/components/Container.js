@@ -6,7 +6,12 @@ const OuterContainer = forwardRef(function OuterContainer(
     ref
 ) {
     return (
-        <div ref={ref} className={clsx("flex justify-center", className)} style={customStyles} {...props}>
+        <div
+            ref={ref}
+            className={clsx("flex flex-col min-h-screen", className)} // Ensure flex column and min height to screen
+            style={customStyles}
+            {...props}
+        >
             {showIcon && (
                 <img src={process.env.PUBLIC_URL + '/ext-icon.png'} alt="logo" className="w-20 h-20 mx-auto" />
             )}
@@ -18,7 +23,6 @@ const OuterContainer = forwardRef(function OuterContainer(
     );
 });
 
-
 const InnerContainer = forwardRef(function InnerContainer(
     { className, children, customStyles, flexDirection = "flex-col", ...props },
     ref
@@ -26,7 +30,7 @@ const InnerContainer = forwardRef(function InnerContainer(
     return (
         <div
             ref={ref}
-            className={clsx(`flex ${flexDirection} m-3 space-y-5 min-w-[400px] className="mx-auto"`, className)}
+            className={clsx(`flex ${flexDirection} m-3 space-y-5 min-w-[400px] mx-auto`, className)}
             style={customStyles}
             {...props}
         >

@@ -11,8 +11,8 @@ const TrendingCommentTopics = ({ keyTopics }) => {
     };
 
     return (
-        <div className="bg-custom-beige p-4 m-2 rounded-lg shadow-md text-center border-1 border-black flex flex-col items-center justify-center">
-            <h4 className="text-xl font-semibold mb-2">Top Trending Comment Topics</h4>
+        <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center border-1 border-black flex flex-col items-center justify-center border-black border">
+            <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>Top Trending Comment Topics</h4>
             <div className="grid grid-cols-5" style={{ width: '100%' }}>
                 <div className="col-span-2 flex flex-col justify-around" style={{ minHeight: '400px' }}>
                     {sortedKeyTopics.map((phrase, index) => (
@@ -25,15 +25,15 @@ const TrendingCommentTopics = ({ keyTopics }) => {
                         </button>
                     ))}
                 </div>
-                <div className="col-span-3 overflow-auto" style={{ maxHeight: '400px' }}>
+                <div className="col-span-3 overflow-auto custom-scrollbar" style={{ maxHeight: '400px' }}>
                     {selectedPhrase && (
-                        <div className="bg-white p-4 rounded-lg shadow-md mb-4 w-11/12 mx-auto" style={{ minHeight: '400px' }}>
-                            <h4 className="text-xl font-semibold">{selectedPhrase}</h4>
+                        <div className="bg-white border-black border p-4 rounded-lg shadow-md mb-4 w-11/12 mx-auto" style={{ minHeight: '400px' }}>
+                            <h4 className="text-xl font-semibold" style={{ fontFamily: "'Montserrat', sans-serif" }}>{selectedPhrase}</h4>
                             <p><strong>Comment Count:</strong> {keyTopics[selectedPhrase].unique_comment_count}</p>
-                            <ul className="list-none space-y-4">
+                            <ul className="list-none space-y-4 mt-2">
                                 {keyTopics[selectedPhrase].comments.map((comment, idx) => (
-                                    <li key={idx} className="mb-4">
-                                        <p>"{comment.body}"</p>
+                                    <li key={idx} className="mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                                        <p style={{ fontFamily: "'Poppins', sans-serif" }}>"{comment.body}"</p>
                                     </li>
                                 ))}
                             </ul>
