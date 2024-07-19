@@ -24,7 +24,8 @@ const options = {
     secureProtocol: 'TLSv1_2_method', // Ensure at least TLS 1.2
 };
 
-
+require('dotenv').config();
+const apiKey = process.env.AI_API_KEY;
 
 // Create an Express application
 const app = express();
@@ -246,6 +247,26 @@ app.post('/ai', async (req, res) => {
         // Process the AI response to add the timeline list
         const processedAIResponse = processReviews(JSON.stringify(response.data));
 
+        // Extract and combine review texts
+        let combinedReviewText = "";
+        processedAIResponse.reviews.forEach(review => {
+            combinedReviewText += review.body + ".";
+            if (combinedReviewText.length > 2000) {
+                combinedReviewText = combinedReviewText.substring(0, 2000);
+                return;
+            }
+        });
+
+        const meaningCloudResponse = await axios.post('https://api.meaningcloud.com/summarization-1.0', null, {
+            params: {
+                key: apiKey, // Replace with your MeaningCloud API key
+                txt: combinedReviewText,
+                sentences: 2
+            }
+        });
+
+        processedAIResponse.shortsummary = meaningCloudResponse.data.summary;
+        console.log(processedAIResponse);
         // Store the AI response in MongoDB
         const db = client.db(dbName); // Access the database
         const analysesCollection = db.collection('analyses'); // Select the collection
