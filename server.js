@@ -312,10 +312,10 @@ app.post('/api/databasequery', async (req, res) => {
 
 // Define a POST route for user registration
 app.post('/register', async (req, res) => {
-    const { name, username, email, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!name || !username || !email || !password) {
-        return res.status(400).send('Name, username, email, and password are required');
+    if (!email || !password) {
+        return res.status(400).send('Email and password are required');
     }
 
     try {
@@ -332,8 +332,6 @@ app.post('/register', async (req, res) => {
         // Create a new user document
         const newUser = {
             _id: email,
-            name,
-            username,
             password_hash,
             isVerified: false,
             favouriteReport: startingReport,
@@ -350,7 +348,7 @@ app.post('/register', async (req, res) => {
         },
         process.env.JWT_SECRET,
         {
-            expiresIn: '7d'
+            expiresIn: '1d'
         },
         (err, token) => {
             if (err) {
