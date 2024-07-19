@@ -9,7 +9,7 @@ import ReportList from './pages/ReportList';
 import PrivateAuthRoute from './auth/PrivateAuthRoute'; // Ensure correct import without braces if default exported
 import NotFoundPage from './pages/NotFoundPage';
 import UserInfo from './pages/UserPages/UserInfo';
-import UserProfile from './pages/UserProfile';
+import UserProfile from './pages/UserPages/UserProfile';
 
 function App() {
     return (
