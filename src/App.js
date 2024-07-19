@@ -9,6 +9,7 @@ import ReportList from './pages/ReportList';
 import PrivateAuthRoute from './auth/PrivateAuthRoute'; // Ensure correct import without braces if default exported
 import NotFoundPage from './pages/NotFoundPage';
 import UserInfo from './pages/UserPages/UserInfo';
+import UserProfile from './pages/UserProfile';
 
 function App() {
     return (
@@ -22,6 +23,7 @@ function App() {
                     <Route path="/report" element={<ReportList />} />
                     <Route path="/report/:reportId" element={<NewPage />} />
                     <Route path="*" element={<NotFoundPage />} />
+                    <Route path="/user" element={<UserProfile />} />
                     <Route element={<PrivateAuthRoute />}>
                         <Route path="/user/:userId" element={<UserInfo />} />
                         <Route path="/user/:userId/history" element={<NewPage />} />
