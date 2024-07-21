@@ -1,11 +1,11 @@
 {
   "ExpandedNodes": [
     "",
+    "\\ScreenScrape",
     "\\src",
-    "\\src\\auth",
-    "\\src\\components",
-    "\\src\\pages"
+    "\\src\\pages",
+    "\\src\\pages\\UserPages"
   ],
-  "SelectedNode": "\\package.json",
+  "SelectedNode": "\\src\\pages\\NewPage.js",
   "PreviewInSolutionExplorer": false
 }

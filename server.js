@@ -15,7 +15,14 @@ const { report } = require('process');
 const { decode } = require('punycode');
 const { JsonWebTokenError } = require('jsonwebtoken');
 const { start } = require('repl');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
+require('dotenv').config();
+// Access your API key as an environment variable (see "Set up your API key" above)
+const genAI = new GoogleGenerativeAI(process.env.AI_API_KEY);
+
+// The Gemini 1.5 models are versatile and work with most use cases
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 // SSL options
 const options = {
@@ -24,8 +31,7 @@ const options = {
     secureProtocol: 'TLSv1_2_method', // Ensure at least TLS 1.2
 };
 
-require('dotenv').config();
-const apiKey = process.env.AI_API_KEY;
+
 
 // Create an Express application
 const app = express();
@@ -85,51 +91,83 @@ app.get('/checkDatabase/:url', async (req, res) => {
 });
 
 
-app.post('/api/scrape', async (req, res) => {
-    // Extract the URL from the request body
-    const { url } = req.body;
-    console.log('Received URL from Extension:', url);
-    // Check if URL is provided, if not, send a 400 Bad Request response
-    if (!url) {
-        return res.status(400).send('URL is required');
-    }
+//app.post('/api/scrape', async (req, res) => {
+//    // Extract the URL from the request body
+//    const { url } = req.body;
+//    console.log('Received URL from Extension:', url);
+//    // Check if URL is provided, if not, send a 400 Bad Request response
+//    if (!url) {
+//        return res.status(400).send('URL is required');
+//    }
 
-    try {
-        const db = client.db(dbName);
-        const analysesCollection = db.collection('analyses');
+//    try {
+//        const db = client.db(dbName);
+//        const analysesCollection = db.collection('analyses');
 
-        // Check if a document with the given URL as _id exists
-        const existingDoc = await analysesCollection.findOne({ _id: url });
+//        // Check if a document with the given URL as _id exists
+//        const existingDoc = await analysesCollection.findOne({ _id: url });
 
-        if (existingDoc) return res.status(200);
+//        if (existingDoc) return res.send(existingDoc);
 
 
-            // Forward the URL to another service running on localhost:6000
-        const response = await axios.post('https://localhost:6000/scrape', { url }, {
-            httpsAgent: new https.Agent({
-                rejectUnauthorized: false, // This will allow self-signed certificates (Without this line, YOU WILL GET a certificate error!!!!!!)
-            }),
-        });
-        // Send the response data back to the client
-        res.send(response.data);
-    } catch (error) {
-        // Log the error message to the console
-        console.error('Error forwarding the URL:', error.message);
-        // Send a 500 Internal Server Error response
-        res.status(500).send('Error forwarding the URL');
-    }
-});
+//        // Forward the URL to another service running on localhost:6000
+//        const response = await axios.post('https://localhost:6000/scrape', { url }, {
+//            httpsAgent: new https.Agent({
+//                rejectUnauthorized: false, // This will allow self-signed certificates (Without this line, YOU WILL GET a certificate error!!!!!!)
+//            }),
+//        });
+//        // Send the response data back to the client
+//        res.send(response.data);
+//    } catch (error) {
+//        // Log the error message to the console
+//        console.error('Error forwarding the URL:', error.message);
+//        // Send a 500 Internal Server Error response
+//        res.status(500).send('Error forwarding the URL');
+//    }
+//});
 
 // if user opens report via link  https://localhost:3000/report/https://www.amazon.com/dp/B07VGRJDFY - this route will be called
-//      Define a route to get the report for a specific URL separate endpoint in server 
-// if they press open report on the extension: scan first and store in DB, then open report 
+//      Define a route to get the report for a specific URL separate endpoint in server
+// if they press open report on the extension: scan first and store in DB, then open report
 
-// 
+//
 // if they search in the website
 //    reload the page with url they search
 
 // if open via history,,,,
 
+//check if the date is the same
+function isSameDate(dateString) {
+    // Parse the input date string
+    const inputDate = new Date(dateString);
+
+    // Get the current date
+    const currentDate = new Date();
+
+    // Compare year, month, and date
+    return inputDate.getFullYear() === currentDate.getFullYear() &&
+        inputDate.getMonth() === currentDate.getMonth() &&
+        inputDate.getDate() === currentDate.getDate();
+}
+
+// Define a POST route to check if report is already in DB
+app.post('/checkReport', async (req, res) => {
+    const url = req.body.url;
+    
+    const db = client.db(dbName);
+    const analysesCollection = db.collection('analyses');
+
+    // Check if a document with the given URL as _id exists
+    const existingDoc = await analysesCollection.findOne({ _id: url });
+
+    if (existingDoc) {
+        // Send the latest report and a script to close the tab
+        res.status(200).send(existingDoc);
+    } else {
+        
+        res.status(404).send(null);
+    }
+});
 
 // Define a POST route for scraping
 app.post('/scrape', async (req, res) => {
@@ -149,10 +187,10 @@ app.post('/scrape', async (req, res) => {
         const existingDoc = await analysesCollection.findOne({ _id: url });
 
         if (existingDoc) {
-
-            const Report = existingDoc;
-            return res.status(200).send(Report);
-
+            if (isSameDate(existingDoc.summary['Processed Time'])) {
+                const Report = existingDoc;
+                return res.status(200).send(Report);
+            }
         }
 
         // Forward the URL to another service running on localhost:6000
@@ -230,12 +268,64 @@ function processReviews(data) {
     }
 }
 
+ // Extract and combine review texts
+function combineReviews(reviews) {
+    let combinedReviewText = "";
+    reviews.forEach(review => {
+        combinedReviewText += review.body + ".";
+    });
+
+    // Limit combinedReviewText to 5,000,000 characters
+    if (combinedReviewText.length > 5000000) {
+        combinedReviewText = combinedReviewText.substring(0, 5000000);
+    }
+
+    return combinedReviewText;
+}
+
+// Define a POST route for short summary for extenstion
+app.post('/shortsummary', async (req, res) => {
+    // Extract reviews data from the request body
+    const reviews = req.body;
+
+    // Extract and combine review texts
+    const combinedReviewText = combineReviews(reviews.reviews);
+
+    const shortPrompt = `Generate a 20 words or lesser short summary of ${combinedReviewText}`;
+
+
+    const shortResult = await model.generateContent(shortPrompt);
+    const shortResponse = await shortResult.response;
+    const shortText = shortResponse.text();
+
+    console.log('Short Summary:', shortText);
+    res.send(shortText);
+});
+
+
+
 // Define a POST route for AI processing
 app.post('/ai', async (req, res) => {
     // Extract reviews data from the request body
     const reviews = req.body;
 
     try {
+        const summaryresponse = await axios.post('https://localhost:3001/shortsummary', reviews, {
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false, // This will allow self-signed certificates
+            }),
+        });
+
+        const shortText = summaryresponse.data;
+
+        
+        res.send({
+            aiSummary: {
+                shortSummary: shortText
+            }
+        });
+        
+
         // Forward the reviews to AI server on localhost:5000
         const response = await axios.post('https://localhost:5000/process_reviews', reviews, {
             httpsAgent: new https.Agent({
@@ -248,25 +338,27 @@ app.post('/ai', async (req, res) => {
         const processedAIResponse = processReviews(JSON.stringify(response.data));
 
         // Extract and combine review texts
-        let combinedReviewText = "";
-        processedAIResponse.reviews.forEach(review => {
-            combinedReviewText += review.body + ".";
-            if (combinedReviewText.length > 2000) {
-                combinedReviewText = combinedReviewText.substring(0, 2000);
-                return;
-            }
-        });
+        const combinedReviewText = combineReviews(processedAIResponse.reviews);
 
-        const meaningCloudResponse = await axios.post('https://api.meaningcloud.com/summarization-1.0', null, {
-            params: {
-                key: apiKey, // Replace with your MeaningCloud API key
-                txt: combinedReviewText,
-                sentences: 2
-            }
-        });
+        
+        const longPrompt = `Generate a 100 words or lesser summary of ${combinedReviewText}`;
 
-        processedAIResponse.shortsummary = meaningCloudResponse.data.summary;
+        const longResult = await model.generateContent(longPrompt);
+        const longResponse = await longResult.response;
+        const longText = longResponse.text();
+        
+
+        // Define aiSummary if it does not exist
+        processedAIResponse.aiSummary = {};
+
+        // Assign the short and long summaries
+        processedAIResponse.aiSummary.shortSummary = shortText;
+        processedAIResponse.aiSummary.longSummary = longText;
+
+       
+
         console.log(processedAIResponse);
+
         // Store the AI response in MongoDB
         const db = client.db(dbName); // Access the database
         const analysesCollection = db.collection('analyses'); // Select the collection
@@ -280,8 +372,6 @@ app.post('/ai', async (req, res) => {
             { upsert: true } // Create a new document if it does not exist
         );
 
-        // Send the AI response back to the client
-        res.status(response.status).send(processedAIResponse);
     } catch (error) {
         // Log the error message to the console
         console.error('Error forwarding the reviews:', error.message);
