@@ -67,15 +67,6 @@ app.post('/scrape', async (req, res) => {
             reactResponse: response.data
         });
 
-        // Save the JSON response to a file
-        const filePath = path.join(__dirname, 'response.json');
-        fs.writeFile(filePath, JSON.stringify(response.data, null, 2), 'utf8', (err) => {
-            if (err) {
-                console.error('Error saving the JSON file:', err);
-            } else {
-                console.log('JSON file saved successfully.');
-            }
-        });
 
     } catch (error) {
         console.error('Error scraping reviews:', error.message);
