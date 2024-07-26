@@ -5,30 +5,55 @@ import {useNavigate} from "react-router-dom";
 import { Loader } from "./Loader"; // Import the Loader component
 
 
-function cleanAmazonUrl(url) {
+function cleanProductUrl(url) {
     try {
-        // Create a URL object
-        let urlObj = new URL(url);
+        const urlObj = new URL(url);
+        const hostname = urlObj.hostname;
 
-        // Extract the path parts
-        let pathParts = urlObj.pathname.split('/');
-
-        // Find the ASIN (usually after "/dp/")
-        let asinIndex = pathParts.indexOf('dp');
-        if (asinIndex === -1 || asinIndex + 1 >= pathParts.length) {
-            throw new Error("ASIN not found");
+        if (hostname.includes('amazon')) {
+            return cleanAmazonUrl(urlObj);
+        } else if (hostname.includes('shopee')) {
+            return cleanShopeeUrl(urlObj);
         }
 
-        let asin = pathParts[asinIndex + 1];
-
-        // Construct the clean URL
-        let cleanUrl = `${urlObj.origin}/dp/${asin}`;
-
-        return cleanUrl;
+        return url;
     } catch (error) {
         console.error(error.message);
-        return url;  // Return the original URL if an error occurs
+        return url;
     }
+}
+
+function cleanAmazonUrl(urlObj) {
+    // Extract the path parts
+    let pathParts = urlObj.pathname.split('/');
+
+    // Find the ASIN (usually after "/dp/")
+    let asinIndex = pathParts.indexOf('dp');
+    if (asinIndex === -1 || asinIndex + 1 >= pathParts.length) {
+        throw new Error("ASIN not found");
+    }
+
+    let asin = pathParts[asinIndex + 1];
+
+    // Construct the clean URL
+    let cleanUrl = `${urlObj.origin}/dp/${asin}`;
+
+    return cleanUrl;
+}
+
+function cleanShopeeUrl(urlObj) {
+    // Extract the pathname
+    let pathname = urlObj.pathname;
+
+    // Extract the 'i.shopId.itemId' part
+    let match = pathname.match(/i\.(\d+)\.(\d+)/);
+    if (match) {
+        let shopId = match[1];
+        let itemId = match[2];
+        return `${urlObj.origin}/product/${shopId}/${itemId}`;
+    }
+
+    return urlObj.href; // Return the original URL if pattern not matched
 }
 
 function SearchBar() {
@@ -45,7 +70,7 @@ function SearchBar() {
         if (url) {
             setIsLoading(true); // Set loading state to true
             try {
-                const cleanUrl = cleanAmazonUrl(url);
+                const cleanUrl = cleanProductUrl(url);
                 const response = await axios.post("https://localhost:3001/scrape", { url: cleanUrl });
                 console.log("Response from server:", response.data);
                 

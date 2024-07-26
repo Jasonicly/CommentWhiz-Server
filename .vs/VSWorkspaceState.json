@@ -1,7 +1,11 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\ScreenScrape",
+    "\\src",
+    "\\src\\pages",
+    "\\src\\pages\\UserPages"
   ],
-  "SelectedNode": "\\C:\\Users\\weili\\CAPSTONE\\web14",
+  "SelectedNode": "\\src\\pages\\NewPage.js",
   "PreviewInSolutionExplorer": false
 }
