@@ -67,6 +67,15 @@ app.post('/scrape', async (req, res) => {
             reactResponse: response.data
         });
 
+
+    } catch (error) {
+        console.error('Error scraping reviews:', error.message);
+        if (error.response) {
+            console.error('React server response error:', error.response.data);
+            res.status(error.response.status).send(error.response.data);
+        } else if (error.request) {
+            console.error('No response from React server:', error.request);
+            res.status(500).send('No response from React server.');
         } else {
             console.error('Error in request setup:', error.message);
             res.status(500).send('Error in request setup.');
