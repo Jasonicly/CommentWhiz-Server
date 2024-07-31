@@ -18,6 +18,7 @@ import ProductInfo from '../components/ProductInfo';
 import KeyTopics from '../components/KeyTopics';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import AveragePositivityRatings from '../components/AveragePositivityRatings'; // Import the new component
+import SarcasmAnalysisPieChart from '../components/SarcasmAnalysisPieChart';
 
 
 function NewPage() {
@@ -107,7 +108,7 @@ function NewPage() {
     const renderReviewSections = () => {
         if (!data) return null;
     
-        const { summary, key_topics } = data;
+        const { summary, key_topics, monthlyRatings } = data;
     
         return (
             <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
@@ -127,18 +128,22 @@ function NewPage() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                                 <div className="col-span-2 bg-white p-4 m-2 rounded-lg shadow-md text-center min-h-[150px] border-black border">
                                     <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>AI Generated Summary</h4>
-                                    <p>Here is a summary of key points. Here is a summary of key points...</p>
+                                    <p>{data.aiSummary.longSummary}</p>
+
                                 </div>
                                 <EnhancedRating originalRating={2.1} enhancedRating={summary["Enhanced Rating"]} />
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                                 <SentimentAnalysisPieChart summary={summary} />
-                                <SentimentAnalysisPieChart summary={summary} />
+                                <SarcasmAnalysisPieChart summary={summary} />
                                 <SentimentAnalysisPieChart summary={summary} />
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-1">
                                 <EmotionAnalysisGraph summary={summary} />
                                 <TrendingCommentTopics keyTopics={data.key_topics} />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-1">
+                                <AveragePositivityRatings monthlyRatings={monthlyRatings} />
                             </div>
                         </>
                     )}

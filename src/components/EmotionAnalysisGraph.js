@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, ResponsiveContainer } from 'recharts';
 
 const EmotionAnalysisGraph = ({ summary }) => {
     const totalEmotions = summary["Number of Joy Emotions"] + summary["Number of Anger Emotions"] + summary["Number of Neutral Emotions"] + summary["Number of Sadness Emotions"] + summary["Number of Disgust Emotions"] + summary["Number of Surprise Emotions"];
@@ -31,19 +31,21 @@ const EmotionAnalysisGraph = ({ summary }) => {
     };
 
     return (
-        <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center border-1 border-black flex flex-col items-center justify-center min-w-[550px] border-black border">
+        <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center border-1 border-black flex flex-col items-center justify-center border-black border">
             <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>Emotion Analysis</h4>
-            <BarChart width={550} height={300} data={barData} style={{ display: 'flex', justifyContent: 'center' }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip content={renderCustomTooltip} />
-                <Bar dataKey="Count" fill="#000000">
-                    {barData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                </Bar>
-            </BarChart>
+            <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={barData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip content={renderCustomTooltip} />
+                    <Bar dataKey="Count" fill="#000000">
+                        {barData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                    </Bar>
+                </BarChart>
+            </ResponsiveContainer>
             <h5 className="text-lg font-semibold mt-4">Top Emotion: {topEmotion.name}</h5>
         </div>
     );

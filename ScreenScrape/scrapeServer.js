@@ -15,7 +15,7 @@ const options = {
 
 const app = express();
 const port = 6000; // The port for your scraping server
-const maxComments = 100; // Set the maximum number of comments to scrape
+const maxComments = 300; // Set the maximum number of comments to scrape
 app.use(bodyParser.json());
 
 app.post('/scrape', async (req, res) => {
@@ -45,21 +45,21 @@ app.post('/scrape', async (req, res) => {
         });
         console.log('React server response received.');
 
-        // Assuming the 'reviews' variable holds the JSON data you want to save
-        const saveDataLocally = (data) => {
-            const filePath = path.join(__dirname, 'reviews.json');
-            fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8', (err) => {
-                if (err) {
-                    console.error('Error saving the JSON file:', err);
-                } else {
-                    console.log('JSON file saved successfully.');
-                }
-            });
-        };
+        // // Assuming the 'reviews' variable holds the JSON data you want to save
+        // const saveDataLocally = (data) => {
+        //     const filePath = path.join(__dirname, 'reviews.json');
+        //     fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8', (err) => {
+        //         if (err) {
+        //             console.error('Error saving the JSON file:', err);
+        //         } else {
+        //             console.log('JSON file saved successfully.');
+        //         }
+        //     });
+        // };
 
         // Call the function after receiving the response
         console.log('React server response received.');
-        saveDataLocally(reviews);
+        // saveDataLocally(reviews);
 
         // Respond back to the client that the process is complete
         res.json({

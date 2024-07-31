@@ -86,7 +86,7 @@ function SearchBar() {
     };
 
     return (
-        <div className="search-bar-container bg-custom-blue text-white flex flex-col items-center justify-center mt-5 border-1 border-brown mx-auto rounded-lg" style={{ minWidth: '1550px', minHeight: '200px' }}>
+<div className="search-bar-container bg-custom-blue text-white flex flex-col items-center justify-center mt-5 border-1 border-brown mx-auto rounded-lg px-5" style={{ width: '80%', height: 'auto', minHeight: '200px' }}>
             <h2 className="text-2xl font-bold mb-4">
                 Search using URL
             </h2>
