@@ -1,58 +1,284 @@
 {
-  "initialUrl": "https://www.amazon.com/dp/B09P8LT61H",
-  "productName": "Morejoy 100 Pieces Gold Plastic Plates - Clear Gold Disposable Plates - 10.25inch Clear Plastic Dinner Plates With Gold Rim for Weddings & Parties & Shower&Thanksgiving",
-  "productDetails": "Material: Plastic, Brand: Morejoy, Color: A-Gold, Special Feature: Disposable,Sturdy, Occasion: Party",
-  "productImageBase64": "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",
+  "initialUrl": "https://www.amazon.sg/dp/B09695BTLD",
+  "productName": "Miseenscene Hello Cream - 8MB Mute Brown",
+  "productDetails": "Colour: Mute Brown, Package information: Box, Product benefits: Hair Coloring, Brand: Mise En Scene, Item form: Cream, Hair type: Normal, Number of items: 1, Unit count: 1 Count, Manufacturer: AMORE PACIFIC",
+  "productImageBase64": "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",
   "reviews": [
     {
-      "title": "5.0 out of 5 stars Plates for wedding",
-      "body": "High quality. Sturdy plates. Very pretty. Perfect for my daughter’s wedding! Love the gold trim!",
-      "time": "May 22, 2024"
+      "body": "Much better than the japanese brands, doesn’t dry your hair too. Will definitely buy again.",
+      "time": "6 March 2022"
     },
     {
-      "title": "5.0 out of 5 stars Perfect",
-      "body": "These are great! Thin but sturdy. The gold is a little more on the yellow side but still works well with the silverware I bought. They look so elegant!",
-      "time": "April 23, 2024"
+      "body": "not sure if I will continue to use this brand due to using the same kit twice with no noticeable difference",
+      "time": "3 October 2023"
     },
     {
-      "title": "5.0 out of 5 stars Perfect for any glamorous gathering event",
-      "body": "I like the design edge in gold very cute",
-      "time": "June 11, 2024"
+      "body": "Easy to use and color very nice but it not covered white hair",
+      "time": "3 February 2022"
     },
     {
-      "title": "5.0 out of 5 stars beautiful plates",
-      "body": "never ordered this plates before but when I need rosegold I definitely will,this plates are just plain beautiful and they look like real China plates!",
-      "time": "June 12, 2024"
+      "body": "I think this hair dye is great. My hair colour is black and dark brown on the bottom. After using this dye my hair turned to this pinky reddish tint (just like the photos of the product) however outside under the sun, some parts of my hair appears orange. Not sure if this is normal but I've seen it happen to someone else who dyed their virgin hair with this dye. However, It does have a sahara tint!\n\nHONESTLY, I'm happy with the final product!!!",
+      "time": "14 June 2021"
     },
     {
-      "title": "5.0 out of 5 stars Very sturdy",
-      "body": "Will be using these plates for a upcoming birthday party. I used these same plates for a previous event those plates were black & guests enjoyed them. Pairs well with a heavy or light dinner.",
-      "time": "July 17, 2024"
+      "body": "I’ve been using this product for almost 5 years and it’s very gentle on my hair. I have thick dark brown hair but after using 2 of the primers (a month apart from first use) my hair has lightened into a light brown. It smells nice and is very easy to use. If anything goes wrong it’s most likely user error in my opinion.",
+      "time": "28 July 2024"
     },
     {
-      "title": "5.0 out of 5 stars Perfect plates!",
-      "body": "These plates are great quality. Perfect for my sister’s baby shower!",
-      "time": "May 7, 2024"
+      "body": "Love the foam dye product. Easy to apply and the colour was great and covered grey hairs (bonus) Prefer to liquid dye that can be messy.",
+      "time": "14 August 2022"
     },
     {
-      "title": "5.0 out of 5 stars Very nice",
-      "body": "They feel very light. Not sturdy enough to handle heavy food items or anything to hot. I used them as decorative plate. So they served the purpose. Providing the table an elegant look",
-      "time": "February 16, 2023"
+      "body": "",
+      "time": "27 November 2022"
     },
     {
-      "title": "4.0 out of 5 stars Too small",
-      "body": "These plates are a dinner sized plate, but they are more like a dessert sized plate. The plates are nice, but too small to be used as a dinner plate.",
-      "time": "July 14, 2024"
+      "body": "My hair went from dark brown almost black to a medium brown after one use. Hair doesn’t feel damaged as well.",
+      "time": "14 March 2024"
     },
     {
-      "title": "4.0 out of 5 stars Beautiful",
-      "body": "Beautiful but I didn’t get all 100. I ordered for 200 guess and I was short. So a whole table at my event didn’t have plates.",
-      "time": "December 19, 2023"
+      "body": "韓国旅行に行った友人からサンプルを貰って使ったらすごくよくてすぐにアマゾンで探しちゃいました。\n予定より少し早く到着。\nワクワクしながらあけました。\nわ～いっぱい！\n週１～２回のペースで使っていますが、毛穴の汚れがよく落ちるし、古い角質層も落としているのか少し明るくなったみたい。\n使った後、化粧水の吸い込みが半端ない！無くなったらまたリピートしたいです。",
+      "time": "21 December 2014"
     },
     {
-      "title": "5.0 out of 5 stars Beautiful plates",
-      "body": "Beautiful plates solid and sturdy !",
-      "time": "March 14, 2024"
+      "body": "I have black hair and this lightened it to a dark brown. It’s was very obvious in light that my hair changed colour and I loved the subtle change. It did make my hair dry and itchy bc of the bleach in it but it stops after some time !!!",
+      "time": "5 October 2022"
+    },
+    {
+      "body": "日本のカラー剤で赤色商品が少なくあっても色持ちが1週間弱と最低で困っていましたが、この商品は発色がとんでも良く、色持ちも1ヶ月程度はしっかり持ちました。\n\nそして日本で市販で売ってなさそうなカラーパターンがあるのも魅力的です。\n\n使い勝手も日本のカラー剤と変わりなく\n韓国語が読めなくてもパッケージのイラストで大体わかります。\nあと容量も多くてとんでもないです。\n毛量多めのミディアムでも残ってしまうくらい量が多いです。\n\nさすが韓国ブランド....あとパッケージもブラックピンクなのがより可愛くていいですね^^",
+      "time": "7 September 2021"
+    },
+    {
+      "body": "The colour doesn’t last very long but I’m okay with it because I mainly bought it to sit in my K-Pop collection as a display.",
+      "time": "2 January 2024"
+    },
+    {
+      "body": "Super fast delivery and great service",
+      "time": "7 May 2021"
+    },
+    {
+      "body": "I wanted a darker color however, it was a darker brown instead of black, and the color fitted really fast with them 2 to 3 washes. I had to use two boxes for a long hair.",
+      "time": "4 July 2023"
+    },
+    {
+      "body": "I have dark, thick Asian hair. Love this product, it’s quite gentle and so easy to apply. Does burn your skin so be sure to wipe off the foam from your neck and face, don’t let it sit. That being said, as a gentle foam bleach it won’t make Asian hair blonde after one application. You need several. And it does make your hair the same as the box. Same color and tone, so sort of peachy and orangey. You can make it lighter than the box with more applications though. In the end it’s not quite cheap, but cheaper than going to the salon, and if you’re doing it yourself, foam is WAY easier. The foil and paint on method is sooo hard to do on yourself. Ive attempted it before and it took forever,and I had to use so many mirrors. Results are stronger (lighter) on first round of bleaching but margin of error is bigger. The foam is so easy to end up with an even application. I add in 2.3 ml of olaplex no 1 to each bottle I use, rinse after 30 mins, and do a hair mask with olaplex no 2 for 15 mins. After that I again rinse out. I do that for each application of this bleach, and my hair has turned out really healthy looking and not fried! Also Olaplex 03 (bond maker) hair mask 2x a week. I’ve used olaplex with the usual powder + developer bleaches and my hair didn’t turn out as soft and healthy looking as with this foam bleach!",
+      "time": "5 January 2021"
+    },
+    {
+      "body": "Pros: Easy to use and apply, great color for Asian skin tone\nCons: dries out hair (but common for hair dyes) and chemical smell lasts for days",
+      "time": "9 August 2023"
+    },
+    {
+      "body": "Since March, it has remained in my hair; as I stand in the sun, it gets lighter. It is simple to use and doesn't smell like store-bought products. Utilising the foam is quite simple. I'm thrilled with this colour and want to buy more in the future.",
+      "time": "18 July 2023"
+    },
+    {
+      "body": "Was debating to use this primer or the EzN bleach, chose to go with this one because it’s supposed to be a mild bleach. Only about 2 inches of my roots were virgin black hair, the rest was previously dyed dark brown with Liese box dye. The application was easy, I sectioned my hair out and was able to get it evenly bleached very easily. My hair is a short bob so one bottle was plenty. I took about 5-10 mins to apply, then waited 25 mins before rinse off. I also wore a plastic bag with sprayed mist to enhance the bleach (bleach could dry out easily and needs to be moist to work). The result is very mild…can’t really tell under artificial light, but it looks like a natural dark brown in natural light. My hair was really healthy before this primer, it still looks healthy and shiny after, but I could tell i my hair is a little dryer after the primer. For that reason I don’t plan on using the primer again immediately although I still want to bleach it again. I never intended to use this to get to a really light color, but a medium brown would be ideal. Seems like I will need to bleach multiple times to get to medium brown though.",
+      "time": "22 June 2022"
+    },
+    {
+      "body": "I really liked how foamy it was way less messy. However this bleached my hair instead of dying it. So I ended up with more orangey tones.😩",
+      "time": "13 September 2023"
+    },
+    {
+      "body": "以前はミザンセーヌを使っていて、その色に感動しました。 昨日使ったばかりで、髪を乾かしてからドアの中で撮影しました。 私が一番好きだったのは、簡単な塗布、細かい匂い（アンモニア臭なし）、そして色がどれほど良いかでした。 髪の毛の下部をブリーチしたので、色が明るくなりました。 ピンク側に少し入っていて、箱の色とは少し違いますが、それでもこの色が大好きです。 私の髪は美容院で明るい色を試してみるよりもさらに良く見えます。 売り手は非常に速く出荷し、ギフトとしてアルガンオイルのヘアパックも含まれています。",
+      "time": "12 June 2021"
+    },
+    {
+      "body": "I had dyed my hair black a few months ago and got tired of it so I bought this to lift it a little bit. I thought I would have to do it at least two or three times to really see a difference, but it actually made my box dyed hair quite a bit lighter. This is perfect if you want to lighten your hair a few shades.",
+      "time": "4 June 2022"
+    },
+    {
+      "body": "I’ve tried a lot of hair dye boxes but this is the worst smell I’ve seen. Exactly like musty-smelling clothes. Took me almost a week to get rid of that smell ;(( I have 7A Ash Taupe Grey but after dying my hair doesn't look anything like it is supposed to. I have dark brown-blackish base hair and this is what it comes out.",
+      "time": "22 June 2023"
+    },
+    {
+      "body": "Very easy to use and the outcome is so great!",
+      "time": "5 May 2023"
+    },
+    {
+      "body": "Good color results.\nEasy applying.",
+      "time": "1 February 2021"
+    },
+    {
+      "body": "My hair was blonde\nDidn’t come out the right color",
+      "time": "5 January 2024"
+    },
+    {
+      "body": "I was excited to redye my hair but when I opened the package, I realized that I got sent the wrong hair dye. I am currently trying to place a return but it’s ineligible for a return. Will update if I can ever get any money back or the right hair color.",
+      "time": "11 May 2023"
+    },
+    {
+      "body": "The good thing about this is that one bottle was more than enough to cover my super thick, Asian hair. I have a blunt shoulder length bob so I bought two boxes as it usually takes me that much. I could have gone with half the bottle!\n\nAnother good thing is that there's no smell or burn. It's very mild.\n\nThat being said, there was very little change to my hair color. I had medium brown hair with about an inch of virgin black and it only lifted a slight bit. The medium brown didn't really change. I usually use L'Oreal Superior Preference in Hi-Lift natural brown for my roots, and it honestly does a way better job at getting my hair to a medium brown. My roots are now a very dark chestnut brown color so I'm a bit sad that I didn't just go with my usual.\n\nSince I have two boxes and the bleach seems to be extremely mild, I may give it another go in a few days but I defintely won't buy this again.",
+      "time": "7 May 2021"
+    },
+    {
+      "body": "Bery Bery good",
+      "time": "18 April 2024"
+    },
+    {
+      "body": "Super easy to use, you need no help of others.\nAnd I definetely did not buy this box because of the model lol!!",
+      "time": "11 May 2022"
+    },
+    {
+      "body": "The seller sent the wrong color and couldn't return it. I contacted Amazon customer service and they told me they would report the situation to the seller, but it still didn't work.",
+      "time": "22 January 2024"
+    },
+    {
+      "body": "It was amazing despite this being my first time to dye my hair alone this was simply amazing the quality and the amount of solution was perfect for my entire hair. The foam like solution made it even better to make sure no section was left undone . The results of my hair came out better than I was expecting especially for a foam based hair dye. I see why BLACKPINK are in the photos amazing dye quality.",
+      "time": "4 September 2023"
+    },
+    {
+      "body": "I like this product for its gentleness on the hair. I started with natural Asian hair (albeit has some brow/red tones under natural light). It took me 3 applications (3x product over course of 6 months) to get to a medium brown where I'm happy and other coloring will likely come through. The first application my mom didn't even say anything so it must have been a very slight change. The result looks more evident under natural light.\n\nThe instructions are easy and helpful. I tend to leave mine on for 45 minutes but I'm not willing to keep it longer because while it is gentle it'll still srip something from the hair strands.\n\nMy hair is thick as in the stands and the volume so that likely impacted how much the product worked. I'm happy with my third application result and look forward to using other foam coloring soon.",
+      "time": "18 February 2022"
+    },
+    {
+      "body": "I bought the khaki ash brown color. I was so excited to use it for the first time. Application was super easy and I like that it comes with a disposable apron and gloves. I followed the instructions and applied it from tip of hair to crown of head and leave on for 30 minutes. Unfortunately after I rinse and showered, my gray hair still shown! It didn’t cover my gray hair at all. I was so disappointed. My hair look basically the same as before , which is black/medium dark brown. Maybe because I never bleach my hair before that’s why the color didn’t stay on? I’m not sure.",
+      "time": "4 March 2023"
+    },
+    {
+      "body": "Current have black hair , after applied it still black , use the one with bubble seems better",
+      "time": "27 November 2023"
+    },
+    {
+      "body": "I’ve been recoloring my hair using this brand for about 2 years now and get compliments on it. I recommend pre-lightening your hair then using this box for the ash color to show more (this is what I did for my dark Asian hair) the color gets better over time and I feel like my hair doesn’t damage as much as it would have going to a salon. Easy to follow instructions, works like shampoo.\n\nThe shipping surprised me, arrived super quick, within 1 week and I love the little extra samples of skin and hair care provided.",
+      "time": "4 May 2022"
+    },
+    {
+      "body": "I used to give you 1 star because it wasn't the color I ordered but my mom loved it....",
+      "time": "2 April 2023"
+    },
+    {
+      "body": "After I using it, friends-always ask me the brand and wanna buy it.",
+      "time": "6 November 2023"
+    },
+    {
+      "body": "I applied on my daughter’s hair. It was sooo easy and good work than I thought. Her hair was natural born black, it’s her first hair dying. We use khaki brown, 7K, it didn’t appeal khaki feel, but she still happy with that color. First 30min later, I feel it didn’t much brown yet, so I applied all the remain on hair. And after more 20min, she got that color. I think it will be more brighter in sunshine. Enclosed hair treatment smells so perfume like good. Like it.",
+      "time": "6 November 2021"
+    },
+    {
+      "body": "Application was easy but the color is now a little too bright on some parts",
+      "time": "3 September 2022"
+    },
+    {
+      "body": "I combined this primer with purple shampoo to remove brassy blonde from a balayage that had grown out . It wasn’t damaging and it came with a nice serum .",
+      "time": "16 April 2021"
+    },
+    {
+      "body": "You need to use this product several times to get a brighter bleached color, but if you want a natural brown (for Asians with dark hair) using this once or twice would give u that unique color!",
+      "time": "13 July 2020"
+    },
+    {
+      "body": "I don’t know why I received the 6A Dusty ash but with Lisa and is different color than the 6A dusty ash with Jennie face, I ordered the one with jennie bc is was more ash brown and the lisa one will do nothing to my hair bc my hair is not bleached.",
+      "time": "22 February 2023"
+    },
+    {
+      "body": "Unfortunately it did nothing for my hair. I have fine, virgin black hair. Maybe that's why it couldn't bleach it.",
+      "time": "22 February 2022"
+    },
+    {
+      "body": "It was very easy to apply, and the color turned out very pretty and even. I originally have a dark brown-black-ish hair, it turned out to be ash-brown color. I got so many compliments after using this product, two of my friends bought this product after I dyed my hair with this. Would definitely buy it again!",
+      "time": "17 March 2020"
+    },
+    {
+      "body": "It worked really well my hair was a dark brown and it went blonde and it looked like a natural tone which was great",
+      "time": "22 May 2021"
+    },
+    {
+      "body": "So the product arrived crazy fast, but the product itself did not even work on me. The top of my hair was black which was my natural hair color, and the middle to the bottom of my hair was brown, which was the color of the dye that I dyed with about six months ago. After dying my hair, the top of my hair didn't change much, but the bottom to the middle part of my hair changed to dark brown. So yeah, I paid 17 dollars and spent 2 hours to do this, but it did not work out--not at all. What a waste, haha.",
+      "time": "27 December 2017"
+    },
+    {
+      "body": "",
+      "time": "17 December 2022"
+    },
+    {
+      "body": "I get a many compliments,",
+      "time": "7 October 2022"
+    },
+    {
+      "body": "I just wonder why I got green hair after using it. Besides the color, everything is good",
+      "time": "14 November 2018"
+    },
+    {
+      "body": "It’s easy to dye but also the color wasn’t i expected",
+      "time": "25 April 2021"
+    },
+    {
+      "body": "LOVE the product. I ordered two items and they arrived fast. Thank you for securely packing the items using a sturdy box.",
+      "time": "13 September 2020"
+    },
+    {
+      "body": "When I saw dusty ash the color was supposed to be a cool brown. But instead it’s gray??? I got a gray color instead of brown. Even in the box it showed a before and after of that exact color. I guess I’ll see how it goes. Disappointed.",
+      "time": "7 December 2022"
+    },
+    {
+      "body": "Works for me. I would order it again. The packaging and shipping very good.",
+      "time": "13 September 2020"
+    },
+    {
+      "body": "Love that the product has a foam pump and my hair feels amazing after using the product. But my hair was chocolate-brown before the product and now it is closer to black, which is absolutely not okay.",
+      "time": "16 February 2021"
+    },
+    {
+      "body": "Hair didn’t change at all damaging",
+      "time": "14 September 2022"
+    },
+    {
+      "body": "Don’t fall for the colors in the images. Dusty ash is actually gray hair coloring, which does not help me trying to dye out my gray hair at all 😅",
+      "time": "8 May 2023"
+    },
+    {
+      "body": "I like the color but It turned my grey hair blue.",
+      "time": "25 February 2022"
+    },
+    {
+      "body": "ok my hair is thick and dark, but even previous lightly dyed part is not covered",
+      "time": "28 August 2023"
+    },
+    {
+      "body": "Is the product expired? The color looked grey during dying instead of brown as advertised :( it's quite disappointed with the outcome. The foam was very liquidy, it ran down all around the face, which not supposed to. I believed the product was expired already.",
+      "time": "15 October 2021"
+    },
+    {
+      "body": "I love it buy so mamy times",
+      "time": "7 January 2021"
+    },
+    {
+      "body": "It doesn’t do much on my hair",
+      "time": "14 December 2021"
+    },
+    {
+      "body": "I purchased it to see based on other YouTube reviews if it would bring my hair to at least a dark brown from black but after directioned use, I did not see a difference. Would not get again :(",
+      "time": "15 August 2021"
+    },
+    {
+      "body": "it doesn't worth",
+      "time": "26 September 2020"
+    },
+    {
+      "body": "Good",
+      "time": "17 January 2021"
+    },
+    {
+      "body": "I don’t know what is the problem with this hair dye, somehow part of my hair turns greenish. I did follow the instructions step by step.",
+      "time": "6 May 2021"
+    },
+    {
+      "body": "The box have a brown ashy look but my hair turns out blue after I dye my hair! I want a refunddd!!!",
+      "time": "23 November 2021"
+    },
+    {
+      "body": "Left my hair feeling like it was bleached",
+      "time": "26 March 2022"
+    },
+    {
+      "body": "I have virgin black hair.. Did nothing for me..",
+      "time": "27 August 2020"
+    },
+    {
+      "body": "It arrived faster than what I expected. Good quality product to dye hair :)",
+      "time": "4 December 2016"
     }
   ]
 }
