@@ -1,4 +1,4 @@
-import React from 'react';
+/*import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 
 const SarcasmAnalysisPieChart = ({ summary }) => {
@@ -54,4 +54,27 @@ const SarcasmAnalysisPieChart = ({ summary }) => {
     );
 };
 
-export default SarcasmAnalysisPieChart;
+export default SarcasmAnalysisPieChart; */
+
+import React from 'react';
+
+const SarcasmAnalysisDashboard = ({ summary }) => {
+    const totalReviews = summary["Number of Reviews"];
+    const sarcasticComments = summary["Number of Sarcastic Comments"];
+    const sarcasmPercentage = Math.round((sarcasticComments / totalReviews) * 100);
+
+    return (
+        <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center border-black border">
+            <div style= {{alignSelf: 'top'}}>
+                <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif", alignSelf: 'center' }}>Sarcasm Detection</h4>
+            </div>
+            <div className="text-4xl font-bold mb-2">{sarcasmPercentage}%</div>
+            <p className="text-sm">of comments detected as sarcastic</p>
+        </div>
+    );
+};
+
+export default SarcasmAnalysisDashboard;
+
+
+
