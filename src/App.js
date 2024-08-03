@@ -23,9 +23,8 @@ function App() {
                     <Route path="/report" element={<ReportList />} />
                     <Route path="/report/:reportId" element={<NewPage />} />
                     <Route path="*" element={<NotFoundPage />} />
-                    <Route path="/user" element={<UserProfile />} />
                     <Route element={<PrivateAuthRoute />}>
-                        <Route path="/user/:userId" element={<UserProfile />} />
+                        <Route path="/user" element={<UserProfile />} />
                         <Route path="/user/:userId/history" element={<NewPage />} />
                         {/* Some kinds of routes can be private content, data management like the pages, or dashboard, history */}
                         {/* Any other routes you want to protect would also go here as children */}
