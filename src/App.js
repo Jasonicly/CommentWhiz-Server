@@ -10,6 +10,7 @@ import PrivateAuthRoute from './auth/PrivateAuthRoute'; // Ensure correct import
 import NotFoundPage from './pages/NotFoundPage';
 import UserInfo from './pages/UserPages/UserInfo';
 import UserProfile from './pages/UserPages/UserProfile';
+import About from './pages/About';
 
 function App() {
     return (
@@ -20,6 +21,7 @@ function App() {
                     <Route path="/home" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Register />} />
+                    <Route path="/about" element={<About />} />
                     <Route path="/report" element={<ReportList />} />
                     <Route path="/report/:reportId" element={<NewPage />} />
                     <Route path="*" element={<NotFoundPage />} />
