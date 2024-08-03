@@ -1,10 +1,12 @@
-import { Navigate } from "react-router-dom";
-import { useUser } from "./useUser";
+// src/auth/PrivateAuthRoute.js
+import React from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
+import { useUser } from './useUser';
 
-const PrivateAuthRoute = ({ element: Component }) => {
+const PrivateAuthRoute = () => {
     const user = useUser();
 
-    return user ? Component : <Navigate to="/login" replace />;
+    return user ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
 export default PrivateAuthRoute;

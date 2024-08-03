@@ -1,10 +1,13 @@
+// src/auth/useUser.js
 import { useState, useEffect } from "react";
 import { useToken } from "./useToken";
 
 export const useUser = () => {
     const [token] = useToken();
-    
-    const getPayloadFromToken = token => {
+
+    const getPayloadFromToken = (token) => {
+        if (!token) return null;
+
         try {
             const encodedPayload = token.split(".")[1];
             if (!encodedPayload) {
@@ -16,22 +19,12 @@ export const useUser = () => {
             console.error("Error decoding token:", error);
             return null;
         }
-    }
+    };
 
-    const [user, setUser] = useState(() => {
-        if (!token) {
-            return null;
-        }
+    const [user, setUser] = useState(() => getPayloadFromToken(token));
 
-        return getPayloadFromToken(token);
-    });
-
-    useEffect(() => {   
-        if (!token) {
-            setUser(null);
-        } else {
-            setUser(getPayloadFromToken(token));
-        }
+    useEffect(() => {
+        setUser(getPayloadFromToken(token));
     }, [token]);
 
     return user;

@@ -416,9 +416,8 @@ app.post('/register', async (req, res) => {
         const saltRounds = 10;
         const password_hash = await bcrypt.hash(password, saltRounds);
         
-        const  startingReport = {
-            favourite: '',
-        };
+        const startingReport = []
+
         // Create a new user document
         const newUser = {
             _id: email,
@@ -494,7 +493,7 @@ app.post('/login', async (req, res) => {
                 if (err) {
                     return res.status(500).send(err);
                 }
-                res.status(200).send('Login Successful').json({token});
+                res.status(200).json({ token });
                 });
     } 
 }catch (error) {
@@ -559,6 +558,95 @@ app.put('/user/:userId', async (req, res) => {
     }
     );
     });
+});
+
+// Middleware to verify the JWT token
+function verifyToken(req, res, next) {
+    const token = req.headers['authorization'];
+    if (!token) {
+        return res.status(401).send('Access Denied: No Token Provided!');
+    }
+    try {
+        const decoded = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET);
+        req.user = decoded;
+        next();
+    } catch (error) {
+        return res.status(400).send('Invalid Token');
+    }
+}
+
+// Route to get user data
+app.get('/user/:userId', verifyToken, async (req, res) => {
+    const userId = req.params.userId;
+
+    if (req.user.id !== userId) {
+        return res.status(403).send('Access Denied: You do not have permission to access this resource.');
+    }
+
+    try {
+        const db = client.db(dbName);
+        const usersCollection = db.collection('users');
+
+        const user = await usersCollection.findOne({ _id: userId }, { projection: { password_hash: 0 } });
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        res.status(200).send(user);
+    } catch (error) {
+        console.error('Error retrieving user data:', error);
+        res.status(500).send('Error retrieving user data');
+    }
+});
+
+// Update user favorite report (add favorite)
+app.put('/user/:userId/addFavorite', verifyToken, async (req, res) => {
+    const { userId } = req.params;
+    const { reportId } = req.body;
+
+    if (req.user.id !== userId) {
+        return res.status(403).send('Access Denied: You do not have permission to access this resource.');
+    }
+
+    try {
+        const db = client.db(dbName);
+        const usersCollection = db.collection('users');
+
+        await usersCollection.updateOne(
+            { _id: userId },
+            { $addToSet: { favouriteReport: reportId } }
+        );
+
+        res.status(200).send('Favorite report added');
+    } catch (error) {
+        console.error('Error adding favorite report:', error);
+        res.status(500).send('Error adding favorite report');
+    }
+});
+
+// Update user favorite report (remove favorite)
+app.put('/user/:userId/removeFavorite', verifyToken, async (req, res) => {
+    const { userId } = req.params;
+    const { reportId } = req.body;
+
+    if (req.user.id !== userId) {
+        return res.status(403).send('Access Denied: You do not have permission to access this resource.');
+    }
+
+    try {
+        const db = client.db(dbName);
+        const usersCollection = db.collection('users');
+
+        await usersCollection.updateOne(
+            { _id: userId },
+            { $pull: { favouriteReport: reportId } }
+        );
+
+        res.status(200).send('Favorite report removed');
+    } catch (error) {
+        console.error('Error removing favorite report:', error);
+        res.status(500).send('Error removing favorite report');
+    }
 });
 
 // Start the Express server with HTTPS

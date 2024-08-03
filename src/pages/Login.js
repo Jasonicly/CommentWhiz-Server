@@ -68,7 +68,7 @@ const Login = () => {
     };
 
     return (
-        <div className="bg-custom-green justify-center items-center relative">
+        <div className="justify-center items-center relative">
             <Header />
             <div className="flex justify-center items-center h-screen relative">
                 <div className="flex bg-white rounded-2xl shadow-2xl overflow-visible max-w-4xl w-full relative">
@@ -121,7 +121,7 @@ const Login = () => {
                                 {message}
                             </div>
                         )}
-                        <p className="text-center mt-6">Don't have an account? <a href="/register" className="text-green-700 hover:underline">Register here</a></p>
+                        <p className="text-center mt-6">Don't have an account? <a href="/signup" className="text-green-700 hover:underline">Register here</a></p>
                         <div className="flex items-center justify-center mt-6">
                             <button aria-label="Login with Google" className="bg-gray-300 p-3 rounded-full mx-2 hover:bg-gray-400 transition duration-200 ease-in-out">
                                 <img src="https://img.icons8.com/ios-filled/50/000000/google-logo.png" alt="Google" className="w-6 h-6" />

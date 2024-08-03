@@ -19,6 +19,7 @@ import KeyTopics from '../components/KeyTopics';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import AveragePositivityRatings from '../components/AveragePositivityRatings'; // Import the new component
 import SarcasmAnalysisPieChart from '../components/SarcasmAnalysisPieChart';
+import LikeButton from '../components/LikeButton'; // Import the LikeButton component
 
 
 function NewPage() {
@@ -115,14 +116,15 @@ function NewPage() {
             <div className="grid grid-cols-1 xl:grid-cols-5 gap-4" style={{ marginTop: '-140px' }}>
                 {/* Right-side container for larger screens, moves above the main content on smaller screens */}
                 <ProductInfo summary={summary} className="xl:col-span-1"/>
-        
+               
                 {/* Main content container */}
                 <div className="xl:col-span-4 container mx-auto p-4 rounded-lg">
                     {currentPhase === 0 && (
                         <>
                             <OverviewBlocks summary={summary} />
-                            <div className="grid grid-cols-10 gap-2">
-                                <div className="col-span-4 bg-white p-4 m-2 rounded-lg shadow-md text-center min-h-[150px] border-black border">
+                            <LikeButton reportId={reportId} /> {/* Use the LikeButton component */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                <div className="col-span-2 bg-white p-4 m-2 rounded-lg shadow-md text-center min-h-[150px] border-black border">
                                     <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>AI Generated Summary</h4>
                                     <p>{data.aiSummary.longSummary}</p>
                                 </div>

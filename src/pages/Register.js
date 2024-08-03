@@ -90,7 +90,7 @@ const Register = () => {
     };
 
     return (
-        <div className="bg-custom-green">
+        <div>
             <Header />
             <div className="flex flex-col justify-center items-center h-screen relative">
                 <div className="flex bg-white rounded-2xl shadow-2xl overflow-visible max-w-4xl w-full relative mt-6">

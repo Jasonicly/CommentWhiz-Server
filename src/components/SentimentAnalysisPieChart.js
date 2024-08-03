@@ -149,7 +149,7 @@ const SentimentAnalysisPieChart = ({ summary }) => {
             <span>Neutral ({summary["Number of Neutral Reviews"]})</span>
           </div>
         </div>
-        <div ref={chartRef} style={{ width: 200, height: 200 }}></div>
+        <div ref={chartRef} style={{display: 'flex', width: 200, height: 200 }}></div>
       </div>
     </div>
   );
