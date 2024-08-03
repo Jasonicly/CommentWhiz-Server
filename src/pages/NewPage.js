@@ -37,8 +37,9 @@ function NewPage() {
     const isAmazonProductPage = /^https?:\/\/(www\.)?amazon\.[a-z\.]{2,6}(\/d\/|\/dp\/|\/gp\/product\/)/.test(reportId); // Check if URL is Amazon product page
     const encodedUrl = encodeURIComponent(reportId); // Encode URL for API request
     const [currentPhase, setCurrentPhase] = useState(0); // State for current phase of report
-    const phases = ['Analysis Overview', 'Reviews', 'Key Topics']; // Phases of report
-    
+    const phases = ['View Analysis Report Dashboard', 'View Report Product Comments', 'View Report Key Topics']; // Phases of report
+    const icons = ['bookcase.png', 'speechbubble.png', 'keytopics.png'];
+
     const handleNext = () => setCurrentPhase((prev) => (prev + 1) % phases.length);
     const handlePrev = () => setCurrentPhase((prev) => (prev - 1 + phases.length) % phases.length);
 
@@ -111,27 +112,24 @@ function NewPage() {
         const { summary, key_topics, monthlyRatings } = data;
     
         return (
-            <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 xl:grid-cols-5 gap-4" style={{ marginTop: '-140px' }}>
                 {/* Right-side container for larger screens, moves above the main content on smaller screens */}
                 <ProductInfo summary={summary} className="xl:col-span-1"/>
         
                 {/* Main content container */}
-                <div className="xl:col-span-4 bg-custom-lightgray container mx-auto border border-black p-4 rounded-lg">
-                    <div className="bg-gray-100 p-2 rounded border border-black flex items-center justify-between">
-                        <FaArrowLeft className="cursor-pointer" onClick={handlePrev} />
-                        <h3 className="text-2xl font-bold text-center">{phases[currentPhase]}</h3>
-                        <FaArrowRight className="cursor-pointer" onClick={handleNext} />
-                    </div>
+                <div className="xl:col-span-4 container mx-auto p-4 rounded-lg">
                     {currentPhase === 0 && (
                         <>
                             <OverviewBlocks summary={summary} />
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                                <div className="col-span-2 bg-white p-4 m-2 rounded-lg shadow-md text-center min-h-[150px] border-black border">
+                            <div className="grid grid-cols-10 gap-2">
+                                <div className="col-span-4 bg-white p-4 m-2 rounded-lg shadow-md text-center min-h-[150px] border-black border">
                                     <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>AI Generated Summary</h4>
                                     <p>{data.aiSummary.longSummary}</p>
-
                                 </div>
-                                <EnhancedRating originalRating={2.1} enhancedRating={summary["Enhanced Rating"]} />
+                                <div className="col-span-3 bg-white m-2 rounded-lg shadow-md text-center min-h-[150px] border-black border">
+                                <SentimentAnalysisPieChart summary={summary} />
+                                </div>
+                                <div className="col-span-3 bg-white p-4 m-2 rounded-lg shadow-md text-center min-h-[150px] border-black border"></div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                                 <SentimentAnalysisPieChart summary={summary} />
@@ -148,12 +146,12 @@ function NewPage() {
                         </>
                     )}
                     {currentPhase === 1 && (
-                        <div className="bg-white p-6 mb-6 mt-2 rounded-lg shadow-md border-black border overflow-auto">
+                        <div className="bg-white p-6 mb-6 mt-2 rounded-lg shadow-md border-black border overflow-auto" style={{ marginTop: '40px' }}>
                             <ReviewList reviews={data.reviews} />
                         </div>
                     )}
                     {currentPhase === 2 && (
-                        <div className="bg-white p-6 mb-6 mt-2 rounded-lg shadow-md border-black border overflow-auto">
+                        <div className="bg-white p-6 mb-6 mt-2 rounded-lg shadow-md border-black border overflow-auto" style={{ marginTop: '40px' }}>
                             <KeyTopics
                                 keyTopics={data.key_topics}
                                 keyTopicsFilter={keyTopicsFilter}
@@ -174,10 +172,37 @@ function NewPage() {
 
     if (data !== null) {
         return (
-            <div className="flex flex-col min-h-screen">
+            <div className="bg-custom-gray  flex flex-col min-h-screen">
                 <Header />
-                <SearchBar />
-                <div className="flex flex-col items-center flex-grow mt-8 relative"> {/* Added relative positioning */}
+                <div className="bg-custom-darkgray" style={{ width: '100vw', height: '150px' }}>
+                    <div className="bg-custom-darkgray flex items-center justify-between mx-auto mt-4 px-8" style={{ width: '90vw', maxWidth: '1580px' }}>
+                        <button
+                            onClick={handlePrev}
+                            className="flex items-center bg-white text-black px-4 py-2 rounded-lg shadow-md focus:outline-none justify-start"
+                            style={{ width: '200px', height: '60px' }}
+                        >
+                            <FaArrowLeft className="mr-2" />
+                            <span className="hidden lg:block">
+                                {currentPhase === 1 ? "View Analysis Report Dashboard" : currentPhase === 2 ? "View Product Reviews" : "View Report Key Topics"}
+                            </span>
+                        </button>
+                        <div className="flex items-center space-x-4">
+                            <h1 className="text-white text-3xl" style={{ fontFamily: 'Oswald, sans-serif' }}>{phases[currentPhase]}</h1>
+                            <img src={process.env.PUBLIC_URL + `../images/${icons[currentPhase]}`} alt={phases[currentPhase]} className="w-10 h-10" />
+                        </div>
+                        <button
+                            onClick={handleNext}
+                            className="flex items-center bg-white text-black px-4 py-2 rounded-lg shadow-md focus:outline-none justify-end"
+                            style={{ width: '200px', height: '60px' }}
+                        >
+                            <span className="hidden lg:block">
+                                {currentPhase === 0 ? "View Product Reviews" : currentPhase === 1 ? "View Report Key Topics" : "View Analysis Report Dashboard"}
+                            </span>
+                            <FaArrowRight className="ml-2" />
+                        </button>
+                    </div>
+                </div>
+                <div className="flex flex-col items-center flex-grow mt-4 relative">
                     <Container.Outer className="w-full max-w-[1580px] absolute-center" showIcon={false} showHeader={false}>
                         <Container.Inner className="w-full">
                             {isLoading ? renderLoading() : renderReviewSections()}
@@ -187,9 +212,11 @@ function NewPage() {
                 <Footer />
             </div>
         );
-        
-    
     }
+    
+    
+    
+    
     else if (data === null) {
         <div>
             <Header />

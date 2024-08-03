@@ -7,7 +7,7 @@ const ProductInfo = ({ summary }) => {
     const toggleDetails = () => setShowDetails(!showDetails);
 
     return (
-        <div className="container mx-auto">
+        <div className="container mx-auto"style={{ marginTop: '55px' }}>
             <div className="bg-custom-lightgray flex flex-col items-center justify-center p-2 mb-4 rounded-lg border-t border-l border-r border-black border">
                 <ProductImage imageBase64={summary.productImageBase64} />
                 <div className="flex text-2xl font-bold text-black max-w-6xl items-center justify-center" style={{ fontFamily: "'Oswald', sans-serif", textAlign: 'center' }}>
