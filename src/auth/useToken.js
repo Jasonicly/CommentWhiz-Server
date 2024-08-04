@@ -1,3 +1,4 @@
+// src/auth/useToken.js
 import { useState } from "react";
 
 export const useToken = () => {
@@ -10,14 +11,14 @@ export const useToken = () => {
         }
     });
 
-    const setToken = newToken => {
+    const setToken = (newToken) => {
         try {
             localStorage.setItem("token", newToken);
             setTokenInternal(newToken);
         } catch (error) {
             console.error("Error setting token in local storage:", error);
         }
-    }
+    };
 
     return [token, setToken];
 };
