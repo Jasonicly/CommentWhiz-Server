@@ -39,6 +39,7 @@
     "recharts": "^2.12.7",
     "simplebar-react": "^3.2.6",
     "web-vitals": "^2.1.4",
+    "wordcloud": "^1.2.2",
     "ws": "^8.17.0"
   },
   "scripts": {
