@@ -11,7 +11,7 @@ const TrendingCommentTopics = ({ keyTopics }) => {
     };
 
     return (
-        <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center border-1 border-black flex flex-col items-center justify-center border-black border">
+        <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center flex flex-col items-center justify-center">
             <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>Top Trending Comment Topics</h4>
             <div className="grid grid-cols-5" style={{ width: '100%' }}>
                 <div className="col-span-2 flex flex-col justify-around" style={{ minHeight: '400px' }}>
