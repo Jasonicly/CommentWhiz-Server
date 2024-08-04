@@ -1,11 +1,13 @@
 {
   "ExpandedNodes": [
     "",
-    "\\ScreenScrape",
+    "\\public",
     "\\src",
-    "\\src\\pages",
-    "\\src\\pages\\UserPages"
+    "\\src\\components",
+    "\\src\\components\\ReportComponents",
+    "\\src\\components\\ReportListComponents",
+    "\\src\\pages"
   ],
-  "SelectedNode": "\\package-lock.json",
+  "SelectedNode": "\\src\\pages\\UserPages",
   "PreviewInSolutionExplorer": false
 }

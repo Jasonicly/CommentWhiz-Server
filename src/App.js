@@ -10,6 +10,7 @@ import PrivateAuthRoute from './auth/PrivateAuthRoute'; // Ensure correct import
 import NotFoundPage from './pages/NotFoundPage';
 import UserInfo from './pages/UserPages/UserInfo';
 import UserProfile from './pages/UserPages/UserProfile';
+import FavoritePage from './pages/UserPages/FavoritePage';
 import About from './pages/About';
 
 function App() {
@@ -27,7 +28,8 @@ function App() {
                     <Route path="*" element={<NotFoundPage />} />
                     <Route element={<PrivateAuthRoute />}>
                         <Route path="/user" element={<UserProfile />} />
-                        <Route path="/user/:userId/history" element={<NewPage />} />
+                        <Route path="/user/favorite" element={<FavoritePage />} />
+                        {/*<Route path="/user/:userId/history" element={<NewPage />} />*/}
                         {/* Some kinds of routes can be private content, data management like the pages, or dashboard, history */}
                         {/* Any other routes you want to protect would also go here as children */}
                     </Route>

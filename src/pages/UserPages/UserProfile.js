@@ -45,6 +45,10 @@ const UserProfile = () => {
         navigate('/');
     };
 
+    const handleGoFav = () => {
+        navigate('/user/favorite');
+    };
+
     if (!user) {
         return <div>Loading...</div>;
     }
@@ -58,7 +62,7 @@ const UserProfile = () => {
                         <div className="w-30 h-30 mb-4 mt-4 overflow-hidden">
                             <img src="/images/userIcon.png" alt="User" className="w-full h-full object-cover rounded-full" />
                         </div>
-                        <button className="px-8 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors mt-4">View My Favourites</button>
+                        <button className="px-8 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors mt-4" onClick={handleGoFav}>View My Favourites</button>
                     </div>
                     <div className="flex-1 p-8 bg-white flex flex-col justify-between">
                         <div className="flex flex-col items-center">

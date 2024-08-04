@@ -3,7 +3,7 @@ const express = require('express'); // Web framework for Node.js
 const bodyParser = require('body-parser'); // Middleware to parse incoming request bodies
 const cors = require('cors'); // Middleware to enable Cross-Origin Resource Sharing
 const axios = require('axios'); // Promise-based HTTP client for making requests
-const WebSocket = require('ws'); // WebSocket library for real-time communication
+
 const jwt = require('jsonwebtoken'); // JSON Web Token library for creating and verifying tokens
 const { MongoClient, ObjectId } = require('mongodb'); // MongoDB client for connecting to MongoDB
 const bcrypt = require('bcrypt'); // Library for hashing passwords
@@ -646,6 +646,89 @@ app.put('/user/:userId/removeFavorite', verifyToken, async (req, res) => {
     } catch (error) {
         console.error('Error removing favorite report:', error);
         res.status(500).send('Error removing favorite report');
+    }
+});
+
+app.get('/api/allreports', async (req, res) => {
+    const db = client.db(dbName);
+    const analysesCollection = db.collection('analyses');
+
+    const { page = 1, limit = 10, search = '', sort = 'Relevance', category = 'All' } = req.query;
+    console.log(req.query);
+
+    let query = {};
+    if (search) {
+        query['summary.Product Name'] = { $regex: search, $options: 'i' };
+    }
+    if (category && category !== 'All') {
+        query['summary.Category'] = category;
+    }
+
+    let options = {};
+    if (sort === 'Newest') {
+        options = { 'summary.Processed Time': -1 };
+    } else if (sort === 'Positivity') {
+        options = { 'summary.Enhanced Rating': -1 };
+    } else if (sort === 'Negativity') {
+        options = { 'summary.Enhanced Rating': 1 };
+    }
+
+    try {
+        const totalReports = await analysesCollection.countDocuments(query);
+        const skip = (page - 1) * limit;
+        const analyses = await analysesCollection.find(query)
+            .sort(options)
+            .skip(skip)
+            .limit(parseInt(limit))
+            .toArray();
+
+        const summaries = analyses.map(analysis => ({
+            id: analysis._id,
+            summary: analysis.aiSummary?.shortSummary || '',
+            productName: analysis.summary['Product Name']?.substring(0, 40) || '',
+            pictureUrl: analysis.summary['productImageBase64'] || ''
+        }));
+
+        res.json({
+            reports: summaries,
+            totalPages: Math.ceil(totalReports / limit)
+        });
+    } catch (error) {
+        console.error("Error fetching reports:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+// Route to get user's favorite reports
+app.get('/user/:userId/favoriteReports', verifyToken, async (req, res) => {
+    const userId = req.params.userId;
+
+    // Ensure that the userId in the token matches the userId in the URL
+    if (req.user.id !== userId) {
+        return res.status(403).send('Access Denied: You do not have permission to access this resource.');
+    }
+
+    try {
+        const db = client.db(dbName);
+        const usersCollection = db.collection('users');
+        const analysesCollection = db.collection('analyses');
+
+        // Find the user by email
+        const user = await usersCollection.findOne({ _id: userId });
+
+        if (!user || !user.favouriteReport) {
+            return res.status(404).send('No favorite reports found for this user');
+        }
+
+        // Fetch the favorite reports from the analyses collection
+        const favoriteReports = await analysesCollection.find({
+            _id: { $in: user.favouriteReport }
+        }).toArray();
+
+        res.status(200).send(favoriteReports);
+    } catch (error) {
+        console.error('Error fetching favorite reports:', error);
+        res.status(500).send('An error occurred while fetching favorite reports');
     }
 });
 
