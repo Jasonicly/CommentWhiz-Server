@@ -78,6 +78,11 @@ const ProductCard = ({ id, image, name, rating }) => {
                 stacked: true,
             },
         },
+        layout: {
+            padding: {
+                right: 11, // Add padding to the left
+            },
+        },
     };
 
     return (
@@ -98,7 +103,12 @@ const ProductCard = ({ id, image, name, rating }) => {
                 </div>
             </div>
             <div className="w-full h-3/5 flex flex-col justify-center items-center p-2">
-                <p className="text-lg font-semibold text-black text-center">{shortName}</p>
+                <div className="relative">
+                    <p className="text-lg font-semibold text-black text-center">{shortName}</p>
+                    <div className="absolute bottom-0 left-0 right-0 mt-2 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <p className="text-sm font-semibold text-black bg-gray-100 p-1 rounded shadow">{name}</p>
+                    </div>
+                </div>
                 <div className="w-full h-20">
                     <Bar data={data} options={options} />
                 </div>
