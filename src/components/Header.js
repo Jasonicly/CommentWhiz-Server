@@ -57,11 +57,14 @@ function Header() {
                         </>
                     ) : (
                         <>
-                            <Link to="/login" className="hidden md:inline-block text-black hover:text-gray-500">Log In</Link>
-                            <Link to="/signup" className="hidden md:inline-block bg-custom-blue text-white px-4 py-2 rounded hover:bg-black hover:text-custom-lightblue">Sign Up</Link>
+                            <Link to="/home" className="hidden xl:inline-block text-black hover:text-white">Home</Link>
+                            <Link to="#" className="hidden xl:inline-block text-black hover:text-white">Features</Link>
+                            <Link to="#" className="hidden xl:inline-block text-black hover:text-white">About</Link>
+                            <Link to="#" className="hidden xl:inline-block text-black hover:text-white">Reports</Link>
+                            <Link to="/login" className="hidden xl:inline-block bg-custom-blue text-white px-4 py-2 rounded hover:bg-black hover:text-custom-lightblue">Login</Link>
                         </>
                     )}
-                    <button onClick={toggleMenu} className="md:hidden text-black focus:outline-none">
+                    <button onClick={toggleMenu} className="xl:hidden text-black focus:outline-none">
                         {menuOpen ? <FaTimes size="24" /> : <FaBars size="24" />}
                     </button>
                 </div>

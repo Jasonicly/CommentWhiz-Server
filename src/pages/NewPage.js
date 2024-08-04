@@ -113,47 +113,47 @@ function NewPage() {
         const { summary, key_topics, monthlyRatings } = data;
     
         return (
-            <div className="grid grid-cols-1 xl:grid-cols-5 gap-4" style={{ marginTop: '-140px' }}>
+            <div className="grid grid-cols-1 xl:grid-cols-5" style={{ marginTop: '-150px' }}>
                 {/* Right-side container for larger screens, moves above the main content on smaller screens */}
                 <ProductInfo summary={summary} className="xl:col-span-1"/>
-               
+                
                 {/* Main content container */}
                 <div className="xl:col-span-4 container mx-auto p-4 rounded-lg">
                     {currentPhase === 0 && (
                         <>
                             <OverviewBlocks summary={summary} />
-                            <LikeButton reportId={reportId} /> {/* Use the LikeButton component */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                                <div className="col-span-2 bg-white p-4 m-2 rounded-lg shadow-md text-center min-h-[150px] border-black border">
+                            <div className="grid grid-cols-1 lg:grid-cols-10 md:grid-cols-1 gap-2">
+                                <div className="col-span-10 lg:col-span-4 bg-white p-4 m-2 rounded-lg shadow-md text-left min-h-[150px]">
                                     <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>AI Generated Summary</h4>
                                     <p>{data.aiSummary.longSummary}</p>
                                 </div>
-                                <div className="col-span-3 bg-white m-2 rounded-lg shadow-md text-center min-h-[150px] border-black border">
-                                <SentimentAnalysisPieChart summary={summary} />
+                                <div className="col-span-5 lg:col-span-3 bg-white m-2 rounded-lg shadow-md text-center min-h-[150px]">
+                                    <SentimentAnalysisPieChart summary={summary} />
                                 </div>
-                                <div className="col-span-3 bg-white p-4 m-2 rounded-lg shadow-md text-center min-h-[150px] border-black border"></div>
+                                <div className="col-span-5 lg:col-span-3 bg-white p-4 m-2 rounded-lg shadow-md text-left min-h-[150px]">
+                                    <SarcasmAnalysisPieChart summary={summary} />
+                                </div>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                                <SentimentAnalysisPieChart summary={summary} />
-                                <SarcasmAnalysisPieChart summary={summary} />
-                                <SentimentAnalysisPieChart summary={summary} />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2" style={{ gridTemplateColumns: '60% 40%' }}>
+                                <SentimentAnalysisPieChart summary={summary} style={{ width: '100%' }} />
+                                <SarcasmAnalysisPieChart summary={summary} style={{ width: '100%' }} />
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-1">
                                 <EmotionAnalysisGraph summary={summary} />
                                 <TrendingCommentTopics keyTopics={data.key_topics} />
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-1">
+                            <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-1 bg-white rounded-lg shadow-md m-2" style={{ maxHeight: '450px', minHeight: '300px' }}>
                                 <AveragePositivityRatings monthlyRatings={monthlyRatings} />
                             </div>
                         </>
                     )}
                     {currentPhase === 1 && (
-                        <div className="bg-white p-6 mb-6 mt-2 rounded-lg shadow-md border-black border overflow-auto" style={{ marginTop: '40px' }}>
+                        <div className="bg-white mb-6 mt-2 rounded-lg shadow-md overflow-auto" style={{ marginTop: '45px' }}>
                             <ReviewList reviews={data.reviews} />
                         </div>
                     )}
                     {currentPhase === 2 && (
-                        <div className="bg-white p-6 mb-6 mt-2 rounded-lg shadow-md border-black border overflow-auto" style={{ marginTop: '40px' }}>
+                        <div className="bg-white p-6 mb-6 mt-2 rounded-lg shadow-md border-black border overflow-auto" style={{ marginTop: '45' }}>
                             <KeyTopics
                                 keyTopics={data.key_topics}
                                 keyTopicsFilter={keyTopicsFilter}

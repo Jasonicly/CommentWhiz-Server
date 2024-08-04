@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 import ProductImage from './ProductImage';
 import { Button } from './Button';
+import LikeButton from './LikeButton';
 
 const ProductInfo = ({ summary }) => {
     const [showDetails, setShowDetails] = useState(false);
     const toggleDetails = () => setShowDetails(!showDetails);
 
     return (
-        <div className="container mx-auto"style={{ marginTop: '55px' }}>
-            <div className="bg-custom-lightgray flex flex-col items-center justify-center p-2 mb-4 rounded-lg border-t border-l border-r border-black border">
+        <div className="container mx-auto" style={{ marginTop: '60px' }}>
+            <div className="bg-white flex flex-col items-center justify-center p-2 mb-4 rounded-lg border-t border-l border-r">
                 <ProductImage imageBase64={summary.productImageBase64} />
-                <div className="flex text-2xl font-bold text-black max-w-6xl items-center justify-center" style={{ fontFamily: "'Oswald', sans-serif", textAlign: 'center' }}>
+                <div className="flex text-xl font-bold text-black max-w-6xl items-center justify-center" style={{ fontFamily: "'Oswald', sans-serif", textAlign: 'center' }}>
                     {summary["Product Name"]}
+                </div>
+                <div className="flex items-center justify-center space-x-2 mt-4 text-black border-black border-t-2 border-b-2 w-full mx-4">
+                    <p>Add to favorites</p>
+                    <LikeButton />
                 </div>
                 <Button
                     onClick={toggleDetails}
@@ -20,8 +25,8 @@ const ProductInfo = ({ summary }) => {
                 />
             </div>
             {showDetails && (
-                <div className="flex items-center justify-center -mt-6 mb-4 p-5 bg-custom-lightgray border-b border-l border-r border-black rounded-b-lg">
-                    <div className="w-full bg-white p-8 mb-8 rounded-xl shadow-md border-black border custom-scrollbar" style={{ maxHeight: '800px', maxWidth: '900px', overflowY: 'auto'  }}>
+                <div className="flex items-center justify-center -mt-6 mb-4 p-5 bg-white border-b border-l border-r rounded-b-lg">
+                    <div className="w-full bg-white p-2 mb-8 rounded-xl shadow-md border-black border custom-scrollbar" style={{ maxHeight: '800px', maxWidth: '900px', overflowY: 'auto' }}>
                         <ul className="list-disc list-inside">
                             {summary["Product Details"].split(', ').map((detail, index) => (
                                 <li key={index} className="text-1xl mb-1">
