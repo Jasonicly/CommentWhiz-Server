@@ -38,11 +38,20 @@ const EmotionAnalysisGraph = ({ summary }) => {
 
     const option = {
       tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-          type: 'shadow'
+        trigger: 'item',
+        formatter: function (params) {
+          // Access the color of the bar
+          const color = params.color;
+          // Use the emotion name from yAxisData and value from params
+          return `
+            <div style="display: flex; align-items: center;">
+              <div style="width: 10px; height: 10px; background-color: ${color}; border-radius: 50%; margin-right: 5px;"></div>
+              <div>${params.name}: ${params.value}</div>
+            </div>
+          `;
         }
       },
+    
       grid: {
         left: '3%',
         right: '4%',
@@ -63,6 +72,7 @@ const EmotionAnalysisGraph = ({ summary }) => {
           stack: 'total',
           label: {
             show: true,
+            position: 'right', // Position the label outside the bar
             formatter: function (params) {
               return params.value ? params.value : '';
             }
@@ -103,4 +113,4 @@ const EmotionAnalysisGraph = ({ summary }) => {
   );
 };
 
-export default EmotionAnalysisGraph;
+export default EmotionAnalysisGraph; 

@@ -20,9 +20,25 @@ const SentimentAnalysisPieChart = ({ summary }) => {
     const chartDom = chartRef.current;
     const myChart = echarts.init(chartDom);
 
+    const totalReviews = summary["Number of Positive Reviews"] +
+                         summary["Number of Negative Reviews"] +
+                         summary["Number of Neutral Reviews"];
+
     const option = {
       tooltip: {
-        trigger: 'item'
+        trigger: 'item',
+        formatter: function (params) {
+          const value = params.value;
+          const name = params.name;
+          const percent = ((value / totalReviews) * 100).toFixed(0);
+          const color = params.color; // Gets the color of the current item
+          return `
+            <div style="display: flex; align-items: center;">
+              <div style="width: 12px; height: 12px; background-color: ${color}; border-radius: 50%; margin-right: 8px;"></div>
+              ${name}:  ${percent}%  (${value})
+            </div>
+          `;
+        }
       },
       series: [
         {
