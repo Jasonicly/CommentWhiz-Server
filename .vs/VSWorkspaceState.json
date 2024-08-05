@@ -6,8 +6,9 @@
     "\\src\\components",
     "\\src\\components\\ReportComponents",
     "\\src\\components\\ReportListComponents",
+    "\\src\\lib",
     "\\src\\pages"
   ],
-  "SelectedNode": "\\src\\pages\\UserPages",
+  "SelectedNode": "\\server.js",
   "PreviewInSolutionExplorer": false
 }

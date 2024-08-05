@@ -1,80 +1,109 @@
-/*import React from 'react';
-import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
-
-const SarcasmAnalysisPieChart = ({ summary }) => {
-    const totalReviews = summary["Number of Reviews"];
-    const sarcasticComments = summary["Number of Sarcastic Comments"];
-    const nonSarcasticComments = totalReviews - sarcasticComments;
-
-    const pieData = [
-        { name: 'Sarcastic', value: sarcasticComments, count: sarcasticComments },
-        { name: 'Non-Sarcastic', value: nonSarcasticComments, count: nonSarcasticComments }
-    ];
-
-    const COLORS = ['#87c187', '#F08080'];
-
-    const renderCustomTooltip = ({ active, payload }) => {
-        if (active && payload && payload.length) {
-            const data = payload[0].payload;
-            return (
-                <div className="custom-tooltip bg-white p-2 border border-gray-300 rounded shadow">
-                    <p className="label text-sm">{`${data.name}: ${data.count} (${((data.value / totalReviews) * 100).toFixed(2)}%)`}</p>
-                </div>
-            );
-        }
-
-        return null;
-    };
-
-    return (
-        <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center border-black border">
-            <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>Sarcasm Analysis</h4>
-            <PieChart width={200} height={250}>
-                <Pie
-                    data={pieData}
-                    cx={90}
-                    cy={90}
-                    labelLine={false}
-                    outerRadius={50}
-                    fill="#8884d8"
-                    dataKey="value"
-                >
-                    {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                </Pie>
-                <Tooltip content={renderCustomTooltip} />
-                <Legend
-                    wrapperStyle={{
-                        paddingTop: '20px'
-                    }}
-                />
-            </PieChart>
-        </div>
-    );
-};
-
-export default SarcasmAnalysisPieChart; */
-
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import ReactECharts from 'echarts-for-react';
+import * as echarts from 'echarts';
 
 const SarcasmAnalysisDashboard = ({ summary }) => {
     const totalReviews = summary["Number of Reviews"];
     const sarcasticComments = summary["Number of Sarcastic Comments"];
-    const sarcasmPercentage = Math.round((sarcasticComments / totalReviews) * 100);
+    const sarcasmPercentage = Math.round((sarcasticComments / totalReviews) * 100) / 100; // Convert to decimal for gauge
+
+    const option = {
+        series: [
+            {
+                type: 'gauge',
+                startAngle: 180,
+                endAngle: 0,
+                center: ['50%', '75%'],
+                radius: '100%',
+                min: 0,
+                max: 1,
+                splitNumber: 8,
+                axisLine: {
+                    lineStyle: {
+                        width: 6,
+                        color: [
+                            [0.25, '#7CFFB2'],
+                            [0.5, '#58D9F9'],
+                            [0.75, '#FDDD60'],
+                            [1, '#FF6E76']
+                        ]
+                    }
+                },
+                pointer: {
+                    icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z',
+                    length: '12%',
+                    width: 15,
+                    offsetCenter: [0, '-60%'],
+                    itemStyle: {
+                        color: '#000000'
+                    }
+                },
+                axisTick: {
+                    length: 12,
+                    lineStyle: {
+                        color: 'auto',
+                        width: 2
+                    }
+                },
+                splitLine: {
+                    length: 20,
+                    lineStyle: {
+                        color: 'auto',
+                        width: 2
+                    }
+                },
+                axisLabel: {
+                    color: '#464646',
+                    fontSize: 15,
+                    distance: -50,
+                    rotate: 'tangential',
+                    formatter: function (value) {
+                        if (value === 0.875) {
+                            return 'Miguel';
+                        } else if (value === 0.625) {
+                            return 'Jonathan';
+                        } else if (value === 0.375) {
+                            return 'Wei Liang';
+                        } else if (value === 0.125) {
+                            return 'Thu Ta';
+                        }
+                        return '';
+                    }
+                },
+                title: {
+                    offsetCenter: [0, '20%'],
+                    fontSize: 20
+                },
+                detail: {
+                    fontSize: 50,
+                    offsetCenter: [0, '-15%'],
+                    valueAnimation: true,
+                    formatter: function (value) {
+                        return Math.round(value * 100) + '%';
+                    },
+                    color: 'inherit'
+                },
+                data: [
+                    {
+                        value: sarcasmPercentage,
+                        name: 'Sarcasm Rating'
+                    }
+                ]
+            }
+        ]
+    };
 
     return (
-        <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center border-black border">
-            <div style= {{alignSelf: 'top'}}>
-                <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif", alignSelf: 'center' }}>Sarcasm Detection</h4>
+        <div className="bg-white m-2 rounded-lg text-left flex flex-col items-left">
+            <div className="text-left">
+                <h4 className="text-xl font-semibold text-left" style={{ fontFamily: "'Oswald', sans-serif" }}>Sarcasm Detection</h4>
             </div>
-            <div className="text-4xl font-bold mb-2">{sarcasmPercentage}%</div>
-            <p className="text-sm">of comments detected as sarcastic</p>
+            <div className="flex flex-col items-center">
+                <ReactECharts option={option} style={{ height: '200px', width: '100%' }} />
+                <p className="text-sm text-center">of comments detected as sarcastic</p>
+            </div>
         </div>
     );
 };
 
 export default SarcasmAnalysisDashboard;
-
-
-

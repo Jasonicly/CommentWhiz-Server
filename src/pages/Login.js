@@ -67,6 +67,10 @@ const Login = () => {
         setMessageType('');
     };
 
+    const handleGoogleLogin = () => {
+        window.location.href = 'https://localhost:3001/auth/google';
+    };
+
     return (
         <div className="justify-center items-center relative">
             <Header />
@@ -123,7 +127,7 @@ const Login = () => {
                         )}
                         <p className="text-center mt-6">Don't have an account? <a href="/signup" className="text-green-700 hover:underline">Register here</a></p>
                         <div className="flex items-center justify-center mt-6">
-                            <button aria-label="Login with Google" className="bg-gray-300 p-3 rounded-full mx-2 hover:bg-gray-400 transition duration-200 ease-in-out">
+                            <button aria-label="Login with Google" className="bg-gray-300 p-3 rounded-full mx-2 hover:bg-gray-400 transition duration-200 ease-in-out" onClick={handleGoogleLogin}>
                                 <img src="https://img.icons8.com/ios-filled/50/000000/google-logo.png" alt="Google" className="w-6 h-6" />
                             </button>
                             <button aria-label="Login with Facebook" className="bg-gray-300 p-3 rounded-full mx-2 hover:bg-gray-400 transition duration-200 ease-in-out">

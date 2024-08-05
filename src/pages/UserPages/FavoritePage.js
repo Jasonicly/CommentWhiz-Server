@@ -66,18 +66,24 @@ const FavoritePage = () => {
             <Header />
             <div className="flex flex-1 p-4">
                 <div className="max-w-7xl mx-auto w-full">
-                    <h1 className="text-3xl font-bold mb-6 text-center">My Favorite Reports</h1>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {products.map(product => (
-                            <ProductCard
-                                key={product._id}
-                                id={product._id}
-                                image={product.summary?.productImageBase64}
-                                name={product.summary?.['Product Name']}
-                                rating={product.summary?.['Enhanced Rating']}
-                            />
-                        ))}
-                    </div>
+                    <h1 className="text-3xl font-bold mb-6 text-center">My Favorites</h1>
+                    {products.length === 0 ? (
+                        <div className="text-center text-gray-500 text-xl">
+                            You have no favorite.
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {products.map(product => (
+                                <ProductCard
+                                    key={product._id}
+                                    id={product._id}
+                                    image={product.summary?.productImageBase64}
+                                    name={product.summary?.['Product Name']}
+                                    rating={product.summary?.['Enhanced Rating']}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
             <Footer />
