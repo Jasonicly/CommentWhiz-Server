@@ -58,9 +58,9 @@ function Header() {
                     ) : (
                         <>
                             <Link to="/home" className="hidden xl:inline-block text-black hover:text-white">Home</Link>
-                            <Link to="#" className="hidden xl:inline-block text-black hover:text-white">Features</Link>
+                            <Link to="/features" className="hidden xl:inline-block text-black hover:text-white">Features</Link>
                             <Link to="/about" className="hidden xl:inline-block text-black hover:text-white">About</Link>
-                            <Link to="#" className="hidden xl:inline-block text-black hover:text-white">Reports</Link>
+                            <Link to="/report" className="hidden xl:inline-block text-black hover:text-white">Reports</Link>
                             <Link to="/login" className="hidden xl:inline-block bg-custom-blue text-white px-4 py-2 rounded hover:bg-black hover:text-custom-lightblue">Login</Link>
                         </>
                     )}

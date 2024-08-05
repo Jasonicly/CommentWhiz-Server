@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ReportComponents/ProductCard';
@@ -13,35 +13,69 @@ const ProductList = () => {
     const [category, setCategory] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const reportsPerPage = 10;
+    const [lastSearchQuery, setLastSearchQuery] = useState(''); // Store the last search query
+    const reportsPerPage = 12;
 
+    const enterPressedRef = useRef(false); // Ref to track if Enter was pressed
+
+    // Fetch Products function
+    const fetchProducts = async (search = searchQuery, page = currentPage) => {
+        setLoading(true);
+        try {
+            const response = await axios.get('https://localhost:3001/api/allreports', {
+                params: {
+                    page,
+                    limit: reportsPerPage,
+                    search,
+                    sort: sortOption,
+                    category,
+                },
+            });
+            setProducts(response.data.reports);
+            setTotalPages(response.data.totalPages);
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Debounce mechanism for search input
     useEffect(() => {
-        const fetchProducts = async () => {
-            setLoading(true);
-            try {
-                const response = await axios.get('https://localhost:3001/api/allreports', {
-                    params: {
-                        page: currentPage,
-                        limit: reportsPerPage,
-                        search: searchQuery,
-                        sort: sortOption,
-                        category,
-                    },
-                });
-                setProducts(response.data.reports);
-                setTotalPages(response.data.totalPages);
-            } catch (error) {
-                setError(error.message);
-            } finally {
-                setLoading(false);
+        if (enterPressedRef.current) {
+            enterPressedRef.current = false; // Reset after handling Enter key
+            return;
+        }
+
+        const delayDebounceFn = setTimeout(() => {
+            if (searchQuery !== lastSearchQuery) {
+                fetchProducts();
+                setCurrentPage(1); // Reset to first page on search
+                setLastSearchQuery(searchQuery); // Update last search query
             }
-        };
+        }, 2000);
+
+        return () => clearTimeout(delayDebounceFn); // Cleanup timeout if component unmounts or searchQuery changes
+    }, [searchQuery, lastSearchQuery]); // Only trigger effect when searchQuery changes
+
+    // Effect to trigger fetch when page, sort, or category changes
+    useEffect(() => {
         fetchProducts();
-    }, [currentPage, searchQuery, sortOption, category]);
+    }, [currentPage, sortOption, category]);
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
-        setCurrentPage(1);
+    };
+
+    const handleSearchKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Prevent default form submission behavior
+            if (searchQuery !== lastSearchQuery) {
+                enterPressedRef.current = true; // Set ref to true when Enter is pressed
+                fetchProducts(); // Trigger immediate fetch
+                setLastSearchQuery(searchQuery); // Update last search query
+            }
+        }
     };
 
     const handleSortChange = (e) => {
@@ -66,24 +100,6 @@ const ProductList = () => {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full border-blue-500" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-red-500 text-xl">Error: {error}</div>
-            </div>
-        );
-    }
-
     return (
         <div className="flex flex-col min-h-screen">
             <Header />
@@ -96,6 +112,7 @@ const ProductList = () => {
                             placeholder="Search for keywords"
                             value={searchQuery}
                             onChange={handleSearchChange}
+                            onKeyDown={handleSearchKeyDown}
                             className="w-full p-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
@@ -126,17 +143,29 @@ const ProductList = () => {
                 </aside>
                 <div className="flex flex-1 flex-col p-4 bg-white shadow-lg rounded-lg">
                     <h1 className="text-3xl font-bold mb-6 text-center text-gray-700">Reports</h1>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {products.map(product => (
-                            <ProductCard
-                                key={product.id}
-                                id={product.id}
-                                image={product.pictureUrl}
-                                name={product.productName}
-                                rating={product.summary}
-                            />
-                        ))}
-                    </div>
+
+                    {/* Loading and Error Handling */}
+                    {loading ? (
+                        <div className="flex justify-center items-center h-full">
+                            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-green-500"></div>
+                        </div>
+                    ) : error ? (
+                        <div className="text-red-500 text-xl">Error: {error}</div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {products.map(product => (
+                                <ProductCard
+                                    key={product.id}
+                                    id={product.id}
+                                    image={product.pictureUrl}
+                                    name={product.productName}
+                                    rating={product.enhancedRating}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Pagination */}
                     <div className="flex justify-between items-center mt-4">
                         <button onClick={handlePrevPage} disabled={currentPage === 1} className="bg-blue-500 text-white py-2 px-4 rounded disabled:opacity-50 shadow-lg">
                             Previous

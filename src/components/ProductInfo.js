@@ -41,4 +41,4 @@ const ProductInfo = ({ summary }) => {
     );
 };
 
-export default ProductInfo;
+export default ProductInfo;  

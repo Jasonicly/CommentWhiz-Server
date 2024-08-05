@@ -7,7 +7,7 @@ const axios = require('axios'); // Promise-based HTTP client for making requests
 const jwt = require('jsonwebtoken'); // JSON Web Token library for creating and verifying tokens
 const { MongoClient, ObjectId } = require('mongodb'); // MongoDB client for connecting to MongoDB
 const bcrypt = require('bcrypt'); // Library for hashing passwords
-
+const passport = require('./passport'); // Import the passport configuration
 const fs = require('fs'); // File system module for reading files
 const path = require('path'); // Path module for working with file paths
 const https = require('https'); // HTTPS module for creating secure servers
@@ -17,6 +17,7 @@ const { JsonWebTokenError } = require('jsonwebtoken');
 const { start } = require('repl');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const http = require('http');
+const Mailjet = require('node-mailjet');
 
 require('dotenv').config();
 // Access your API key as an environment variable (see "Set up your API key" above)
@@ -33,7 +34,6 @@ const options = {
 };
 
 
-
 // Create an Express application
 const app = express();
 // Define the port number the server will listen on
@@ -43,6 +43,8 @@ const port = 3001;
 app.use(bodyParser.json());
 // Use CORS middleware to allow cross-origin requests
 app.use(cors());
+
+app.use(passport.initialize());
 
 // MongoDB connection URL and database name
 const mongoUrl = 'mongodb://localhost:27017';
@@ -397,6 +399,12 @@ app.post('/api/databasequery', async (req, res) => {
     res.send(summaries);
 });
 
+
+const mailjet = Mailjet.apiConnect(
+    process.env.MJ_APIKEY_PUBLIC,
+    process.env.MJ_APIKEY_PRIVATE,
+);
+
 // Define a POST route for user registration
 app.post('/register', async (req, res) => {
     const { email, password } = req.body;
@@ -415,33 +423,70 @@ app.post('/register', async (req, res) => {
         
         const startingReport = []
 
+        // Generate a verification token
+        const verificationToken = await bcrypt.hash(email + Date.now().toString(), saltRounds);
+
         // Create a new user document
         const newUser = {
             _id: email,
             password_hash,
             isVerified: false,
+            verificationToken,
             favouriteReport: startingReport,
         };
 
         // Insert the new user into the users collection
         await usersCollection.insertOne(newUser);
-        
-        // Send back a json web token
-        jwt.sign({
-            id : email,
-            isVerified: false, 
-            favouriteReport: startingReport,
-        },
-        process.env.JWT_SECRET,
-        {
-            expiresIn: '1d'
-        },
-        (err, token) => {
-            if (err) {
-                return res.status(500).send(err);
-            }
-            res.status(201).json({token});
-        });
+
+        // Send verification email using Mailjet
+        const request = mailjet
+            .post('send', { version: 'v3.1' })
+            .request({
+                Messages: [
+                    {
+                        From: {
+                            Email: "commentwhiz2@gmail.com",
+                            Name: "CommentWhiz"
+                        },
+                        To: [
+                            {
+                                Email: email,
+                                Name: "CommentWhiz User"
+                            }
+                        ],
+                        Subject: "Verify your email address",
+                        TextPart: `Please verify your email by clicking on the following link: https://localhost:${port}/verify-email?token=${verificationToken}&email=${email}`,
+                        HTMLPart: `<p>Please verify your email by clicking on the following link: <a href="https://localhost:${port}/verify-email?token=${verificationToken}&email=${email}">Verify Email</a></p>`
+                    }
+                ]
+            });
+
+        request
+            .then((result) => {
+                console.log(result.body);
+
+                // Send back a json web token
+                jwt.sign({
+                    id: email,
+                    isVerified: false,
+                    favouriteReport: startingReport,
+                },
+                    process.env.JWT_SECRET,
+                    {
+                        expiresIn: '7d'
+                    },
+                    (err, token) => {
+                        if (err) {
+                            return res.status(500).send(err);
+                        }
+                        res.status(201).json({ token });
+                    });
+            })
+            .catch((err) => {
+                console.error(err.statusCode);
+                res.status(500).send('Error sending verification email');
+            });
+
     } catch (error) {
         // Log the error message to the console
         console.error('Error registering user:', error.message);
@@ -500,6 +545,82 @@ app.post('/login', async (req, res) => {
 }
 });
 
+const serveHTML = (message) => `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <style>
+        .fixed {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .popup {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+    <script>
+        setTimeout(function() {
+            window.location.href = 'https://localhost:3000';
+        }, 5000);
+    </script>
+</head>
+<body>
+    <div class="fixed">
+        <div class="popup">
+            <h1>${message}</h1>
+            <p>You will be redirected shortly...</p>
+        </div>
+    </div>
+</body>
+</html>
+`;
+
+app.get('/verify-email', async (req, res) => {
+    const { token, email } = req.query;
+
+    if (!token || !email) {
+        return res.status(400).send(serveHTML('Invalid verification link'));
+    }
+
+    try {
+        const db = client.db(dbName);
+        const usersCollection = db.collection('users');
+
+        // Find the user by email and token
+        const user = await usersCollection.findOne({ _id: email, verificationToken: token });
+
+        if (!user) {
+            return res.status(400).send(serveHTML('Invalid verification link'));
+        }
+
+        // Update the user document to set isVerified to true and remove the verification token
+        await usersCollection.updateOne(
+            { _id: email },
+            { $set: { isVerified: true }, $unset: { verificationToken: '' } }
+        );
+
+        res.send(serveHTML('Email verified successfully!'));
+    } catch (error) {
+        console.error('Error verifying email:', error.message);
+        res.status(500).send(serveHTML('An error occurred while verifying the email'));
+    }
+});
 
 // update User Info page 
 app.put('/user/:userId', async (req, res) => {
@@ -646,6 +767,10 @@ app.put('/user/:userId/removeFavorite', verifyToken, async (req, res) => {
     }
 });
 
+const escapeRegex = (text) => {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+};
+
 app.get('/api/allreports', async (req, res) => {
     const db = client.db(dbName);
     const analysesCollection = db.collection('analyses');
@@ -655,7 +780,8 @@ app.get('/api/allreports', async (req, res) => {
 
     let query = {};
     if (search) {
-        query['summary.Product Name'] = { $regex: search, $options: 'i' };
+        const safeSearch = escapeRegex(search);
+        query['summary.Product Name'] = { $regex: safeSearch, $options: 'i' };
     }
     if (category && category !== 'All') {
         query['summary.Category'] = category;
@@ -681,8 +807,8 @@ app.get('/api/allreports', async (req, res) => {
 
         const summaries = analyses.map(analysis => ({
             id: analysis._id,
-            summary: analysis.aiSummary?.shortSummary || '',
-            productName: analysis.summary['Product Name']?.substring(0, 40) || '',
+            enhancedRating: analysis.summary['Enhanced Rating'] || '',
+            productName: analysis.summary['Product Name'] || '',
             pictureUrl: analysis.summary['productImageBase64'] || ''
         }));
 
@@ -727,6 +853,13 @@ app.get('/user/:userId/favoriteReports', verifyToken, async (req, res) => {
         console.error('Error fetching favorite reports:', error);
         res.status(500).send('An error occurred while fetching favorite reports');
     }
+});
+
+// Google authentication route
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+app.get('/auth/google/callback', passport.authenticate('google', { session: false }), (req, res) => {
+    res.redirect(`https://localhost:3000?token=${req.user.token}`);
 });
 
 // Start the Express server with HTTPS

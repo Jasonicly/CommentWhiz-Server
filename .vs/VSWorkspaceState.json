@@ -1,13 +1,6 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\public",
-    "\\src",
-    "\\src\\components",
-    "\\src\\components\\ReportComponents",
-    "\\src\\components\\ReportListComponents",
-    "\\src\\pages"
+    ""
   ],
-  "SelectedNode": "\\src\\pages\\UserPages",
   "PreviewInSolutionExplorer": false
 }
