@@ -48,6 +48,11 @@ function Header() {
                 <div className="flex items-center space-x-4">
                     {isAuthenticated() ? (
                         <>
+                            <Link to="/home" className="hidden xl:inline-block text-black hover:text-white">Home</Link>
+                            <Link to="/features" className="hidden xl:inline-block text-black hover:text-white">Features</Link>
+                            <Link to="/about" className="hidden xl:inline-block text-black hover:text-white">About</Link>
+                            <Link to="/report" className="hidden xl:inline-block text-black hover:text-white">Reports</Link>
+
                             <Link to="/user" className="hidden md:inline-block text-black hover:text-blue-500">
                                 <h2>{userEmail.split('@')[0]}</h2>
                             </Link>
@@ -74,10 +79,10 @@ function Header() {
                 <nav className="lg:hidden bg-custom-gray text-white px-4 py-2 border-b-2 border-black">
                     <ul className="space-y-4">
                         <li><SearchBar /></li>
-                        <li><a href="/home" className="block text-black hover:text-gray-500">HOME</a></li>
-                        <li><a href="#" className="block text-black hover:text-gray-500">FEATURES</a></li>
-                        <li><a href="#" className="block text-black hover:text-gray-500">ABOUT</a></li>
-                        <li><a href="#" className="block text-black hover:text-gray-500">REPORTS</a></li>
+                        <Link to="/home" className="hidden xl:inline-block text-black hover:text-white">Home</Link>
+                            <Link to="/features" className="hidden xl:inline-block text-black hover:text-white">Features</Link>
+                            <Link to="/about" className="hidden xl:inline-block text-black hover:text-white">About</Link>
+                            <Link to="/report" className="hidden xl:inline-block text-black hover:text-white">Reports</Link>
                         {isAuthenticated() ? (
                             <>
                                 <Link to="/user" className="block text-black hover:text-blue-500">

@@ -16,6 +16,7 @@ const { decode } = require('punycode');
 const { JsonWebTokenError } = require('jsonwebtoken');
 const { start } = require('repl');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const http = require('http');
 const Mailjet = require('node-mailjet');
 
 require('dotenv').config();
@@ -320,19 +321,8 @@ app.post('/ai', async (req, res) => {
 
         const shortText = summaryresponse.data;
 
-        
-        res.send({
-            aiSummary: {
-                shortSummary: shortText
-            }
-        });
-        
-
         // Forward the reviews to AI server on localhost:5000
-        const response = await axios.post('https://localhost:5000/process_reviews', reviews, {
-            httpsAgent: new https.Agent({
-                rejectUnauthorized: false, // This will allow self-signed certificates
-            }),
+        const response = await axios.post('http://34.136.31.161:5000/process_reviews', reviews, {
         });
         console.log('Response from AI:', response.data);
 
@@ -342,13 +332,11 @@ app.post('/ai', async (req, res) => {
         // Extract and combine review texts
         const combinedReviewText = combineReviews(processedAIResponse.reviews);
 
-        
         const longPrompt = `Generate a 100 words or lesser summary of ${combinedReviewText}`;
 
         const longResult = await model.generateContent(longPrompt);
         const longResponse = await longResult.response;
-        const longText = longResponse.text();
-        
+        const longText = await longResponse.text();
 
         // Define aiSummary if it does not exist
         processedAIResponse.aiSummary = {};
@@ -373,6 +361,15 @@ app.post('/ai', async (req, res) => {
             { $set: processedAIResponse },
             { upsert: true } // Create a new document if it does not exist
         );
+
+        // Send the final response back to the client
+        res.send({
+            aiSummary: {
+                shortSummary: shortText,
+                longSummary: longText
+            },
+            processedAIResponse
+        });
 
     } catch (error) {
         // Log the error message to the console

@@ -66,4 +66,4 @@ const EnhancedRating = ({ originalRating, enhancedRating }) => {
     );
 };
 
-export default EnhancedRating;
+export default EnhancedRating; 

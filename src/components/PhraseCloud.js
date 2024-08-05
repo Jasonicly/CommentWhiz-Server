@@ -51,7 +51,7 @@ export default TrendingCommentTopics; */
 import React, { useState, useEffect, useRef } from 'react';
 import WordCloud from 'wordcloud';
 
-const TrendingCommentTopics = ({ keyTopics }) => {
+const PhraseCloud = ({ keyTopics }) => {
     const sortedKeyTopics = Object.keys(keyTopics)
         .sort((a, b) => keyTopics[b].unique_comment_count - keyTopics[a].unique_comment_count)
         .slice(0, 10); // Line to limit to  first 5 topics
@@ -85,14 +85,14 @@ const TrendingCommentTopics = ({ keyTopics }) => {
 
     return (
         <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center border-1 border-black flex flex-col items-center justify-center border-black border">
-            <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>Top Trending Comment Topics</h4>
+            <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>Phrases Cloud</h4>
             
             <div style={{ width: '100%', height: '400px' }} ref={wordCloudRef}></div>
         </div>
     );
 };
 
-export default TrendingCommentTopics;
+export default PhraseCloud; 
 
 /*
 <div className="grid grid-cols-5" style={{ width: '100%' }}>
