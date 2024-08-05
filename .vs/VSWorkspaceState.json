@@ -1,14 +1,6 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\public",
-    "\\src",
-    "\\src\\components",
-    "\\src\\components\\ReportComponents",
-    "\\src\\components\\ReportListComponents",
-    "\\src\\lib",
-    "\\src\\pages"
+    ""
   ],
-  "SelectedNode": "\\server.js",
   "PreviewInSolutionExplorer": false
 }
