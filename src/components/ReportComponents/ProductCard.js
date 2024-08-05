@@ -9,7 +9,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ChartDataLabels);
 
 const ProductCard = ({ id, image, name, rating }) => {
-    const shortName = name.length > 30 ? `${name.slice(0, 30)}...` : name;
+    const shortName = name.length > 40 ? `${name.slice(0, 40)}...` : name;
     const navigate = useNavigate();
 
     const handleCardClick = () => {
@@ -97,7 +97,7 @@ const ProductCard = ({ id, image, name, rating }) => {
                     className="w-full h-full object-contain transition-opacity duration-300 group-hover:opacity-75"
                 />
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="bg-green-100 rounded-full p-2 flex items-center justify-center w-9 h-9">
+                    <div className="bg-blue-100 rounded-full p-2 flex items-center justify-center w-12 h-12">
                         <LikeButton reportId={id} />
                     </div>
                 </div>
@@ -106,7 +106,7 @@ const ProductCard = ({ id, image, name, rating }) => {
                 <div className="relative">
                     <p className="text-lg font-semibold text-black text-center">{shortName}</p>
                     <div className="absolute bottom-0 left-0 right-0 mt-2 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <p className="text-sm font-semibold text-black bg-gray-100 p-1 rounded shadow">{name}</p>
+                        {/* <p className="text-sm font-semibold text-black bg-gray-100 p-1 rounded shadow">{name}</p> */}
                     </div>
                 </div>
                 <div className="w-full h-20">
