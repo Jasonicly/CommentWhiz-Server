@@ -20,6 +20,7 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import AveragePositivityRatings from '../components/AveragePositivityRatings'; // Import the new component
 import SarcasmAnalysisPieChart from '../components/SarcasmAnalysisPieChart';
 import LikeButton from '../components/LikeButton'; // Import the LikeButton component
+import TopicsVisual from '../components/TopicsVisual';
 
 
 function NewPage() {
@@ -110,7 +111,7 @@ function NewPage() {
     const renderReviewSections = () => {
         if (!data) return null;
     
-        const { summary, key_topics, monthlyRatings } = data;
+        const { summary, monthlyRatings, topics_with_sentiments } = data; // Extracting topics_with_sentiments
     
         return (
             <div className="grid grid-cols-1 xl:grid-cols-5" style={{ marginTop: '-150px' }}>
@@ -136,11 +137,11 @@ function NewPage() {
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2" style={{ gridTemplateColumns: '60% 40%' }}>
                                 <SentimentAnalysisPieChart summary={summary} style={{ width: '100%' }} />
-                                <SarcasmAnalysisPieChart summary={summary} style={{ width: '100%' }} />
+                                <TopicsVisual topicsWithSentiments={topics_with_sentiments} /> {/* Pass the topics_with_sentiments data */}
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-1">
                                 <EmotionAnalysisGraph summary={summary} />
-                                <TrendingCommentTopics keyTopics={data.key_topics} />
+                                {/* <TrendingCommentTopics keyTopics={data.key_topics} /> */}
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-1 bg-white rounded-lg shadow-md m-2" style={{ maxHeight: '450px', minHeight: '300px' }}>
                                 <AveragePositivityRatings monthlyRatings={monthlyRatings} />
@@ -244,4 +245,4 @@ function NewPage() {
 }
     
     
-    export default NewPage;
+export default NewPage;

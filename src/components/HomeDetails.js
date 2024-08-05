@@ -33,7 +33,7 @@ const HomeDetails = () => {
                     leftColumnRef.current.style.top = '50%';
                     leftColumnRef.current.style.transform = 'translateY(-50%)';
                     leftColumnRef.current.style.opacity = '1';
-                } else if (centerViewport >= (maxBottom)) {
+                } else if (centerViewport >= (maxBottom + 30)) {
                     leftColumnRef.current.style.position = 'relative';
                     leftColumnRef.current.style.top = `${parentHeight - leftColumnHeight -80}px`;
                     leftColumnRef.current.style.transform = 'translateY(0)';

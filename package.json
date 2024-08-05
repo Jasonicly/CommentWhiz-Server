@@ -23,6 +23,7 @@
     "echarts-for-react": "^3.0.2",
     "eslint": "^8.57.0",
     "express": "^4.19.2",
+    "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
     "mongodb": "^6.7.0",
