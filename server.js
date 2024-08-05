@@ -809,8 +809,8 @@ app.get('/api/allreports', async (req, res) => {
 
         const summaries = analyses.map(analysis => ({
             id: analysis._id,
-            summary: analysis.aiSummary?.shortSummary || '',
-            productName: analysis.summary['Product Name']?.substring(0, 40) || '',
+            enhancedRating: analysis.summary['Enhanced Rating'] || '',
+            productName: analysis.summary['Product Name'] || '',
             pictureUrl: analysis.summary['productImageBase64'] || ''
         }));
 

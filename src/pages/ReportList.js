@@ -159,7 +159,7 @@ const ProductList = () => {
                                     id={product.id}
                                     image={product.pictureUrl}
                                     name={product.productName}
-                                    rating={product.summary}
+                                    rating={product.enhancedRating}
                                 />
                             ))}
                         </div>
