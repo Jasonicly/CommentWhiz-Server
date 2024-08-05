@@ -423,23 +423,11 @@ app.post('/register', async (req, res) => {
         // Hash the password
         const saltRounds = 10;
         const password_hash = await bcrypt.hash(password, saltRounds);
-        
+
         const startingReport = []
 
         // Generate a verification token
         const verificationToken = await bcrypt.hash(email + Date.now().toString(), saltRounds);
-
-        // Create a new user document
-        const newUser = {
-            _id: email,
-            password_hash,
-            isVerified: false,
-            verificationToken,
-            favouriteReport: startingReport,
-        };
-
-        // Insert the new user into the users collection
-        await usersCollection.insertOne(newUser);
 
         // Send verification email using Mailjet
         const request = mailjet
@@ -465,8 +453,20 @@ app.post('/register', async (req, res) => {
             });
 
         request
-            .then((result) => {
+            .then(async (result) => {
                 console.log(result.body);
+
+                // Create a new user document
+                const newUser = {
+                    _id: email,
+                    password_hash,
+                    isVerified: false,
+                    verificationToken,
+                    favouriteReport: startingReport,
+                };
+
+                // Insert the new user into the users collection
+                await usersCollection.insertOne(newUser);
 
                 // Send back a json web token
                 jwt.sign({
