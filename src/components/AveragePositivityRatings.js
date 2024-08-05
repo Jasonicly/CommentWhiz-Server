@@ -102,4 +102,4 @@ const AveragePositivityRatings = ({ monthlyRatings }) => {
   );
 };
 
-export default AveragePositivityRatings;
+export default AveragePositivityRatings; 

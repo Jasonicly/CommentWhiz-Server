@@ -16,6 +16,7 @@ const { decode } = require('punycode');
 const { JsonWebTokenError } = require('jsonwebtoken');
 const { start } = require('repl');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const http = require('http');
 const Mailjet = require('node-mailjet');
 
 require('dotenv').config();
@@ -320,19 +321,8 @@ app.post('/ai', async (req, res) => {
 
         const shortText = summaryresponse.data;
 
-        
-        res.send({
-            aiSummary: {
-                shortSummary: shortText
-            }
-        });
-        
-
         // Forward the reviews to AI server on localhost:5000
-        const response = await axios.post('https://localhost:5000/process_reviews', reviews, {
-            httpsAgent: new https.Agent({
-                rejectUnauthorized: false, // This will allow self-signed certificates
-            }),
+        const response = await axios.post('http://34.136.31.161:5000/process_reviews', reviews, {
         });
         console.log('Response from AI:', response.data);
 
@@ -342,13 +332,11 @@ app.post('/ai', async (req, res) => {
         // Extract and combine review texts
         const combinedReviewText = combineReviews(processedAIResponse.reviews);
 
-        
         const longPrompt = `Generate a 100 words or lesser summary of ${combinedReviewText}`;
 
         const longResult = await model.generateContent(longPrompt);
         const longResponse = await longResult.response;
-        const longText = longResponse.text();
-        
+        const longText = await longResponse.text();
 
         // Define aiSummary if it does not exist
         processedAIResponse.aiSummary = {};
@@ -373,6 +361,15 @@ app.post('/ai', async (req, res) => {
             { $set: processedAIResponse },
             { upsert: true } // Create a new document if it does not exist
         );
+
+        // Send the final response back to the client
+        res.send({
+            aiSummary: {
+                shortSummary: shortText,
+                longSummary: longText
+            },
+            processedAIResponse
+        });
 
     } catch (error) {
         // Log the error message to the console
@@ -548,11 +545,57 @@ app.post('/login', async (req, res) => {
 }
 });
 
+const serveHTML = (message) => `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <style>
+        .fixed {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .popup {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+    <script>
+        setTimeout(function() {
+            window.location.href = 'https://localhost:3000';
+        }, 5000);
+    </script>
+</head>
+<body>
+    <div class="fixed">
+        <div class="popup">
+            <h1>${message}</h1>
+            <p>You will be redirected shortly...</p>
+        </div>
+    </div>
+</body>
+</html>
+`;
+
 app.get('/verify-email', async (req, res) => {
     const { token, email } = req.query;
 
     if (!token || !email) {
-        return res.status(400).send('Invalid verification link');
+        return res.status(400).send(serveHTML('Invalid verification link'));
     }
 
     try {
@@ -563,7 +606,7 @@ app.get('/verify-email', async (req, res) => {
         const user = await usersCollection.findOne({ _id: email, verificationToken: token });
 
         if (!user) {
-            return res.status(400).send('Invalid verification link');
+            return res.status(400).send(serveHTML('Invalid verification link'));
         }
 
         // Update the user document to set isVerified to true and remove the verification token
@@ -572,55 +615,10 @@ app.get('/verify-email', async (req, res) => {
             { $set: { isVerified: true }, $unset: { verificationToken: '' } }
         );
 
-        // Serve the professional styled HTML content
-        res.send(`
-              <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Email Verified</title>
-                <style>
-                    .fixed {
-                        position: fixed;
-                        top: 0;
-                        right: 0;
-                        bottom: 0;
-                        left: 0;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        background: rgba(0, 0, 0, 0.5);
-                    }
-                    .popup {
-                        background: white;
-                        padding: 20px;
-                        border-radius: 10px;
-                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                        max-width: 400px;
-                        width: 100%;
-                        text-align: center;
-                    }
-                </style>
-                <script>
-                    setTimeout(function() {
-                        window.location.href = 'https://localhost:3000';
-                    }, 5000);
-                </script>
-            </head>
-            <body>
-                <div class="fixed">
-                    <div class="popup">
-                        <h1>Email verified successfully!</h1>
-                        <p>You will be redirected shortly...</p>
-                    </div>
-                </div>
-            </body>
-            </html>
-        `);
+        res.send(serveHTML('Email verified successfully!'));
     } catch (error) {
         console.error('Error verifying email:', error.message);
-        res.status(500).send('An error occurred while verifying the email');
+        res.status(500).send(serveHTML('An error occurred while verifying the email'));
     }
 });
 
