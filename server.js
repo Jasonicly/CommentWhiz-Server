@@ -649,6 +649,10 @@ app.put('/user/:userId/removeFavorite', verifyToken, async (req, res) => {
     }
 });
 
+const escapeRegex = (text) => {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+};
+
 app.get('/api/allreports', async (req, res) => {
     const db = client.db(dbName);
     const analysesCollection = db.collection('analyses');
@@ -658,7 +662,8 @@ app.get('/api/allreports', async (req, res) => {
 
     let query = {};
     if (search) {
-        query['summary.Product Name'] = { $regex: search, $options: 'i' };
+        const safeSearch = escapeRegex(search);
+        query['summary.Product Name'] = { $regex: safeSearch, $options: 'i' };
     }
     if (category && category !== 'All') {
         query['summary.Category'] = category;

@@ -12,6 +12,7 @@ import UserInfo from './pages/UserPages/UserInfo';
 import UserProfile from './pages/UserPages/UserProfile';
 import FavoritePage from './pages/UserPages/FavoritePage';
 import About from './pages/About';
+import Testing from './pages/test';
 
 function App() {
     return (
@@ -25,6 +26,7 @@ function App() {
                     <Route path="/about" element={<About />} />
                     <Route path="/report" element={<ReportList />} />
                     <Route path="/report/:reportId" element={<NewPage />} />
+                    <Route path="/testing" element={<Testing />} />
                     <Route path="*" element={<NotFoundPage />} />
                     <Route element={<PrivateAuthRoute />}>
                         <Route path="/user" element={<UserProfile />} />
