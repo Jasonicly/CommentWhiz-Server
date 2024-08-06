@@ -4,7 +4,7 @@ import * as echarts from 'echarts';
 
 const SarcasmAnalysisDashboard = ({ summary }) => {
     const totalReviews = summary["Number of Reviews"];
-    const sarcasticComments = summary["Number of Sarcastic Comments"];
+    const sarcasticComments = summary["Number of Sarcastic Reviews"];
     const sarcasmPercentage = Math.round((sarcasticComments / totalReviews) * 100) / 100; // Convert to decimal for gauge
 
     const option = {
