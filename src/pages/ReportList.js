@@ -132,10 +132,11 @@ const ProductList = () => {
                             <option value="Clothing, Shoes & Accessories">Clothing, Shoes & Accessories</option>
                             <option value="Electronics & Computers">Electronics & Computers</option>
                             <option value="Automotive & Industrial">Automotive & Industrial</option>
-                            <option value="Toys, Kids & Baby">Toys, Kids & Baby</option>
+                            <option value="Toys, Kids & Baby">Toys, Kids & Babies</option>
                             <option value="Books, Media & Music">Books, Media & Music</option>
                             <option value="Grocery & Pet Supplies">Grocery & Pet Supplies</option>
                             <option value="Home, Kitchen & Garden">Home, Kitchen & Garden</option>
+                            <option value="Office, Arts & Crafts">Office, Arts & Crafts</option>
                             <option value="Sports & Outdoors">Sports & Outdoors</option>
                             <option value="Others">Others</option>
                         </select>
@@ -159,7 +160,8 @@ const ProductList = () => {
                                     id={product.id}
                                     image={product.pictureUrl}
                                     name={product.productName}
-                                    rating={product.enhancedRating}
+                                    positive={product.positive}
+                                    negative={product.negative}
                                 />
                             ))}
                         </div>

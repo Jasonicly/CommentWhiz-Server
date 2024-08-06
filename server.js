@@ -795,7 +795,7 @@ app.get('/api/allreports', async (req, res) => {
         query['summary.Product Name'] = { $regex: safeSearch, $options: 'i' };
     }
     if (category && category !== 'All') {
-        query['summary.Category'] = category;
+        query['summary.product_category'] = category;
     }
 
     let options = {};
@@ -818,7 +818,8 @@ app.get('/api/allreports', async (req, res) => {
 
         const summaries = analyses.map(analysis => ({
             id: analysis._id,
-            enhancedRating: analysis.summary['Enhanced Rating'] || '',
+            positive: analysis.summary['Percentage of Positive Reviews'] || '',
+            negative: analysis.summary['Percentage of Negative Reviews'] || '',
             productName: analysis.summary['Product Name'] || '',
             pictureUrl: analysis.summary['productImageBase64'] || ''
         }));

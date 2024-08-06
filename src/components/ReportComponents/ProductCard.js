@@ -8,7 +8,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ChartDataLabels);
 
-const ProductCard = ({ id, image, name, rating }) => {
+const ProductCard = ({ id, image, name, positive, negative }) => {
     const shortName = name.length > 40 ? `${name.slice(0, 40)}...` : name;
     const navigate = useNavigate();
 
@@ -17,8 +17,9 @@ const ProductCard = ({ id, image, name, rating }) => {
     };
 
     // Convert rating to percentage
-    const positivePercentage = rating * 20; // Assuming rating is out of 5
-    const negativePercentage = 100 - positivePercentage;
+    const positivePercentage = positive; // Assuming rating is out of 5
+    const negativePercentage = negative;
+    const neutralPercentage = 100 - positivePercentage - negativePercentage;
 
     const data = {
         labels: [''],
@@ -31,12 +32,21 @@ const ProductCard = ({ id, image, name, rating }) => {
                 borderWidth: 2,
             },
             {
+                label: 'Neutral',
+                data: [neutralPercentage],
+                backgroundColor: 'rgba(109, 115, 120, 0.8)',
+                borderColor: 'rgba(80, 84, 87, 1)',
+                borderWidth: 2,
+            },
+            {
                 label: 'Negative',
                 data: [negativePercentage],
                 backgroundColor: 'rgba(255, 99, 132, 0.8)',
                 borderColor: 'rgba(255, 99, 132, 1)',
                 borderWidth: 2,
             },
+
+
         ],
     };
 
@@ -51,6 +61,7 @@ const ProductCard = ({ id, image, name, rating }) => {
             title: {
                 display: true,
                 text: 'Positivity Distribution',
+                align: 'center',
             },
             tooltip: {
                 enabled: false, // Disable the tooltip
@@ -58,7 +69,7 @@ const ProductCard = ({ id, image, name, rating }) => {
             datalabels: {
                 display: true,
                 color: 'white',
-                formatter: (value) => (value >= 8 ? `${value}%` : ''),
+                formatter: (value) => (value >= 11 ? `${value}%` : ''),
                 anchor: 'center',
                 align: 'center',
                 font: {
