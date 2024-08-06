@@ -25,7 +25,7 @@ const genAI = new GoogleGenerativeAI(process.env.AI_API_KEY);
 
 // The Gemini 1.5 models are versatile and work with most use cases
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
+const AI_IP = "34.72.22.222";
 // SSL options
 const options = {
     key: fs.readFileSync(path.resolve(__dirname, 'localhost-key.pem')),
@@ -321,11 +321,30 @@ app.post('/ai', async (req, res) => {
 
         const shortText = summaryresponse.data;
 
-        // Forward the reviews to AI server on localhost:5000
-        const response = await axios.post('http://34.72.22.222:5000/process_reviews', reviews, {
+        res.send({
+            aiSummary: {
+                shortSummary: shortText
+            }
         });
-        console.log('Response from AI:', response.data);
 
+        // Forward the reviews to AI server on localhost:5000
+        let response;
+        try {
+            response = await axios.post(`http://${AI_IP}:5000/process_reviews`, reviews);
+        } catch (error) {
+            console.error('First server request failed:', error);
+            try {
+                response = await axios.post('https://localhost:5000/process_reviews', reviews, {
+                    httpsAgent: new https.Agent({
+                        rejectUnauthorized: false, // This will allow self-signed certificates
+                    }),
+                });
+            } catch (fallbackError) {
+                console.error('Fallback server request also failed:', fallbackError);
+                throw fallbackError; // Re-throw the error to handle it further up if needed
+            }
+        }
+        console.log('Response from AI:', response.data);
         // Process the AI response to add the timeline list
         const processedAIResponse = processReviews(JSON.stringify(response.data));
 
@@ -362,14 +381,6 @@ app.post('/ai', async (req, res) => {
             { upsert: true } // Create a new document if it does not exist
         );
 
-        // Send the final response back to the client
-        res.send({
-            aiSummary: {
-                shortSummary: shortText,
-                longSummary: longText
-            },
-            processedAIResponse
-        });
 
     } catch (error) {
         // Log the error message to the console
@@ -420,23 +431,11 @@ app.post('/register', async (req, res) => {
         // Hash the password
         const saltRounds = 10;
         const password_hash = await bcrypt.hash(password, saltRounds);
-        
+
         const startingReport = []
 
         // Generate a verification token
         const verificationToken = await bcrypt.hash(email + Date.now().toString(), saltRounds);
-
-        // Create a new user document
-        const newUser = {
-            _id: email,
-            password_hash,
-            isVerified: false,
-            verificationToken,
-            favouriteReport: startingReport,
-        };
-
-        // Insert the new user into the users collection
-        await usersCollection.insertOne(newUser);
 
         // Send verification email using Mailjet
         const request = mailjet
@@ -462,8 +461,20 @@ app.post('/register', async (req, res) => {
             });
 
         request
-            .then((result) => {
+            .then(async (result) => {
                 console.log(result.body);
+
+                // Create a new user document
+                const newUser = {
+                    _id: email,
+                    password_hash,
+                    isVerified: false,
+                    verificationToken,
+                    favouriteReport: startingReport,
+                };
+
+                // Insert the new user into the users collection
+                await usersCollection.insertOne(newUser);
 
                 // Send back a json web token
                 jwt.sign({

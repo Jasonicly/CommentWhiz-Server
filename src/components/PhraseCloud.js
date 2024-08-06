@@ -52,9 +52,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import WordCloud from 'wordcloud';
 
 const PhraseCloud = ({ keyTopics }) => {
+    // Log keyTopics to check if it is receiving the correct data
+    console.log('keyTopics:', keyTopics);
+
+    // Sort and slice the key topics based on their counts
     const sortedKeyTopics = Object.keys(keyTopics)
-        .sort((a, b) => keyTopics[b].unique_comment_count - keyTopics[a].unique_comment_count)
-        .slice(0, 10); // Line to limit to  first 5 topics
+        .sort((a, b) => keyTopics[b] - keyTopics[a])
+        .slice(0, 20); // Limit to the first 10 topics
     const [selectedPhrase, setSelectedPhrase] = useState(sortedKeyTopics[0]);
 
     const wordCloudRef = useRef(null);
@@ -62,37 +66,35 @@ const PhraseCloud = ({ keyTopics }) => {
     useEffect(() => {
         const words = sortedKeyTopics.map(topic => [
             topic,
-            keyTopics[topic].unique_comment_count,
+            keyTopics[topic],
         ]);
-    
+
+        console.log('words:', words); // Log words to verify correct format
+
         if (wordCloudRef.current) {
             WordCloud(wordCloudRef.current, {
                 list: words,
                 gridSize: 16,
-                weightFactor: 10,
-                fontFamily: 'Roboto, serif',
+                weightFactor: 3, // Decrease this value to make words smaller
+                fontFamily: 'Helvetica, serif',
                 color: 'random-dark',
-                rotateRatio: 0, // Rotaion of words
-                rotationSteps: 0, 
+                rotateRatio: 0, // No rotation of words
+                rotationSteps: 0,
                 backgroundColor: '#fff',
             });
         }
     }, [keyTopics, sortedKeyTopics]);
 
-    const handlePhraseClick = (phrase) => {
-        setSelectedPhrase(phrase);
-    };
-
     return (
-        <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center border-1 border-black flex flex-col items-center justify-center border-black border">
+        <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center border-1 flex flex-col items-center justify-center border-black border">
             <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>Phrases Cloud</h4>
-            
-            <div style={{ width: '100%', height: '400px' }} ref={wordCloudRef}></div>
+            <div style={{ width: '100%', height: '400px', padding: '20px' }} ref={wordCloudRef}></div>
         </div>
     );
 };
 
-export default PhraseCloud; 
+export default PhraseCloud;
+
 
 /*
 <div className="grid grid-cols-5" style={{ width: '100%' }}>
