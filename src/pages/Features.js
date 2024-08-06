@@ -195,12 +195,11 @@ const Features = () => {
         {/* Adjusted map width to 60% and added margin-right */}
         <iframe
             className="w-full md:w-3/5 h-96 md:h-[600px] rounded-lg md:mr-8"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.019112484716!2d-122.4194154846811!3d37.77492927975965!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80858064f1a4e5b1%3A0x4c8b8b4b5f5e4b1!2sSan%20Francisco%2C%20CA%2C%20USA!5e0!3m2!1sen!2sin!4v1616161616161!5m2!1sen!2sin"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.738433396531!2d103.7733616738141!3d1.3330916616318897!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da107d8eb4e359%3A0x75d2e7ffdeeb0c43!2sNgee%20Ann%20Polytechnic!5e0!3m2!1sen!2ssg!4v1722977338483!5m2!1sen!2ssg"
             title="Google Maps"
             frameBorder="0"
             allowFullScreen
         ></iframe>
-        
         {/* Added more padding for the contact section */}
         <div className="p-4 md:w-2/5">
             <h2 className="text-3xl font-bold mb-6 text-gray-800">Contact Us</h2>
