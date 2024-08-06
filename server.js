@@ -40,8 +40,8 @@ const app = express();
 const port = 3001;
 
 // Use bodyParser middleware to parse JSON request bodies
-app.use(bodyParser.json());
-// Use CORS middleware to allow cross-origin requests
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 
 app.use(passport.initialize());
@@ -321,6 +321,12 @@ app.post('/ai', async (req, res) => {
 
         const shortText = summaryresponse.data;
 
+        res.send({
+            aiSummary: {
+                shortSummary: shortText
+            }
+        });
+
         // Forward the reviews to AI server on localhost:5000
         let response;
         try {
@@ -375,14 +381,6 @@ app.post('/ai', async (req, res) => {
             { upsert: true } // Create a new document if it does not exist
         );
 
-        // Send the final response back to the client
-        res.send({
-            aiSummary: {
-                shortSummary: shortText,
-                longSummary: longText
-            },
-            processedAIResponse
-        });
 
     } catch (error) {
         // Log the error message to the console
