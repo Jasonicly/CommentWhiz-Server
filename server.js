@@ -322,10 +322,23 @@ app.post('/ai', async (req, res) => {
         const shortText = summaryresponse.data;
 
         // Forward the reviews to AI server on localhost:5000
-        const response = await axios.post('http://34.136.31.161:5000/process_reviews', reviews, {
-        });
+        let response;
+        try {
+            response = await axios.post('http://34.136.31.161:5000/process_reviews', reviews);
+        } catch (error) {
+            console.error('First server request failed:', error);
+            try {
+                response = await axios.post('https://localhost:5000/process_reviews', reviews, {
+                    httpsAgent: new https.Agent({
+                        rejectUnauthorized: false, // This will allow self-signed certificates
+                    }),
+                });
+            } catch (fallbackError) {
+                console.error('Fallback server request also failed:', fallbackError);
+                throw fallbackError; // Re-throw the error to handle it further up if needed
+            }
+        }
         console.log('Response from AI:', response.data);
-
         // Process the AI response to add the timeline list
         const processedAIResponse = processReviews(JSON.stringify(response.data));
 
