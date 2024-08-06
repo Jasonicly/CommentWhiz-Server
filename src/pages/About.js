@@ -30,6 +30,14 @@ const teamMembers = [
     }
 ];
 
+// Role descriptions
+const roleDescription = {
+    'AI Specialist': 'We create algorithms to understand user sentiment, categorize feedback & streamline responses from real-time interactions to historical data.',
+    'Frontend/Backend Developer': 'We develop and maintain both the front end and back end of our applications, ensuring seamless integration and performance.',
+    'UI/UX Frontend Developer': 'We design user interfaces and user experiences that are both visually appealing and highly functional.',
+    'Backend/Integration Developer': 'We handle the integration of various systems and ensure the back end is robust and scalable.'
+};
+
 // Get unique roles
 const roles = [...new Set(teamMembers.map(member => member.role))];
 
@@ -100,7 +108,7 @@ const About = () => {
                             <div className="relative z-10">
                                 <h2 className="text-xl font-semibold mb-4">What We Do</h2>
                                 <p>
-                                    We create algorithms to understand user sentiment, categorize feedback & streamline responses from real-time interactions to historical data.
+                                    {roleDescription[currentRole]}
                                 </p>
                             </div>
                         </div>

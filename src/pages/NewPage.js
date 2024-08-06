@@ -100,13 +100,13 @@ function NewPage() {
 
     const renderReviewSections = () => {
         if (!data) return null;
-
+    
         const { summary, monthlyRatings, topics_with_sentiments, comment_category_sentiments } = data;
-
+    
         return (
-            <div className="grid grid-cols-1 xl:grid-cols-5" style={{ marginTop: '-150px' }}>
-                <ProductInfo summary={summary} className="xl:col-span-1" />
-
+            <div className="grid grid-cols-1 xl:grid-cols-5" style={{ marginTop: '-145px' }}>
+                <ProductInfo summary={summary} reportId={reportId} className="xl:col-span-1" />
+    
                 <div className="xl:col-span-4 container mx-auto p-4 rounded-lg">
                     {currentPhase === 0 && (
                         <>
@@ -144,7 +144,7 @@ function NewPage() {
                 </div>
             </div>
         );
-    };
+    };    
 
     if (data !== null) {
         return (

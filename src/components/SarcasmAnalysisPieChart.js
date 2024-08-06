@@ -59,13 +59,13 @@ const SarcasmAnalysisDashboard = ({ summary }) => {
                     rotate: 'tangential',
                     formatter: function (value) {
                         if (value === 0.875) {
-                            return 'Miguel';
+                            return 'Extreme';
                         } else if (value === 0.625) {
-                            return 'Jonathan';
+                            return 'High';
                         } else if (value === 0.375) {
-                            return 'Wei Liang';
+                            return 'Medium';
                         } else if (value === 0.125) {
-                            return 'Thu Ta';
+                            return 'Low';
                         }
                         return '';
                     }
@@ -100,7 +100,7 @@ const SarcasmAnalysisDashboard = ({ summary }) => {
             </div>
             <div className="flex flex-col items-center">
                 <ReactECharts option={option} style={{ height: '200px', width: '100%' }} />
-                <p className="text-sm text-center">of comments detected as sarcastic</p>
+                <p className="text-xs text-center">Percentage of comments detected as sarcastic</p>
             </div>
         </div>
     );

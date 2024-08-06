@@ -86,7 +86,7 @@ const PhraseCloud = ({ keyTopics }) => {
     }, [keyTopics, sortedKeyTopics]);
 
     return (
-        <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center border-1 flex flex-col items-center justify-center border-black border">
+        <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center border-1 flex flex-col items-center justify-center">
             <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>Phrases Cloud</h4>
             <div style={{ width: '100%', height: '400px', padding: '20px' }} ref={wordCloudRef}></div>
         </div>

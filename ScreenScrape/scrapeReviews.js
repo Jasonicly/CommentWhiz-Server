@@ -8,7 +8,9 @@ async function scrapeReviewPages(initialUrl, maxComments) {
     let productName = 'Unknown Product';
     let productDetails = [];
     let productImageBase64 = '';
+    let productRating = '';
     let reviewsPageUrl = '';
+    let totalReviewsCount = '';
 
     const browser = await puppeteer.launch({
         headless: true,
@@ -41,8 +43,8 @@ async function scrapeReviewPages(initialUrl, maxComments) {
             await page.waitForSelector('#productTitle');
             await page.waitForSelector('a[data-hook="see-all-reviews-link-foot"]');
 
-            // Scrape product name and reviews page URL in parallel
-            const [name, reviewsUrl] = await Promise.all([
+            // Scrape product name, reviews page URL, and product rating in parallel
+            const [name, reviewsUrl, rating] = await Promise.all([
                 page.evaluate(() => {
                     const productTitleElement = document.querySelector('#productTitle');
                     return productTitleElement ? productTitleElement.innerText.trim() : 'Unknown Product';
@@ -50,11 +52,16 @@ async function scrapeReviewPages(initialUrl, maxComments) {
                 page.evaluate(() => {
                     const reviewLink = document.querySelector('a[data-hook="see-all-reviews-link-foot"]');
                     return reviewLink ? reviewLink.href : '';
+                }),
+                page.evaluate(() => {
+                    const ratingElement = document.querySelector('#acrPopover .a-size-base.a-color-base');
+                    return ratingElement ? ratingElement.innerText.trim() : 'No rating';
                 })
             ]);
 
             productName = name;
             reviewsPageUrl = reviewsUrl;
+            productRating = rating;
 
             // Scrape product details and image in parallel
             const [details, imageUrl] = await Promise.all([
@@ -87,7 +94,18 @@ async function scrapeReviewPages(initialUrl, maxComments) {
     async function scrapeReviewPage(page, url) {
         console.log("Scraping reviews from:", url);
         await page.goto(url, { waitUntil: 'domcontentloaded' });
-        await new Promise(resolve => setTimeout(resolve, 250)); // Wait for 0.25 seconds
+        await new Promise(resolve => setTimeout(resolve, 250)); // Wait for 0.25 seconds as small buffer for loading
+
+        // Fetch the number of total reviews first
+        if (!totalReviewsCount) {
+            totalReviewsCount = await page.evaluate(() => {
+                const totalReviewsElement = document.querySelector('div[data-hook="cr-filter-info-review-rating-count"]');
+                const totalReviewsText = totalReviewsElement ? totalReviewsElement.innerText.trim() : '';
+
+                const match = totalReviewsText.match(/(\d+)\s+total ratings.*?(\d+)\s+with reviews/);
+                return match ? match[2] : '0';
+            });
+        }
 
         // Fetch the next page URL first
         const nextPageLink = await page.evaluate(() => {
@@ -138,6 +156,8 @@ async function scrapeReviewPages(initialUrl, maxComments) {
                 productName,
                 productDetails,
                 productImageBase64,
+                productRating,
+                totalReviewsCount,
                 reviews: []
             };
         }
@@ -160,6 +180,8 @@ async function scrapeReviewPages(initialUrl, maxComments) {
         productName,
         productDetails,
         productImageBase64,
+        productRating,
+        totalReviewsCount,
         reviews: results.slice(0, maxComments)
     };
 }

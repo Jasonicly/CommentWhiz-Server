@@ -3,7 +3,7 @@ import ProductImage from './ProductImage';
 import { Button } from './Button';
 import LikeButton from './LikeButton';
 
-const ProductInfo = ({ summary }) => {
+const ProductInfo = ({ summary, reportId }) => {
     const [showDetails, setShowDetails] = useState(false);
     const toggleDetails = () => setShowDetails(!showDetails);
 
@@ -16,7 +16,7 @@ const ProductInfo = ({ summary }) => {
                 </div>
                 <div className="flex items-center justify-center space-x-2 mt-4 text-black border-black border-t-2 border-b-2 w-full mx-4">
                     <p>Add to favorites</p>
-                    <LikeButton />
+                    <LikeButton reportId={reportId} />
                 </div>
                 <Button
                     onClick={toggleDetails}
@@ -41,4 +41,4 @@ const ProductInfo = ({ summary }) => {
     );
 };
 
-export default ProductInfo;  
+export default ProductInfo;
