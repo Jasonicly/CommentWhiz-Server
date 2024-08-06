@@ -25,7 +25,7 @@ const genAI = new GoogleGenerativeAI(process.env.AI_API_KEY);
 
 // The Gemini 1.5 models are versatile and work with most use cases
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-const AI_IP = "35.224.120.109";
+const AI_IP = "34.72.22.222";
 // SSL options
 const options = {
     key: fs.readFileSync(path.resolve(__dirname, 'localhost-key.pem')),
@@ -797,7 +797,7 @@ app.get('/api/allreports', async (req, res) => {
         query['summary.Product Name'] = { $regex: safeSearch, $options: 'i' };
     }
     if (category && category !== 'All') {
-        query['summary.Category'] = category;
+        query['summary.product_category'] = category;
     }
 
     let options = {};
@@ -820,7 +820,8 @@ app.get('/api/allreports', async (req, res) => {
 
         const summaries = analyses.map(analysis => ({
             id: analysis._id,
-            enhancedRating: analysis.summary['Enhanced Rating'] || '',
+            positive: analysis.summary['Percentage of Positive Reviews'] || '',
+            negative: analysis.summary['Percentage of Negative Reviews'] || '',
             productName: analysis.summary['Product Name'] || '',
             pictureUrl: analysis.summary['productImageBase64'] || ''
         }));
