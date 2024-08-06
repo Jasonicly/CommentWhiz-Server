@@ -25,7 +25,7 @@ const genAI = new GoogleGenerativeAI(process.env.AI_API_KEY);
 
 // The Gemini 1.5 models are versatile and work with most use cases
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-const AI_IP = "35.224.120.109";
+const AI_IP = "34.72.22.222";
 // SSL options
 const options = {
     key: fs.readFileSync(path.resolve(__dirname, 'localhost-key.pem')),
@@ -321,6 +321,12 @@ app.post('/ai', async (req, res) => {
 
         const shortText = summaryresponse.data;
 
+        res.send({
+            aiSummary: {
+                shortSummary: shortText
+            }
+        });
+
         // Forward the reviews to AI server on localhost:5000
         let response;
         try {
@@ -375,14 +381,6 @@ app.post('/ai', async (req, res) => {
             { upsert: true } // Create a new document if it does not exist
         );
 
-        // Send the final response back to the client
-        res.send({
-            aiSummary: {
-                shortSummary: shortText,
-                longSummary: longText
-            },
-            processedAIResponse
-        });
 
     } catch (error) {
         // Log the error message to the console
