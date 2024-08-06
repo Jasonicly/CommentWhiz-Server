@@ -25,7 +25,7 @@ const genAI = new GoogleGenerativeAI(process.env.AI_API_KEY);
 
 // The Gemini 1.5 models are versatile and work with most use cases
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
+const AI_IP = "35.224.120.109";
 // SSL options
 const options = {
     key: fs.readFileSync(path.resolve(__dirname, 'localhost-key.pem')),
@@ -324,7 +324,7 @@ app.post('/ai', async (req, res) => {
         // Forward the reviews to AI server on localhost:5000
         let response;
         try {
-            response = await axios.post('http://34.136.31.161:5000/process_reviews', reviews);
+            response = await axios.post(`http://${AI_IP}:5000/process_reviews`, reviews);
         } catch (error) {
             console.error('First server request failed:', error);
             try {
