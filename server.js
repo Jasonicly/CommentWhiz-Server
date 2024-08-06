@@ -40,8 +40,8 @@ const app = express();
 const port = 3001;
 
 // Use bodyParser middleware to parse JSON request bodies
-app.use(bodyParser.json());
-// Use CORS middleware to allow cross-origin requests
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 
 app.use(passport.initialize());
@@ -322,7 +322,7 @@ app.post('/ai', async (req, res) => {
         const shortText = summaryresponse.data;
 
         // Forward the reviews to AI server on localhost:5000
-        const response = await axios.post('http://34.136.31.161:5000/process_reviews', reviews, {
+        const response = await axios.post('http://34.72.22.222:5000/process_reviews', reviews, {
         });
         console.log('Response from AI:', response.data);
 

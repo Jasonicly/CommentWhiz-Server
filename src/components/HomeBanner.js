@@ -5,26 +5,24 @@ const slides = [
     {
         title: "The one stop solution for all your E-commerce needs!",
         description: "Our Team of 5 will demostrate our ingenuity in developing web applications your interest, allowing you to condense your time and effort reading online reviews into a single platform.",
-        image: process.env.PUBLIC_URL + '../images/logo.png',
+        image: process.env.PUBLIC_URL + '../images/logoBlack.png',
         link: "https://www.swagsoft.com/mobile-app-development",
-        width: "400px",
-        height: "400px"
+        width: "300px",
+        height: "300px"
     },
     {
         title: "Slide 2 Title",
         description: "Slide 2 Description",
-        image: "https://static.wixstatic.com/media/bddcfd_3cc6568658ce4cf9b37e3930d30002c0~mv2.png/v1/fill/w_750,h_612,al_c,q_90,usm_0.66_1.00_0.01,enc_auto/0a2f83_323c2590e2db4e7880080a5de69efa77~mv2.png",
-        link: "#",
-        width: "600px",
-        height: "600px"
+        image: process.env.PUBLIC_URL + '../images/logoWhite.png',        link: "#",
+        width: "300px",
+        height: "300px"
     },
     {
         title: "Slide 3 Title",
         description: "Slide 3 Description",
-        image: "https://static.wixstatic.com/media/bddcfd_19fc85313d444780a8492f18b687409c~mv2.png/v1/fill/w_750,h_612,al_c,q_90,usm_0.66_1.00_0.01,enc_auto/0a2f83_c80cc9287bae42da8908cd204553c91b~mv2.png",
-        link: "#",
-        width: "600px",
-        height: "600px"
+        image: process.env.PUBLIC_URL + '../images/logo.png',        link: "#",
+        width: "300px",
+        height: "300px"
     }
 ];
 

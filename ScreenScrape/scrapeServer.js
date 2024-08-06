@@ -1,22 +1,22 @@
-// scripts/scrapeServer.js
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
-const FormData = require('form-data');
 const scrapeReviews = require('./scrapeReviews');
 const https = require('https');
 
 const options = {
     key: fs.readFileSync('../localhost-key.pem'),
     cert: fs.readFileSync('../localhost.pem'),
-  };
+};
 
 const app = express();
 const port = 6000; // The port for your scraping server
 const maxComments = 300; // Set the maximum number of comments to scrape
-app.use(bodyParser.json());
+
+// Increase the payload size limit
+app.use(bodyParser.json({ limit: '50mb' }));
 
 app.post('/scrape', async (req, res) => {
     const { url } = req.body;
