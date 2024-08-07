@@ -12,7 +12,7 @@ function Download() {
 
                     <div className="flex flex-col lg:flex-row items-center lg:items-start">
                         <div className="lg:w-1/2 p-4">
-                        <img src={process.env.PUBLIC_URL + '../images/logo.png'} alt="Download Extension" className="w-80 h-80 mx-auto mr-4 rounded-lg shadow-lg" />
+                        <img src={process.env.PUBLIC_URL + '../images/logoWhite.png'} alt="Download Extension" className="w-80 h-90 mx-auto mr-4 rounded-lg" />
                         </div>
                         <div className="lg:w-1/2 p-4 lg:pl-12">
                             <h3 className="text-3xl font-semibold mb-4">What You Will Get</h3>
@@ -36,7 +36,7 @@ function Download() {
                             </ul>
                             <div className="flex space-x-4">
                                 <button className="bg-white text-blue-500 px-6 py-2 rounded-lg font-semibold shadow hover:bg-gray-200 transition">Download Now</button>
-                                <a href="https://example.com/learn-more" target="_blank" rel="noopener noreferrer" className="flex items-center text-white underline font-semibold">
+                                <a href="/features" target="_blank" rel="noopener noreferrer" className="flex items-center text-white underline font-semibold">
                                     Learn More
                                 </a>
                             </div>

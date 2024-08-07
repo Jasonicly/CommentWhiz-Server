@@ -5,13 +5,13 @@ const testimonials = [
     {
         quote: "The CommentWhiz extension has significantly improved our ability to analyze product reviews. The AI-generated reports are incredibly detailed and have helped us make informed decisions quickly.",
         author: "Lee Guan Xi",
-        position: "Local Ngee Ann Drug Dealer, CSF01",
+        position: "Local Ngee Ann student, CSF01",
         company: "Ngee Ann Polytechnic Singapore",
     },
     {
         quote: "Using CommentWhiz has been a game changer for our team. The sentiment analysis and bot detection features provide us with comprehensive insights that we previously lacked.",
         author: "Lim Rachelle",
-        position: "Student, CSF01",
+        position: "Local Ngee Ann student, CSF01",
         company: "Ngee Ann Polytechnic Singapore",
     },
     {

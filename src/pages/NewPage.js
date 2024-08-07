@@ -151,22 +151,23 @@ function NewPage() {
             <div className="bg-custom-gray flex flex-col min-h-screen">
                 <Header />
                 <div className="bg-custom-darkgray" style={{ width: '100vw', height: '150px' }}>
-                    <div className="bg-custom-darkgray flex items-center justify-between mx-auto mt-4 px-8" style={{ width: '90vw', maxWidth: '1580px' }}>
+                    <div className="bg-custom-darkgray flex items-center justify-between mx-auto mt-4 px-8" style={{ width: '90vw', maxWidth: '1580px', zIndex: 10 }}>
                         {currentPhase === 1 ? (
                             <button
                                 onClick={handlePrev}
                                 className="flex items-center bg-white text-black px-4 py-2 rounded-lg shadow-md focus:outline-none justify-start"
-                                style={{ width: '200px', height: '60px' }}
+                                style={{ width: '200px', height: '60px', zIndex: 20 }}
                             >
                                 <FaArrowLeft className="mr-2" />
-                                <span className="">
+                                <span className="text-xs md:text-base lg:text-xs">
                                     View Analysis Report Dashboard
                                 </span>
                             </button>
+
                         ) : (
-                            <div style={{ width: '200px', height: '60px' }}></div>
+                            <div style={{ width: '200px', height: '60px', zIndex: 20 }}></div>
                         )}
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-4" style={{ zIndex: 20 }}>
                             <h1 className="text-white text-3xl" style={{ fontFamily: 'Oswald, sans-serif' }}>{phases[currentPhase]}</h1>
                             <img src={process.env.PUBLIC_URL + `../images/${icons[currentPhase]}`} alt={phases[currentPhase]} className="w-10 h-10" />
                         </div>
@@ -174,7 +175,7 @@ function NewPage() {
                             <button
                                 onClick={handleNext}
                                 className="flex items-center bg-white text-black px-4 py-2 rounded-lg shadow-md focus:outline-none justify-end"
-                                style={{ width: '200px', height: '60px' }}
+                                style={{ width: '200px', height: '60px', zIndex: 20 }}
                             >
                                 <span className="">
                                     View Product Reviews
@@ -182,7 +183,7 @@ function NewPage() {
                                 <FaArrowRight className="ml-2" />
                             </button>
                         ) : (
-                            <div style={{ width: '200px', height: '60px' }}></div>
+                            <div style={{ width: '200px', height: '60px', zIndex: 20 }}></div>
                         )}
                     </div>
                 </div>

@@ -1,27 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
+import { faSyncAlt, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 
 const ReviewList = ({ reviews }) => {
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [selectedSentiment, setSelectedSentiment] = useState('All Sentiments');
   const [selectedEmotion, setSelectedEmotion] = useState('All Emotions');
   const [selectedRating, setSelectedRating] = useState('All Ratings');
+  const [selectedSarcasm, setSelectedSarcasm] = useState('View All');
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [showScrollButtons, setShowScrollButtons] = useState({ up: false, down: true });
+  const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
   const chartRef = useRef(null);
 
   const handleCategoryChange = (e) => setSelectedCategory(e.target.value);
   const handleSentimentChange = (e) => setSelectedSentiment(e.target.value);
   const handleEmotionChange = (e) => setSelectedEmotion(e.target.value);
   const handleRatingChange = (e) => setSelectedRating(e.target.value);
+  const handleSarcasmChange = (e) => setSelectedSarcasm(e.target.value);
 
   const resetFilters = () => {
     setSelectedCategory('All Categories');
     setSelectedSentiment('All Sentiments');
     setSelectedEmotion('All Emotions');
     setSelectedRating('All Ratings');
+    setSelectedSarcasm('View All');
   };
 
   const filteredReviews = reviews.filter(review => {
@@ -29,8 +33,11 @@ const ReviewList = ({ reviews }) => {
     const emotionMatch = selectedEmotion === 'All Emotions' || selectedEmotion.toLowerCase() === review.emotions.toLowerCase();
     const ratingMatch = selectedRating === 'All Ratings' || review['AI-rating'] === parseInt(selectedRating);
     const categoryMatch = selectedCategory === 'All Categories' || review.comment_category.includes(selectedCategory);
+    const sarcasmMatch = selectedSarcasm === 'View All' ||
+      (selectedSarcasm === 'Sarcastic' && review.sarcasm_label === 1) ||
+      (selectedSarcasm === 'Not Sarcastic' && review.sarcasm_label === 0);
 
-    return sentimentMatch && emotionMatch && ratingMatch && categoryMatch;
+    return sentimentMatch && emotionMatch && ratingMatch && categoryMatch && sarcasmMatch;
   });
 
   const toggleShowAllReviews = () => setShowAllReviews(!showAllReviews);
@@ -67,12 +74,12 @@ const ReviewList = ({ reviews }) => {
     const fullStars = Math.floor(rating);
     const halfStar = rating % 1 !== 0;
     const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-  
+
     const starStyle = {
       color: 'yellow',
       textShadow: '0 0 2px #000'
     };
-  
+
     return (
       <>
         {Array(fullStars).fill().map((_, i) => <span key={`full-${i}`} style={starStyle}>&#9733;</span>)}
@@ -150,7 +157,13 @@ const ReviewList = ({ reviews }) => {
       <div className="bg-custom-green mb-4 rounded relative pb-5 pr-4">
         <div className="text-center mb-4">
           <h2 className="text-lg font-semibold mb-4">Filter Options</h2>
-          <div className="flex items-center justify-center mb-4 space-x-4">
+          <button 
+            className="md:hidden bg-white p-2 rounded mb-4" 
+            onClick={() => setIsFiltersCollapsed(!isFiltersCollapsed)}
+          >
+            {isFiltersCollapsed ? 'Show Filters' : 'Hide Filters'}
+          </button>
+          <div className={`flex flex-col md:flex-row items-center justify-center mb-4 space-y-4 md:space-y-0 md:space-x-4 ${isFiltersCollapsed ? 'hidden' : ''}`}>
             <label className="font-semibold text-white">Filter by:</label>
             <select value={selectedCategory} onChange={handleCategoryChange} className="p-2 rounded">
               <option value="All Categories">All Categories</option>
@@ -181,6 +194,11 @@ const ReviewList = ({ reviews }) => {
               <option value="4">4 Stars</option>
               <option value="5">5 Stars</option>
             </select>
+            <select value={selectedSarcasm} onChange={handleSarcasmChange} className="p-2 rounded">
+              <option value="View All">View All</option>
+              <option value="Sarcastic">Sarcastic</option>
+              <option value="Not Sarcastic">Not Sarcastic</option>
+            </select>
             <button onClick={resetFilters} className="p-2 bg-white border rounded">
               <FontAwesomeIcon icon={faSyncAlt} />
             </button>
@@ -195,6 +213,12 @@ const ReviewList = ({ reviews }) => {
             <p className="mb-2"><strong>Categories:</strong> {renderCategories(review.comment_category)}</p>
             <p className="mb-2"><strong>Emotion: {review.emotions} {emotionEmojis[review.emotions.toLowerCase()]}</strong></p>
             <p className="mb-2"><strong>Sentiment: <span className={sentimentColors[review.sentiment]}>{review.sentiment} {sentimentEmojis[review.sentiment]}</span></strong></p>
+            {review.sarcasm_label === 1 && (
+              <p className="mb-2">
+                <strong>Sarcasm:</strong>
+                <FontAwesomeIcon icon={faExclamationCircle} className="text-red-500 ml-2" title="This review is flagged as sarcastic or satirical" />
+              </p>
+            )}
             <br />
             <strong>{review.title}</strong>
             <p className="mb-2">{review.body}</p>
@@ -232,4 +256,4 @@ const ReviewList = ({ reviews }) => {
   );
 };
 
-export default ReviewList; 
+export default ReviewList;

@@ -107,8 +107,8 @@ const EmotionAnalysisGraph = ({ summary }) => {
 
   return (
     <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center flex flex-col items-center justify-center">
-      <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>Emotion Analysis</h4>
-      <div ref={chartRef} style={{ width: '100%', height: '300px', maxWidth: '100%' }}></div>
+      <h4 className="text-xl font-semibold" style={{ fontFamily: "'Oswald', sans-serif" }}>Emotion Analysis</h4>
+      <div ref={chartRef} style={{ width: '100%', height: '350px', maxWidth: '100%' }}></div>
     </div>
   );
 };

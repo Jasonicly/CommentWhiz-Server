@@ -5,22 +5,21 @@ const slides = [
     {
         title: "The one stop solution for all your E-commerce needs!",
         description: "Our Team of 5 will demostrate our ingenuity in developing web applications your interest, allowing you to condense your time and effort reading online reviews into a single platform.",
-        image: process.env.PUBLIC_URL + '../images/logoBlack.png',
-        link: "https://www.swagsoft.com/mobile-app-development",
+        image: process.env.PUBLIC_URL + '/images/logoBlack.png',
         width: "300px",
         height: "300px"
     },
     {
         title: "Slide 2 Title",
         description: "Slide 2 Description",
-        image: process.env.PUBLIC_URL + '../images/logoWhite.png',        link: "#",
+        image: process.env.PUBLIC_URL + '/images/logoWhite.png',
         width: "300px",
         height: "300px"
     },
     {
         title: "Slide 3 Title",
         description: "Slide 3 Description",
-        image: process.env.PUBLIC_URL + '../images/logo.png',        link: "#",
+        image: process.env.PUBLIC_URL + '/images/logo.png',
         width: "300px",
         height: "300px"
     }
@@ -51,12 +50,19 @@ const HomeBanner = () => {
     }, [currentSlide]);
 
     return (
-        <div className="relative w-full h-screen bg-custom-lightgray flex items-center justify-center">
-            <div className="flex items-center justify-between w-full h-full max-w-7xl">
+        <div 
+            className="relative w-full h-screen flex items-center justify-center" 
+            style={{ 
+                backgroundImage: `url(${process.env.PUBLIC_URL + '/images/banner.jpg'})`, 
+                backgroundSize: 'cover', 
+                backgroundPosition: 'center'
+            }}
+        >
+            <div className="flex items-center justify-between w-full h-full max-w-7xl bg-custom-gray bg-opacity-70 p-8 rounded-lg">
                 <div className="w-1/2 p-8">
                     <h1 className="text-black text-4xl mb-4">{slides[0].title}</h1>
                     <p className="text-black mb-4">{slides[0].description}</p>
-                    <a href={slides[0].link} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
+                    <a href="/about" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
                         Learn more about us
                     </a>
                 </div>
