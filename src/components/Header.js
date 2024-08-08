@@ -31,6 +31,7 @@ function Header() {
         setToken(null); // Clear the token from the state
         localStorage.removeItem('token'); // Remove the token from local storage
         // You can add any other logout logic here if needed
+        window.location.reload(); // Refresh the page
     };
 
     return (
