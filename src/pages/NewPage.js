@@ -9,7 +9,7 @@ import { PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, Cart
 import axios from 'axios';
 import EnhancedRating from '../components/EnhancedRating';
 import ReviewList from '../components/ReviewList';
-import TrendingCommentTopics from '../components/TrendingCommentTopics';
+import PhraseCloud from '../components/PhraseCloud';
 import OverviewBlocks from '../components/OverviewBlocks';
 import SentimentAnalysisPieChart from '../components/SentimentAnalysisPieChart';
 import EmotionAnalysisGraph from '../components/EmotionAnalysisGraph';
@@ -17,27 +17,29 @@ import ProductImage from '../components/ProductImage';
 import ProductInfo from '../components/ProductInfo';
 import KeyTopics from '../components/KeyTopics';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-import AveragePositivityRatings from '../components/AveragePositivityRatings'; // Import the new component
-
+import AveragePositivityRatings from '../components/AveragePositivityRatings';
+import SarcasmAnalysisPieChart from '../components/SarcasmAnalysisPieChart';
+import LikeButton from '../components/LikeButton';
+import CommentCategories from '../components/CommentCategories';
+import TopicsVisual from '../components/TopicsVisual';
 
 function NewPage() {
-    const [showDetails, setShowDetails] = useState(false); // State for showing product details
-    const [data, setData] = useState(null); // State for data from WebSocket
-    const [showAllKeyTopics, setShowAllKeyTopics] = useState(false); // State for showing all key topics
-    const [isLoading, setIsLoading] = useState(false); // State for loading circle
-    const [keyTopicsFilter, setKeyTopicsFilter] = useState('All Sentiments'); // State for filtering key topics by sentiment
-    const [showKeyTopicsFilterOptions, setShowKeyTopicsFilterOptions] = useState(false); // State for showing key topics filter options
-    const [expandedTopics, setExpandedTopics] = useState({}); // State for expanded key topics for more comments
-    //when they enter url from the website, ie they type: https://localhost:3000/report/1234
-
-    const { reportId } = useParams(); // Get unique link for report  
+    const [showDetails, setShowDetails] = useState(false);
+    const [data, setData] = useState(null);
+    const [showAllKeyTopics, setShowAllKeyTopics] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [keyTopicsFilter, setKeyTopicsFilter] = useState('All Sentiments');
+    const [showKeyTopicsFilterOptions, setShowKeyTopicsFilterOptions] = useState(false);
+    const [expandedTopics, setExpandedTopics] = useState({});
+    const { reportId } = useParams();
     console.log(reportId);
 
-    const isAmazonProductPage = /^https?:\/\/(www\.)?amazon\.[a-z\.]{2,6}(\/d\/|\/dp\/|\/gp\/product\/)/.test(reportId); // Check if URL is Amazon product page
-    const encodedUrl = encodeURIComponent(reportId); // Encode URL for API request
-    const [currentPhase, setCurrentPhase] = useState(0); // State for current phase of report
-    const phases = ['Analysis Overview', 'Reviews', 'Key Topics']; // Phases of report
-    
+    const isAmazonProductPage = /^https?:\/\/(www\.)?amazon\.[a-z\.]{2,6}(\/d\/|\/dp\/|\/gp\/product\/)/.test(reportId);
+    const encodedUrl = encodeURIComponent(reportId);
+    const [currentPhase, setCurrentPhase] = useState(0);
+    const phases = ['Analysis Report Dashboard', 'Report Product Comments'];
+    const icons = ['bookcase.png', 'speechbubble.png'];
+
     const handleNext = () => setCurrentPhase((prev) => (prev + 1) % phases.length);
     const handlePrev = () => setCurrentPhase((prev) => (prev - 1 + phases.length) % phases.length);
 
@@ -54,41 +56,33 @@ function NewPage() {
                     setIsLoading(false);
                 });
         }
-
     }, [encodedUrl, isAmazonProductPage]);
 
-
-
-
-    const toggleKeyTopicsFilterOptions = () => { // Toggle show collapsible key topics filter options
+    const toggleKeyTopicsFilterOptions = () => {
         setShowKeyTopicsFilterOptions(!showKeyTopicsFilterOptions);
     };
-    
 
-    const toggleDetails = () => { // Toggle show details of product
+    const toggleDetails = () => {
         setShowDetails(!showDetails);
     };
 
-    const toggleShowAllKeyTopics = () => { // Toggle show all key topics of product
+    const toggleShowAllKeyTopics = () => {
         setShowAllKeyTopics(!showAllKeyTopics);
     };
 
-
-    const toggleShowMoreComments = (topic) => { // Toggle show more comments for key topic
-         setExpandedTopics(prev => ({
+    const toggleShowMoreComments = (topic) => {
+        setExpandedTopics(prev => ({
             ...prev,
             [topic]: !prev[topic]
         }));
     };
 
-    const COLORS = ['#87c187', '#F08080', '#ffd966']; // Colors for PieChart 
+    const COLORS = ['#87c187', '#F08080', '#ffd966'];
 
-
-
-    const renderLoading = () => { // Render loading icon
+    const renderLoading = () => {
         return (
             <div className="flex justify-center mt-20">
-                <div className="loading-icon-container justify-self-center" customStyles={{width: '100%'}}>
+                <div className="loading-icon-container justify-self-center" customStyles={{ width: '100%' }}>
                     <div role="status" className="loading-icon">
                         <svg aria-hidden="true" className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-300" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
@@ -98,7 +92,7 @@ function NewPage() {
                     </div>
                 </div>
                 <div className="fixed bottom-0">
-                <Footer />
+                    <Footer />
                 </div>
             </div>
         );
@@ -107,59 +101,44 @@ function NewPage() {
     const renderReviewSections = () => {
         if (!data) return null;
     
-        const { summary, key_topics } = data;
+        const { summary, monthlyRatings, topics_with_sentiments, comment_category_sentiments } = data;
     
         return (
-            <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
-                {/* Right-side container for larger screens, moves above the main content on smaller screens */}
-                <ProductInfo summary={summary} className="xl:col-span-1"/>
-        
-                {/* Main content container */}
-                <div className="xl:col-span-4 bg-custom-lightgray container mx-auto border border-black p-4 rounded-lg">
-                    <div className="bg-gray-100 p-2 rounded border border-black flex items-center justify-between">
-                        <FaArrowLeft className="cursor-pointer" onClick={handlePrev} />
-                        <h3 className="text-2xl font-bold text-center">{phases[currentPhase]}</h3>
-                        <FaArrowRight className="cursor-pointer" onClick={handleNext} />
-                    </div>
+            <div className="grid grid-cols-1 xl:grid-cols-5" style={{ marginTop: '-145px' }}>
+                <ProductInfo summary={summary} reportId={reportId} className="xl:col-span-1" />
+    
+                <div className="xl:col-span-4 container mx-auto p-4 rounded-lg">
                     {currentPhase === 0 && (
                         <>
                             <OverviewBlocks summary={summary} />
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                                <div className="col-span-2 bg-white p-4 m-2 rounded-lg shadow-md text-center min-h-[150px] border-black border">
+                            <div className="grid grid-cols-1 lg:grid-cols-10 md:grid-cols-1 gap-2">
+                                <div className="col-span-10 lg:col-span-4 bg-white p-4 m-2 rounded-lg shadow-md text-left min-h-[150px]">
                                     <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>AI Generated Summary</h4>
-                                    <p>Here is a summary of key points. Here is a summary of key points...</p>
+                                    <p>{data.aiSummary.longSummary}</p>
                                 </div>
-                                <EnhancedRating originalRating={2.1} enhancedRating={summary["Enhanced Rating"]} />
+                                <div className="col-span-5 lg:col-span-3 bg-white m-2 rounded-lg shadow-md text-center min-h-[150px]">
+                                    <SentimentAnalysisPieChart summary={summary} />
+                                </div>
+                                <div className="col-span-5 lg:col-span-3 bg-white p-4 m-2 rounded-lg shadow-md text-left min-h-[150px]">
+                                    <SarcasmAnalysisPieChart summary={summary} />
+                                </div>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                                <SentimentAnalysisPieChart summary={summary} />
-                                <SentimentAnalysisPieChart summary={summary} />
-                                <SentimentAnalysisPieChart summary={summary} />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2" style={{ gridTemplateColumns: '60% 40%' }}>
+                                <CommentCategories data={comment_category_sentiments} style={{ width: '100%' }} />
+                                <TopicsVisual topicsWithSentiments={topics_with_sentiments} />
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-1">
                                 <EmotionAnalysisGraph summary={summary} />
-                                <TrendingCommentTopics keyTopics={data.key_topics} />
+                                <PhraseCloud keyTopics={data.key_phrases} />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-1 bg-white rounded-lg shadow-md m-2" style={{ maxHeight: '450px', minHeight: '300px' }}>
+                                <AveragePositivityRatings monthlyRatings={monthlyRatings} />
                             </div>
                         </>
                     )}
                     {currentPhase === 1 && (
-                        <div className="bg-white p-6 mb-6 mt-2 rounded-lg shadow-md border-black border overflow-auto">
+                        <div className="bg-white mb-6 mt-2 rounded-lg shadow-md overflow-auto" style={{ marginTop: '45px' }}>
                             <ReviewList reviews={data.reviews} />
-                        </div>
-                    )}
-                    {currentPhase === 2 && (
-                        <div className="bg-white p-6 mb-6 mt-2 rounded-lg shadow-md border-black border overflow-auto">
-                            <KeyTopics
-                                keyTopics={data.key_topics}
-                                keyTopicsFilter={keyTopicsFilter}
-                                showKeyTopicsFilterOptions={showKeyTopicsFilterOptions}
-                                showAllKeyTopics={showAllKeyTopics}
-                                expandedTopics={expandedTopics}
-                                toggleKeyTopicsFilterOptions={toggleKeyTopicsFilterOptions}
-                                setKeyTopicsFilter={setKeyTopicsFilter}
-                                toggleShowMoreComments={toggleShowMoreComments}
-                                toggleShowAllKeyTopics={toggleShowAllKeyTopics}
-                            />
                         </div>
                     )}
                 </div>
@@ -169,10 +148,47 @@ function NewPage() {
 
     if (data !== null) {
         return (
-            <div className="flex flex-col min-h-screen">
+            <div className="bg-custom-gray flex flex-col min-h-screen">
                 <Header />
-                <SearchBar />
-                <div className="flex flex-col items-center flex-grow mt-8 relative"> {/* Added relative positioning */}
+                <div className="bg-custom-darkgray" style={{ width: '100vw', height: '150px' }}>
+                    <div className="bg-custom-darkgray flex items-center justify-between mx-auto mt-4 px-8" style={{ width: '90vw', maxWidth: '1580px', zIndex: 10 }}>
+                        {currentPhase === 1 ? (
+                            <button
+                                onClick={handlePrev}
+                                className="flex items-center bg-white text-black px-4 py-2 rounded-lg shadow-md focus:outline-none justify-start"
+                                style={{ width: '200px', height: '60px', zIndex: 20 }}
+                            >
+                                <FaArrowLeft className="mr-2" />
+                                <span className="text-xs md:text-base lg:text-xs">
+                                    View Analysis Report Dashboard
+                                </span>
+                            </button>
+
+                        ) : (
+                            <div style={{ width: '200px', height: '60px', zIndex: 20 }}></div>
+                        )}
+                        <div className="flex items-center space-x-4" style={{ zIndex: 20 }}>
+                            <h1 className="text-white text-3xl" style={{ fontFamily: 'Oswald, sans-serif' }}>{phases[currentPhase]}</h1>
+                            <img src={process.env.PUBLIC_URL + `../images/${icons[currentPhase]}`} alt={phases[currentPhase]} className="w-10 h-10" />
+                        </div>
+                        {currentPhase === 0 ? (
+                            <button
+                                onClick={handleNext}
+                                className="flex items-center bg-white text-black px-4 py-2 rounded-lg shadow-md focus:outline-none justify-end"
+                                style={{ width: '200px', height: '60px', zIndex: 20 }}
+                            >
+                                <span className="">
+                                    View Product Reviews
+                                </span>
+                                <FaArrowRight className="ml-2" />
+                            </button>
+                        ) : (
+                            <div style={{ width: '200px', height: '60px', zIndex: 20 }}></div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="flex flex-col items-center flex-grow mt-4 relative">
                     <Container.Outer className="w-full max-w-[1580px] absolute-center" showIcon={false} showHeader={false}>
                         <Container.Inner className="w-full">
                             {isLoading ? renderLoading() : renderReviewSections()}
@@ -182,32 +198,34 @@ function NewPage() {
                 <Footer />
             </div>
         );
-        
-    
     }
+
     else if (data === null) {
-        <div>
-            <Header />
-            <SearchBar />
-            <Container.Outer className="absolute left-1/2 transform -translate-x-1/2" customStyles={{ padding: '20px', margin: '20px', width: '100%', maxWidth: '1580px' }} showIcon={false} showHeader={false}>
-                <Container.Inner className="w-full mx-auto">
-                    {data ? renderReviewSections() : <p>No report was found</p>}
-                </Container.Inner>
-            </Container.Outer>
-        </div>
+        return (
+            <div>
+                <Header />
+                <SearchBar />
+                <Container.Outer className="absolute left-1/2 transform -translate-x-1/2" customStyles={{ padding: '20px', margin: '20px', width: '100%', maxWidth: '1580px' }} showIcon={false} showHeader={false}>
+                    <Container.Inner className="w-full mx-auto">
+                        {data ? renderReviewSections() : <p>No report was found</p>}
+                    </Container.Inner>
+                </Container.Outer>
+            </div>
+        );
     }
     else {
-        <div>
-            <Header />
-            <SearchBar />
-            <Container.Outer className="absolute left-1/2 transform -translate-x-1/2" customStyles={{ padding: '20px', margin: '20px', width: '100%', maxWidth: '1580px' }} showIcon={false} showHeader={false}>
-                <Container.Inner className="w-full mx-auto">
-                    {data ? renderReviewSections() : <p>Our server had not responded</p>}
-                </Container.Inner>
-            </Container.Outer>
-        </div>
+        return (
+            <div>
+                <Header />
+                <SearchBar />
+                <Container.Outer className="absolute left-1/2 transform -translate-x-1/2" customStyles={{ padding: '20px', margin: '20px', width: '100%', maxWidth: '1580px' }} showIcon={false} showHeader={false}>
+                    <Container.Inner className="w-full mx-auto">
+                        {data ? renderReviewSections() : <p>Our server had not responded</p>}
+                    </Container.Inner>
+                </Container.Outer>
+            </div>
+        );
     }
 }
-    
-    
-    export default NewPage;
+
+export default NewPage;

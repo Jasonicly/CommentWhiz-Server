@@ -22,23 +22,33 @@ const HomeDetails = () => {
                 const parentTop = parentRef.current.offsetTop;
                 const parentHeight = parentRef.current.clientHeight;
                 const leftColumnHeight = leftColumnRef.current.clientHeight;
+                const viewportHeight = window.innerHeight;
 
-                const minY = parentTop;
-                const maxY = parentTop + parentHeight - leftColumnHeight + 40;
+                const centerViewport = scrollTop + viewportHeight / 2;
+                const centerLeftColumn = parentTop + leftColumnHeight / 2;
+                const maxBottom = parentTop + parentHeight - leftColumnHeight + 90;
 
-                if (scrollTop > minY && scrollTop < maxY) {
+                if (centerViewport > centerLeftColumn && centerViewport < maxBottom) {
                     leftColumnRef.current.style.position = 'fixed';
-                    leftColumnRef.current.style.top = '16px';
-                } else if (scrollTop >= maxY) {
-                    leftColumnRef.current.style.position = 'absolute';
-                    leftColumnRef.current.style.bottom = '0';
+                    leftColumnRef.current.style.top = '50%';
+                    leftColumnRef.current.style.transform = 'translateY(-50%)';
+                    leftColumnRef.current.style.opacity = '1';
+                } else if (centerViewport >= (maxBottom + 30)) {
+                    leftColumnRef.current.style.position = 'relative';
+                    leftColumnRef.current.style.top = `${parentHeight - leftColumnHeight -80}px`;
+                    leftColumnRef.current.style.transform = 'translateY(0)';
+                    leftColumnRef.current.style.opacity = '1';
                 } else {
                     leftColumnRef.current.style.position = 'relative';
                     leftColumnRef.current.style.top = '0';
+                    leftColumnRef.current.style.transform = 'translateY(0)';
+                    leftColumnRef.current.style.opacity = '1';
                 }
             } else if (leftColumnRef.current) {
                 leftColumnRef.current.style.position = 'relative';
                 leftColumnRef.current.style.top = '0';
+                leftColumnRef.current.style.transform = 'translateY(0)';
+                leftColumnRef.current.style.opacity = '1';
             }
         };
 

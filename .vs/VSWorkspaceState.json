@@ -1,11 +1,7 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\ScreenScrape",
-    "\\src",
-    "\\src\\pages",
-    "\\src\\pages\\UserPages"
+    ""
   ],
-  "SelectedNode": "\\src\\pages\\NewPage.js",
+  "SelectedNode": "\\passport.js",
   "PreviewInSolutionExplorer": false
 }

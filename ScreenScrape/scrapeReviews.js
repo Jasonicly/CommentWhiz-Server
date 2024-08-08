@@ -2,107 +2,132 @@ const puppeteer = require('puppeteer');
 const axios = require('axios');
 const fs = require('fs').promises;
 
-async function scrapeReviews(initialUrl, maxComments) {
+async function scrapeReviewPages(initialUrl, maxComments) {
+    const results = [];
+    const visitedPages = new Set();
+    let productName = 'Unknown Product';
+    let productDetails = [];
+    let productImageBase64 = '';
+    let productRating = '';
+    let reviewsPageUrl = '';
+    let totalReviewsCount = '';
+
     const browser = await puppeteer.launch({
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
     });
-    const page = await browser.newPage();
-    await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36");
 
-    const results = [];
-    let currentPageUrl = initialUrl;
-    let productName = 'Unknown Product';
-    let productDetails = [];
-    let productDescription = [];
-    let productImageBase64 = '';
+    async function scrapeProductDetails(page) {
+        console.log("Navigating to the product home page:", initialUrl);
+        await page.goto(initialUrl);
 
-    console.log("Navigating to the product home page:", currentPageUrl);
-    await page.goto(currentPageUrl, { waitUntil: 'domcontentloaded' });
-
-    // Block unnecessary resources
-    await page.setRequestInterception(true);
-    page.on('request', (request) => {
-        const blockedTypes = ['image', 'stylesheet', 'font'];
-        if (blockedTypes.includes(request.resourceType())) {
-            request.abort();
-        } else {
-            request.continue();
-        }
-    });
-
-    async function downloadImageToBase64(url) {
-        const response = await axios.get(url, { responseType: 'arraybuffer' });
-        const buffer = Buffer.from(response.data, 'binary');
-        return buffer.toString('base64');
-    }
-
-    try {
-        // Scrape product name
-        productName = await page.evaluate(() => {
-            const productTitleElement = document.querySelector('#productTitle');
-            return productTitleElement ? productTitleElement.innerText.trim() : null;
+        // Block unnecessary resources
+        await page.setRequestInterception(true);
+        page.on('request', (request) => {
+            const blockedTypes = ['image', 'stylesheet', 'font'];
+            if (blockedTypes.includes(request.resourceType())) {
+                request.abort();
+            } else {
+                request.continue();
+            }
         });
 
-        // Scrape product details
-        productDetails = await page.evaluate(() => {
-            const details = [];
-            document.querySelectorAll('.a-normal.a-spacing-micro tr').forEach(detailRow => {
-                const keyElement = detailRow.querySelector('td.a-span3 .a-text-bold');
-                const valueElement = detailRow.querySelector('td.a-span9');
-                if (keyElement && valueElement) {
-                    details.push(`${keyElement.innerText.trim()}: ${valueElement.innerText.trim()}`);
-                }
+        async function downloadImageToBase64(url) {
+            const response = await axios.get(url, { responseType: 'arraybuffer' });
+            const buffer = Buffer.from(response.data, 'binary');
+            return buffer.toString('base64');
+        }
+
+        try {
+            // Wait for the elements we need
+            await page.waitForSelector('#productTitle');
+            await page.waitForSelector('a[data-hook="see-all-reviews-link-foot"]');
+
+            // Scrape product name, reviews page URL, and product rating in parallel
+            const [name, reviewsUrl, rating] = await Promise.all([
+                page.evaluate(() => {
+                    const productTitleElement = document.querySelector('#productTitle');
+                    return productTitleElement ? productTitleElement.innerText.trim() : 'Unknown Product';
+                }),
+                page.evaluate(() => {
+                    const reviewLink = document.querySelector('a[data-hook="see-all-reviews-link-foot"]');
+                    return reviewLink ? reviewLink.href : '';
+                }),
+                page.evaluate(() => {
+                    const ratingElement = document.querySelector('#acrPopover .a-size-base.a-color-base');
+                    return ratingElement ? ratingElement.innerText.trim() : 'No rating';
+                })
+            ]);
+
+            productName = name;
+            reviewsPageUrl = reviewsUrl;
+            productRating = rating;
+
+            // Scrape product details and image in parallel
+            const [details, imageUrl] = await Promise.all([
+                page.evaluate(() => {
+                    const details = [];
+                    document.querySelectorAll('.a-normal.a-spacing-micro tr').forEach(detailRow => {
+                        const keyElement = detailRow.querySelector('td.a-span3 .a-text-bold');
+                        const valueElement = detailRow.querySelector('td.a-span9');
+                        if (keyElement && valueElement) {
+                            details.push(`${keyElement.innerText.trim()}: ${valueElement.innerText.trim()}`);
+                        }
+                    });
+                    return details.join(', ');
+                }),
+                page.evaluate(() => {
+                    const imageElement = document.querySelector('#landingImage');
+                    return imageElement ? imageElement.src : '';
+                })
+            ]);
+
+            productDetails = details;
+            if (imageUrl) {
+                productImageBase64 = await downloadImageToBase64(imageUrl);
+            }
+        } catch (error) {
+            console.error("Error scraping product details:", error);
+        }
+    }
+
+    async function scrapeReviewPage(page, url) {
+        console.log("Scraping reviews from:", url);
+        await page.goto(url, { waitUntil: 'domcontentloaded' });
+        await new Promise(resolve => setTimeout(resolve, 250)); // Wait for 0.25 seconds as small buffer for loading
+
+        // Fetch the number of total reviews first
+        if (!totalReviewsCount) {
+            totalReviewsCount = await page.evaluate(() => {
+                const totalReviewsElement = document.querySelector('div[data-hook="cr-filter-info-review-rating-count"]');
+                const totalReviewsText = totalReviewsElement ? totalReviewsElement.innerText.trim() : '';
+
+                const match = totalReviewsText.match(/(\d+)\s+total ratings.*?(\d+)\s+with reviews/);
+                return match ? match[2] : '0';
             });
-            return details.join(', ');
-        });
-
-        // Scrape product image
-        const productImageUrl = await page.evaluate(() => {
-            const imageElement = document.querySelector('#landingImage');
-            return imageElement ? imageElement.src : null;
-        });
-
-        if (productImageUrl) {
-            productImageBase64 = await downloadImageToBase64(productImageUrl);
         }
 
-        // Wait for and click the link to the reviews page
-        await page.waitForSelector('a[data-hook="see-all-reviews-link-foot"]', { timeout: 15000 });
-        const reviewsPageUrl = await page.evaluate(() => {
-            const reviewLink = document.querySelector('a[data-hook="see-all-reviews-link-foot"]');
-            return reviewLink ? reviewLink.href : null;
+        // Fetch the next page URL first
+        const nextPageLink = await page.evaluate(() => {
+            const nextButton = document.querySelector('.a-pagination .a-last a');
+            return nextButton && !nextButton.parentElement.classList.contains('a-disabled') ? nextButton.href : null;
         });
 
-        if (reviewsPageUrl) {
-            console.log("Navigating to reviews page:", reviewsPageUrl);
-            await page.goto(reviewsPageUrl, { waitUntil: 'domcontentloaded' });
-            currentPageUrl = page.url();
-        }
-    } catch (error) {
-        console.error("Error navigating to reviews page:", error);
-        await browser.close();
-        return {
-            initialUrl,
-            productName,
-            productDetails,
-            productImageBase64,
-            reviews: results
-        };
-    }
-
-    // Uses the .a-section.review.aok-relative selector to find and extract review elements
-    while (currentPageUrl && results.length < maxComments) {
-        console.log("Scraping reviews from:", currentPageUrl);
+        // Scrape reviews
         await page.waitForSelector('.a-section.review.aok-relative', { timeout: 15000 });
 
         const reviewsOnPage = await page.evaluate(() => {
             const reviews = [];
             document.querySelectorAll('.a-section.review.aok-relative').forEach(review => {
-                const title = review.querySelector('a[data-hook="review-title"]')?.innerText.trim();
-                const body = review.querySelector('span[data-hook="review-body"]')?.innerText.trim();
+                let title = review.querySelector('a[data-hook="review-title"]')?.innerText.trim();
+                let body = review.querySelector('span[data-hook="review-body"]')?.innerText.trim();
                 const rawTime = review.querySelector('span[data-hook="review-date"]')?.innerText.trim();
                 const time = rawTime ? rawTime.replace(/^.*on\s/, '') : ''; // Extract just the date part
+
+                if (!body) {
+                    body = title; // Replace empty body with title
+                }
+
                 reviews.push({ title, body, time });
             });
             return reviews;
@@ -110,31 +135,59 @@ async function scrapeReviews(initialUrl, maxComments) {
 
         results.push(...reviewsOnPage);
 
-        // Navigate to the next page of reviews if it exists
-        const nextPageLink = await page.evaluate(() => {
-            const nextButton = document.querySelector('.a-pagination .a-last a');
-            return nextButton && !nextButton.parentElement.classList.contains('a-disabled') ? nextButton.href : null;
-        });
-
         if (nextPageLink && results.length < maxComments) {
-            currentPageUrl = nextPageLink;
-            await page.goto(currentPageUrl, { waitUntil: 'domcontentloaded' });
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            return nextPageLink;
         } else {
-            currentPageUrl = null;
+            return null;
         }
     }
 
+    async function scrapeAllReviews(initialUrl) {
+        const page = await browser.newPage();
+        await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36");
+
+        await scrapeProductDetails(page);
+
+        if (!reviewsPageUrl) {
+            console.error("No reviews page URL found.");
+            await browser.close();
+            return {
+                initialUrl,
+                productName,
+                productDetails,
+                productImageBase64,
+                productRating,
+                totalReviewsCount,
+                reviews: []
+            };
+        }
+
+        let nextPageUrl = reviewsPageUrl;
+
+        while (nextPageUrl && results.length < maxComments) {
+            nextPageUrl = await scrapeReviewPage(page, nextPageUrl);
+        }
+
+        await page.close();
+    }
+
+    await scrapeAllReviews(initialUrl);
+
     await browser.close();
 
-    // Create the result JSON
-    const resultJson = {
+    return {
         initialUrl,
         productName,
         productDetails,
         productImageBase64,
+        productRating,
+        totalReviewsCount,
         reviews: results.slice(0, maxComments)
     };
+}
+
+async function scrapeReviews(initialUrl, maxComments) {
+    const resultJson = await scrapeReviewPages(initialUrl, maxComments);
 
     // Log the result JSON
     console.log(JSON.stringify(resultJson, null, 2));
