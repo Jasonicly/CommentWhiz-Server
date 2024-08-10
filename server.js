@@ -25,7 +25,7 @@ const genAI = new GoogleGenerativeAI(process.env.AI_API_KEY);
 
 // The Gemini 1.5 models are versatile and work with most use cases
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-const AI_IP = "35.225.159.219";
+const AI_IP = "35.193.144.175";
 // SSL options
 const options = {
     key: fs.readFileSync(path.resolve(__dirname, 'localhost-key.pem')),

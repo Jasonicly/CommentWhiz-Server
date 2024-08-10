@@ -79,7 +79,7 @@ const Login = () => {
                     <div className="hidden md:flex flex-col items-center justify-center text-white p-10 rounded-l-2xl" style={styles.customGradient}>
                         <h1 className="text-3xl font-bold mb-2">Welcome to</h1>
                         <h2 className="text-5xl font-bold">Comment Whiz</h2>
-                        <img src="/images/logo.png" alt="CommentSense Logo" className="w-64 mt-6" />
+                        <img src="/images/logoWhite.png" alt="CommentSense Logo" className="w-64 mt-6" />
                     </div>
                     <div className="flex-1 p-8 bg-gray-100 rounded-r-2xl" style={styles.formContainer}>
                         <h2 className="text-4xl font-semibold text-center mb-6 text-green-800">Login</h2>

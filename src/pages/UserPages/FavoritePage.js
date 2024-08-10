@@ -79,7 +79,8 @@ const FavoritePage = () => {
                                     id={product._id}
                                     image={product.summary?.productImageBase64}
                                     name={product.summary?.['Product Name']}
-                                    rating={product.summary?.['Enhanced Rating']}
+                                    positive={product.summary?.['Percentage of Positive Reviews']}
+                                    negative={product.summary?.['Percentage of Negative Reviews']}
                                 />
                             ))}
                         </div>

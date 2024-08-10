@@ -5,14 +5,14 @@ const slides = [
     {
         title: "The one stop solution for all your E-commerce needs!",
         description: "Our Team of 5 will demostrate our ingenuity in developing web applications your interest, allowing you to condense your time and effort reading online reviews into a single platform.",
-        image: process.env.PUBLIC_URL + '/images/logoBlack.png',
+        image: process.env.PUBLIC_URL + '/images/logoWhite.png',
         width: "300px",
         height: "300px"
     },
     {
         title: "Slide 2 Title",
         description: "Slide 2 Description",
-        image: process.env.PUBLIC_URL + '/images/logoWhite.png',
+        image: process.env.PUBLIC_URL + '/images/logoBlack.png',
         width: "300px",
         height: "300px"
     },
