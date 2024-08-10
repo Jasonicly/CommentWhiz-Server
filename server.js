@@ -802,9 +802,9 @@ app.get('/api/allreports', async (req, res) => {
     if (sort === 'Newest') {
         options = { 'summary.Processed Time': -1 };
     } else if (sort === 'Positivity') {
-        options = { 'summary.Enhanced Rating': -1 };
+        options = { 'summary.Percentage of Positive Reviews': -1 };
     } else if (sort === 'Negativity') {
-        options = { 'summary.Enhanced Rating': 1 };
+        options = { 'summary.Percentage of Positive Reviews': 1 };
     }
 
     try {
