@@ -53,7 +53,7 @@ const FeaturesSection = () => {
             <div className="md:w-2/5">
                 <iframe
                     className="w-full h-64 md:h-full rounded-lg"
-                    src="https://www.youtube.com/embed/5LkUtBlaW18"
+                    src="https://www.youtube.com/embed/B3eWoK088eM?si=KIO31cDUn6yaFErO"
                     title="Video"
                     frameBorder="0"
                     allowFullScreen
