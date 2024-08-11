@@ -18,6 +18,7 @@ const { start } = require('repl');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const http = require('http');
 const Mailjet = require('node-mailjet');
+var sanitizeUrl = require("@braintree/sanitize-url").sanitizeUrl;
 
 require('dotenv').config();
 // Access your API key as an environment variable (see "Set up your API key" above)
@@ -175,7 +176,7 @@ app.post('/checkReport', async (req, res) => {
 // Define a POST route for scraping
 app.post('/scrape', async (req, res) => {
     // Extract the URL from the request body
-    const { url } = req.body;
+    const { url } = sanitizeUrl(req.body);
     console.log('Received URL from Extension:', url);
     // Check if URL is provided, if not, send a 400 Bad Request response
     if (!url) {
@@ -782,6 +783,27 @@ const escapeRegex = (text) => {
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 };
 
+const sanitizeSearchInput = (text) => {
+    if (typeof text !== 'string') {
+        throw new Error('Invalid input type');
+    }
+
+    const trimmedInput = text.trim();
+
+    if (trimmedInput.length === 0 || trimmedInput.length > 100) {
+        throw new Error('Input too long or empty');
+    }
+
+    const sanitizedInput = escapeRegex(trimmedInput.toLowerCase());
+
+    const allowedCharacters = /^[a-zA-Z0-9\s]+$/;
+    if (!allowedCharacters.test(sanitizedInput)) {
+        throw new Error('Invalid characters in input');
+    }
+
+    return sanitizedInput;
+};
+
 app.get('/api/allreports', async (req, res) => {
     const db = client.db(dbName);
     const analysesCollection = db.collection('analyses');
@@ -791,7 +813,7 @@ app.get('/api/allreports', async (req, res) => {
 
     let query = {};
     if (search) {
-        const safeSearch = escapeRegex(search);
+        const safeSearch = sanitizeSearchInput(search);
         query['summary.Product Name'] = { $regex: safeSearch, $options: 'i' };
     }
     if (category && category !== 'All') {
