@@ -1,11 +1,12 @@
 {
   "ExpandedNodes": [
     "",
-    "\\ScreenScrape",
+    "\\public",
+    "\\public\\images",
     "\\src",
-    "\\src\\pages",
-    "\\src\\pages\\UserPages"
+    "\\src\\components",
+    "\\src\\pages"
   ],
-  "SelectedNode": "\\src\\pages\\NewPage.js",
+  "SelectedNode": "\\server.js",
   "PreviewInSolutionExplorer": false
 }

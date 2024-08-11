@@ -1,177 +1,259 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './Button';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSyncAlt, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 
 const ReviewList = ({ reviews }) => {
-    const [showFilterOptions, setShowFilterOptions] = useState(false);
-    const [activeFilter, setActiveFilter] = useState(null);
-    const [selectedSentiments, setSelectedSentiments] = useState(['All Sentiments']);
-    const [selectedEmotions, setSelectedEmotions] = useState(['All Emotions']);
-    const [selectedRating, setSelectedRating] = useState(null);
-    const [showAllReviews, setShowAllReviews] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('All Categories');
+  const [selectedSentiment, setSelectedSentiment] = useState('All Sentiments');
+  const [selectedEmotion, setSelectedEmotion] = useState('All Emotions');
+  const [selectedRating, setSelectedRating] = useState('All Ratings');
+  const [selectedSarcasm, setSelectedSarcasm] = useState('View All');
+  const [showAllReviews, setShowAllReviews] = useState(false);
+  const [showScrollButtons, setShowScrollButtons] = useState({ up: false, down: true });
+  const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(true);
+  const chartRef = useRef(null);
 
-    const toggleFilterOptions = () => setShowFilterOptions(!showFilterOptions);
-    const setFilterType = (filterType) => setActiveFilter(activeFilter === filterType ? null : filterType);
+  const handleCategoryChange = (e) => setSelectedCategory(e.target.value);
+  const handleSentimentChange = (e) => setSelectedSentiment(e.target.value);
+  const handleEmotionChange = (e) => setSelectedEmotion(e.target.value);
+  const handleRatingChange = (e) => setSelectedRating(e.target.value);
+  const handleSarcasmChange = (e) => setSelectedSarcasm(e.target.value);
 
-    const toggleShowAllReviews = () => setShowAllReviews(!showAllReviews);
+  const resetFilters = () => {
+    setSelectedCategory('All Categories');
+    setSelectedSentiment('All Sentiments');
+    setSelectedEmotion('All Emotions');
+    setSelectedRating('All Ratings');
+    setSelectedSarcasm('View All');
+  };
 
-    const handleSentimentClick = (sentiment) => {
-        if (sentiment === 'All Sentiments') {
-            setSelectedSentiments(['All Sentiments']);
-        } else {
-            if (selectedSentiments.includes('All Sentiments')) {
-                setSelectedSentiments([sentiment]);
-            } else if (selectedSentiments.includes(sentiment)) {
-                setSelectedSentiments(selectedSentiments.filter(item => item !== sentiment));
-            } else {
-                setSelectedSentiments([...selectedSentiments, sentiment]);
-            }
-        }
-    };
+  const filteredReviews = reviews.filter(review => {
+    const sentimentMatch = selectedSentiment === 'All Sentiments' || selectedSentiment.toLowerCase() === review.sentiment.toLowerCase();
+    const emotionMatch = selectedEmotion === 'All Emotions' || selectedEmotion.toLowerCase() === review.emotions.toLowerCase();
+    const ratingMatch = selectedRating === 'All Ratings' || review['AI-rating'] === parseInt(selectedRating);
+    const categoryMatch = selectedCategory === 'All Categories' || review.comment_category.includes(selectedCategory);
+    const sarcasmMatch = selectedSarcasm === 'View All' ||
+      (selectedSarcasm === 'Sarcastic' && review.sarcasm_label === 1) ||
+      (selectedSarcasm === 'Not Sarcastic' && review.sarcasm_label === 0);
 
-    const handleEmotionClick = (emotion) => {
-        if (emotion === 'All Emotions') {
-            setSelectedEmotions(['All Emotions']);
-        } else {
-            if (selectedEmotions.includes('All Emotions')) {
-                setSelectedEmotions([emotion]);
-            } else if (selectedEmotions.includes(emotion)) {
-                setSelectedEmotions(selectedEmotions.filter(item => item !== emotion));
-            } else {
-                setSelectedEmotions([...selectedEmotions, emotion]);
-            }
-        }
-    };
+    return sentimentMatch && emotionMatch && ratingMatch && categoryMatch && sarcasmMatch;
+  });
 
-    const resetFilters = () => {
-        setSelectedSentiments(['All Sentiments']);
-        setSelectedEmotions(['All Emotions']);
-        setSelectedRating(null);
-    };
+  const toggleShowAllReviews = () => setShowAllReviews(!showAllReviews);
 
-    const filteredReviews = reviews.filter(review => {
-        const sentimentMatch = selectedSentiments.includes('All Sentiments') || selectedSentiments.includes(review.sentiment);
-        const emotionMatch = selectedEmotions.includes('All Emotions') || selectedEmotions.includes(review.emotions);
-        const ratingMatch = selectedRating === null || review['AI-rating'] === selectedRating;
-        return sentimentMatch && emotionMatch && ratingMatch;
+  const scrollToBottom = () => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleScroll = () => {
+    const scrollPosition = window.scrollY;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.body.scrollHeight;
+
+    setShowScrollButtons({
+      up: scrollPosition > 100,
+      down: scrollPosition + windowHeight < documentHeight - 100
     });
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Set initial state
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  const renderStars = (rating) => {
+    const fullStars = Math.floor(rating);
+    const halfStar = rating % 1 !== 0;
+    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+    const starStyle = {
+      color: 'yellow',
+      textShadow: '0 0 2px #000'
+    };
 
     return (
-        <div>
-            <button onClick={toggleFilterOptions} className="mb-4 p-2 bg-custom-gray border border-black rounded" style={{ minWidth: '125px' }}>
-                {showFilterOptions ? 'Hide Filters' : 'Show Filters'}
-            </button>
-            {showFilterOptions && (
-                <div className="bg-gray-100 p-4 border border-black mb-4 rounded relative">
-                    <button onClick={resetFilters} className="absolute top-2 left-2 p-2 bg-custom-gray border border-black rounded">
-                        Reset Filters
-                    </button>
-                    <div className="text-center mb-4">
-                        <h2 className="text-lg font-semibold mb-4">Filter Options</h2>
-                        <div className="flex items-center justify-center mb-4">
-                            <button onClick={() => setFilterType('Sentiment')} className={`mx-2 p-2 rounded border-2 border-black ${activeFilter === 'Sentiment' ? 'bg-blue-500 text-white' : 'bg-custom-gray'}`}>Sentiment</button>
-                            <button onClick={() => setFilterType('Emotion')} className={`mx-2 p-2 rounded border-2 border-black ${activeFilter === 'Emotion' ? 'bg-blue-500 text-white' : 'bg-custom-gray'}`}>Emotion</button>
-                            <button onClick={() => setFilterType('AI Rating')} className={`mx-2 p-2 rounded border-2 border-black ${activeFilter === 'AI Rating' ? 'bg-blue-500 text-white' : 'bg-custom-gray'}`}>AI Rating</button>
-                        </div>
-                    </div>
-
-                    {activeFilter === 'Sentiment' && (
-                        <div className="flex justify-center">
-                            <div className="inline-flex items-center justify-center mb-4 border-2 border-black p-5">
-                                <button onClick={() => handleSentimentClick('Positive')} className={`mx-2 p-2 rounded border border-black ${selectedSentiments.includes('Positive') ? 'bg-green-500 text-white' : 'bg-custom-gray'}`}>Positive</button>
-                                <button onClick={() => handleSentimentClick('Negative')} className={`mx-2 p-2 rounded border border-black ${selectedSentiments.includes('Negative') ? 'bg-red-500 text-white' : 'bg-custom-gray'}`}>Negative</button>
-                                <button onClick={() => handleSentimentClick('Neutral')} className={`mx-2 p-2 rounded border border-black ${selectedSentiments.includes('Neutral') ? 'bg-yellow-500 text-white' : 'bg-custom-gray'}`}>Neutral</button>
-                                <button onClick={() => handleSentimentClick('All Sentiments')} className={`mx-2 p-2 rounded border border-black ${selectedSentiments.includes('All Sentiments') ? 'bg-blue-500 text-white' : 'bg-custom-gray'}`}>All Sentiments</button>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeFilter === 'Emotion' && (
-                        <div className="flex justify-center">
-                            <div className="grid grid-cols-1 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-7 gap-4 justify-center mb-4 border-2 border-black p-5">
-                                {['Joy', 'Anger', 'Neutral', 'Sadness', 'Disgust', 'Surprise'].map((emotion, index) => {
-                                    let bgColor = 'bg-gray-200';
-                                    if (selectedEmotions.includes(emotion.toLowerCase())) {
-                                        switch (emotion.toLowerCase()) {
-                                            case 'anger':
-                                                bgColor = 'bg-red-500';
-                                                break;
-                                            case 'disgust':
-                                                bgColor = 'bg-green-500';
-                                                break;
-                                            case 'joy':
-                                                bgColor = 'bg-yellow-500';
-                                                break;
-                                            case 'neutral':
-                                                bgColor = 'bg-gray-500';
-                                                break;
-                                            case 'sadness':
-                                                bgColor = 'bg-blue-300';
-                                                break;
-                                            case 'surprise':
-                                                bgColor = 'bg-purple-300';
-                                                break;
-                                            default:
-                                                bgColor = 'bg-gray-100';
-                                        }
-                                    }
-
-                                    return (
-                                        <button
-                                            key={index}
-                                            onClick={() => handleEmotionClick(emotion.toLowerCase())}
-                                            className={`mx-2 p-2 rounded border border-black ${bgColor} text-black`}
-                                        >
-                                            {emotion}
-                                        </button>
-                                    );
-                                })}
-                                <button onClick={() => handleEmotionClick('All Emotions')} className={`mx-2 p-2 rounded border border-black ${selectedEmotions.includes('All Emotions') ? 'bg-blue-500 text-white' : 'bg-custom-gray'}`}>All Emotions</button>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeFilter === 'AI Rating' && (
-                        <div className="flex justify-center">
-                            <div className="inline-flex items-center justify-center mb-4 border-2 border-black p-5">
-                                {[1, 2, 3, 4, 5].map(star => (
-                                    <svg
-                                        key={star}
-                                        onClick={() => setSelectedRating(star)}
-                                        className={`mx-2 w-8 h-8 ${selectedRating >= star ? 'text-yellow-500' : 'text-gray-500'} cursor-pointer`}
-                                        fill="currentColor"
-                                        viewBox="0 0 20 20"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path d="M9.049.927C9.433.292 10.567.292 10.951.927l2.364 4.787 5.288.768c.663.097.93.912.448 1.379L15.949 11.5l.898 5.24c.113.657-.578 1.154-1.157.846L10 15.347l-4.69 2.46c-.579.308-1.27-.189-1.157-.846l.898-5.24-3.843-3.64c-.483-.467-.215-1.282.448-1.38l5.288-.767L9.049.927z" />
-                                    </svg>
-                                ))}
-                                <button onClick={() => setSelectedRating(null)} className={`mx-2 p-2 rounded border border-black ${selectedRating === null ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>All AI Ratings</button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {filteredReviews.slice(0, showAllReviews ? filteredReviews.length : 4).map((review, index) => (
-                    <div key={index} className="p-4 rounded-lg border-black border shadow-md mb-4">
-                        <p>{review.title}</p>
-                        <p>{review.body}</p>
-                        <p><strong>Emotion:</strong> {review.emotions}</p>
-                        <p><strong>Sentiment:</strong> {review.sentiment}</p>
-                        <p><strong>AI Rating:</strong> {review["AI-rating"]}</p>
-                    </div>
-                ))}
-            </div>
-            {filteredReviews.length > 4 && (
-                <Button
-                    onClick={toggleShowAllReviews}
-                    text={showAllReviews ? 'Show Less' : 'Show More'}
-                    className="mt-4"
-                />
-            )}
-        </div>
+      <>
+        {Array(fullStars).fill().map((_, i) => <span key={`full-${i}`} style={starStyle}>&#9733;</span>)}
+        {halfStar && <span style={starStyle}>&#9733;</span>}
+        {Array(emptyStars).fill().map((_, i) => <span key={`empty-${i}`} style={{ textShadow: '0 0 2px #000' }}>&#9734;</span>)}
+      </>
     );
+  };
+
+  const sentimentColors = {
+    Positive: 'text-green-500',
+    Negative: 'text-red-500',
+    Neutral: 'text-yellow-500'
+  };
+
+  const sentimentEmojis = {
+    Positive: '👍',
+    Negative: '👎',
+    Neutral: '😐'
+  };
+
+  const emotionEmojis = {
+    joy: '😊',
+    anger: '😠',
+    neutral: '😐',
+    sadness: '😢',
+    disgust: '🤢',
+    surprise: '😮'
+  };
+
+  const categoryColors = {
+    delivery: 'bg-purple-300 text-black',
+    service: 'bg-yellow-300 text-black',
+    price: 'bg-green-500 text-black',
+    value: 'bg-green-300 text-black',
+    quality: 'bg-rose-300 text-black',
+    usage_performance: 'bg-blue-300 text-black',
+    overall_satisfaction: 'bg-yellow-300 text-black'
+  };
+
+  const categoryDescriptions = {
+    delivery: 'Focuses on how the product arrived and the time it took.',
+    service: 'Describes interactions with customer support.',
+    price: 'Specifically mentions cost or pricing aspects.',
+    value: 'Talks about the balance between cost and benefits.',
+    quality: 'Mentions the materials, durability, or construction of the product.',
+    usage_performance: 'Discusses how the product works and its ease of use.',
+    overall_satisfaction: 'Provides an overarching tone or summary of the user’s experience.'
+  };
+
+  const categoryName = {
+    delivery: 'Delivery📦',
+    service: 'Service🫱🏽',
+    price: 'Price💵',
+    value: 'Value💎',
+    quality: 'Quality🪧',
+    usage_performance: 'Usage Performance⚡',
+    overall_satisfaction: 'Overall Satisfaction😀'
+  };
+
+  const renderCategories = (categories) => {
+    return categories.map(category => (
+      <span 
+        key={category} 
+        data-category={category} 
+        className={`px-2 py-1 rounded-full mx-1 ${categoryColors[category]}`} 
+      >
+        {categoryName[category]}
+      </span>
+    ));
+  };
+
+  return (
+    <div>
+      <div className="bg-custom-green mb-4 rounded relative pb-5 pr-4">
+        <div className="text-center mb-4">
+          <h2 className="text-lg font-semibold mb-4">Filter Options</h2>
+          <button 
+            className="md:hidden bg-white p-2 rounded mb-4" 
+            onClick={() => setIsFiltersCollapsed(!isFiltersCollapsed)}
+          >
+            {isFiltersCollapsed ? 'Show Filters' : 'Hide Filters'}
+          </button>
+          <div className={`flex flex-col md:flex-row items-center justify-center mb-4 space-y-4 md:space-y-0 md:space-x-4 ${isFiltersCollapsed ? 'hidden' : ''}`}>
+            <label className="font-semibold text-white">Filter by:</label>
+            <select value={selectedCategory} onChange={handleCategoryChange} className="p-2 rounded">
+              <option value="All Categories">All Categories</option>
+              {Object.keys(categoryName).map(category => (
+                <option key={category} value={category}>{categoryName[category]}</option>
+              ))}
+            </select>
+            <select value={selectedSentiment} onChange={handleSentimentChange} className="p-2 rounded">
+              <option value="All Sentiments">All Sentiments</option>
+              <option value="Positive">Positive</option>
+              <option value="Negative">Negative</option>
+              <option value="Neutral">Neutral</option>
+            </select>
+            <select value={selectedEmotion} onChange={handleEmotionChange} className="p-2 rounded">
+              <option value="All Emotions">All Emotions</option>
+              <option value="joy">Joy</option>
+              <option value="anger">Anger</option>
+              <option value="neutral">Neutral</option>
+              <option value="sadness">Sadness</option>
+              <option value="disgust">Disgust</option>
+              <option value="surprise">Surprise</option>
+            </select>
+            <select value={selectedRating} onChange={handleRatingChange} className="p-2 rounded">
+              <option value="All Ratings">All Ratings</option>
+              <option value="1">1 Star</option>
+              <option value="2">2 Stars</option>
+              <option value="3">3 Stars</option>
+              <option value="4">4 Stars</option>
+              <option value="5">5 Stars</option>
+            </select>
+            <select value={selectedSarcasm} onChange={handleSarcasmChange} className="p-2 rounded">
+              <option value="View All">View All</option>
+              <option value="Sarcastic">Sarcastic</option>
+              <option value="Not Sarcastic">Not Sarcastic</option>
+            </select>
+            <button onClick={resetFilters} className="p-2 bg-white border rounded">
+              <FontAwesomeIcon icon={faSyncAlt} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 px-6">
+        {filteredReviews.slice(0, showAllReviews ? filteredReviews.length : 4).map((review, index) => (
+          <div key={index} className="p-4 border-black border-t mb-4">
+            <p className="mb-2"><strong>Ratings: {review['AI-rating']} out of 5 stars </strong>{renderStars(review['AI-rating'])}</p>
+            <p className="mb-2"><strong>Categories:</strong> {renderCategories(review.comment_category)}</p>
+            <p className="mb-2"><strong>Emotion: {review.emotions} {emotionEmojis[review.emotions.toLowerCase()]}</strong></p>
+            <p className="mb-2"><strong>Sentiment: <span className={sentimentColors[review.sentiment]}>{review.sentiment} {sentimentEmojis[review.sentiment]}</span></strong></p>
+            {review.sarcasm_label === 1 && (
+              <p className="mb-2">
+                <strong>Sarcasm:</strong>
+                <FontAwesomeIcon icon={faExclamationCircle} className="text-red-500 ml-2" title="This review is flagged as sarcastic or satirical" />
+              </p>
+            )}
+            <br />
+            <strong>{review.title}</strong>
+            <p className="mb-2">{review.body}</p>
+          </div>
+        ))}
+      </div>
+      {filteredReviews.length > 4 && (
+        <Button
+          onClick={toggleShowAllReviews}
+          text={showAllReviews ? 'Show Less' : 'Show More'}
+          className="m-4"
+        />
+      )}
+      {showAllReviews && (
+        <>
+          {showScrollButtons.down && (
+            <button
+              onClick={scrollToBottom}
+              className="fixed bottom-10 left-10 p-4 text-black rounded-full text-3xl"
+            >
+              &#x2193;
+            </button>
+          )}
+          {showScrollButtons.up && (
+            <button
+              onClick={scrollToTop}
+              className="fixed bottom-10 right-10 p-4 text-black rounded-full text-3xl"
+            >
+              &#x2191;
+            </button>
+          )}
+        </>
+      )}
+    </div>
+  );
 };
 
 export default ReviewList;

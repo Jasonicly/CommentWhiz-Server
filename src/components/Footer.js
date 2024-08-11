@@ -12,8 +12,8 @@ function Footer() {
                 <div className="mb-4 md:mb-0">
                     <ul className="flex flex-col md:flex-row md:space-x-6">
                         <li><a href="/home" className="hover:text-gray-400">Home</a></li>
-                        <li><a href="#" className="hover:text-gray-400">Features</a></li>
-                        <li><a href="#" className="hover:text-gray-400">About</a></li>
+                        <li><a href="features" className="hover:text-gray-400">Features</a></li>
+                        <li><a href="/about" className="hover:text-gray-400">About</a></li>
                         <li><a href="/login" className="hover:text-gray-400">Log In</a></li>
                         <li><a href="/signup" className="hover:text-gray-400">Sign Up</a></li>
                     </ul>

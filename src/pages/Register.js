@@ -4,7 +4,7 @@ import axios from 'axios';
 import Header from "../components/Header";
 import { useToken } from '../auth/useToken';
 import Footer from '../components/Footer';
-
+import PopUp from '../components/PopUp';
 
 const Register = () => {
     const [email, setEmail] = useState('');
@@ -12,6 +12,7 @@ const Register = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const [isOpen, setIsOpen] = useState(false);
 
     const [token, setToken] = useToken();
     const navigate = useNavigate();
@@ -43,14 +44,14 @@ const Register = () => {
                 if (response.status === 201) {
                     setErrorMessage(''); // Clear error message on success
                     setSuccessMessage('User registered successfully');
+                    setIsOpen(true);
 
                     const { token } = response.data;
                     setToken(token);
-                    navigate('/home');
                 }
             } catch (error) {
                 setSuccessMessage(''); // Clear success message if there's an error
-                setErrorMessage('An error occurred during registration, maybe the email already have been used');
+                setErrorMessage('An error occurred during registration, maybe the email already have been used or the email used is not valid');
                 console.error('Error:', error);
             }
         }
@@ -62,6 +63,10 @@ const Register = () => {
         setConfirmPassword('');
         setErrorMessage('');
         setSuccessMessage('');
+    };
+
+    const handleGoogleLogin = () => {
+        window.location.href = 'https://localhost:3001/auth/google';
     };
 
     // Define styles
@@ -90,14 +95,14 @@ const Register = () => {
     };
 
     return (
-        <div className="bg-custom-green">
+        <div>
             <Header />
             <div className="flex flex-col justify-center items-center h-screen relative">
                 <div className="flex bg-white rounded-2xl shadow-2xl overflow-visible max-w-4xl w-full relative mt-6">
                     <div className="hidden md:flex flex-col items-center justify-center text-white p-10 rounded-l-2xl" style={styles.customGradient}>
                         <h1 className="text-3xl font-bold mb-2">Welcome to</h1>
                         <h2 className="text-5xl font-bold">Comment Whiz</h2>
-                        <img src="/images/logo.png" alt="CommentSense Logo" className="w-64 mt-6" />
+                        <img src="/images/logoWhite.png" alt="CommentSense Logo" className="w-64 mt-6" />
                     </div>
                     <div className="flex-1 p-8 bg-gray-100 rounded-r-2xl" style={styles.formContainer}>
                         <h2 className="text-4xl font-semibold text-center mb-6 text-green-800">Register</h2>
@@ -150,7 +155,7 @@ const Register = () => {
                         </form>
                         <p className="text-center mt-6">Already have an account? <a href="/login" className="text-green-700 hover:underline">Log in</a></p>
                         <div className="flex items-center justify-center mt-6">
-                            <button aria-label="Register with Google" className="bg-gray-300 p-3 rounded-full mx-2 hover:bg-gray-400 transition duration-200 ease-in-out">
+                            <button aria-label="Register with Google" className="bg-gray-300 p-3 rounded-full mx-2 hover:bg-gray-400 transition duration-200 ease-in-out" onClick={handleGoogleLogin}>
                                 <img src="https://img.icons8.com/ios-filled/50/000000/google-logo.png" alt="Google" className="w-6 h-6" />
                             </button>
                             <button aria-label="Register with Facebook" className="bg-gray-300 p-3 rounded-full mx-2 hover:bg-gray-400 transition duration-200 ease-in-out">
@@ -162,6 +167,10 @@ const Register = () => {
                 </div>
             </div>
             <Footer />
+            <PopUp isOpen={isOpen} onClose={() => { setIsOpen(false); navigate('/home'); }}>
+                <h2 className="text-2xl font-semibold mb-4">Verify Your Email</h2>
+                <p className="text-gray-700">Please check your email to verify your account.</p>
+            </PopUp>
         </div>
     );
 };

@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import axios from "axios";
-import {useNavigate} from "react-router-dom";
-import { Loader } from "./Loader"; // Import the Loader component
-
+import { useNavigate } from "react-router-dom";
 
 function cleanProductUrl(url) {
     try {
@@ -24,42 +22,31 @@ function cleanProductUrl(url) {
 }
 
 function cleanAmazonUrl(urlObj) {
-    // Extract the path parts
     let pathParts = urlObj.pathname.split('/');
-
-    // Find the ASIN (usually after "/dp/")
     let asinIndex = pathParts.indexOf('dp');
     if (asinIndex === -1 || asinIndex + 1 >= pathParts.length) {
         throw new Error("ASIN not found");
     }
-
     let asin = pathParts[asinIndex + 1];
-
-    // Construct the clean URL
     let cleanUrl = `${urlObj.origin}/dp/${asin}`;
-
     return cleanUrl;
 }
 
 function cleanShopeeUrl(urlObj) {
-    // Extract the pathname
     let pathname = urlObj.pathname;
-
-    // Extract the 'i.shopId.itemId' part
     let match = pathname.match(/i\.(\d+)\.(\d+)/);
     if (match) {
         let shopId = match[1];
         let itemId = match[2];
         return `${urlObj.origin}/product/${shopId}/${itemId}`;
     }
-
-    return urlObj.href; // Return the original URL if pattern not matched
+    return urlObj.href;
 }
 
 function SearchBar() {
     const navigate = useNavigate();
     const [url, setUrl] = useState("");
-    const [isLoading, setIsLoading] = useState(false); // State for loading
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleInputChange = (e) => {
         setUrl(e.target.value);
@@ -68,7 +55,7 @@ function SearchBar() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (url) {
-            setIsLoading(true); // Set loading state to true
+            setIsLoading(true);
             try {
                 const cleanUrl = cleanProductUrl(url);
                 const response = await axios.post("https://localhost:3001/scrape", { url: cleanUrl });
@@ -76,51 +63,62 @@ function SearchBar() {
                 
                 setTimeout(() => {
                     navigate(`/report/${encodeURIComponent(cleanUrl)}`);
-                }, 100); // 1000 milliseconds = 1 second
+                }, 100);
             } catch (error) {
                 console.error("Error sending URL to server:", error);
             } finally {
-                setIsLoading(false); // Set loading state to false
+                setIsLoading(false);
             }
         }
     };
 
     return (
-        <div className="search-bar-container bg-custom-blue text-white flex flex-col items-center justify-center mt-5 border-1 border-brown mx-auto rounded-lg" style={{ minWidth: '1550px', minHeight: '200px' }}>
-            <h2 className="text-2xl font-bold mb-4">
-                Search using URL
-            </h2>
-            <div className="flex items-center justify-center w-full">
-                <div className="relative flex items-center" style={{ width: '600px' }}>
-                    <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
-                    <input
-                        type="text"
-                        placeholder="Enter Amazon URL"
-                        value={url}
-                        onChange={handleInputChange}
-                        className="pl-10 pr-4 py-2 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-3 focus:ring-black w-full rounded-l-xl"
+        <form onSubmit={handleSubmit} className="relative flex items-center mx-4" style={{ width: '400px' }}>
+            <input
+                type="text"
+                placeholder="Enter product Url..."
+                value={url}
+                onChange={handleInputChange}
+                className="flex-grow bg-custom-searchbar text-white px-4 py-2 rounded-l-full focus:outline-none"
+                style={{
+                    backgroundColor: '#86BFB0',
+                    fontFamily: 'Poppins, sans-serif',
+                    height: '40px',
+                }}
+            />
+            <button
+                type="submit"
+                className="bg-custom-searchbar text-gray-400 px-4 py-3 rounded-r-full focus:outline-none flex items-center justify-center"
+                style={{ height: '40px' }}
+            >
+                {isLoading ? (
+                    <div
                         style={{
-                            backgroundColor: '#e0e0e0',
-                            fontFamily: 'Poppins, sans-serif',
-                            height: '70px',
+                            border: '4px solid bg-gray-400',
+                            borderTop: '4px solid white',
+                            borderRadius: '50%',
+                            width: '20px',
+                            height: '20px',
+                            animation: 'spin 2s linear infinite',
                         }}
                     />
-                </div>
-                {isLoading ? (
-                    <div>
-                        <Loader /> {/* Render Loader when loading */}
-                    </div>
                 ) : (
-                    <button
-                        onClick={handleSubmit}
-                        className="ml-4 bg-custom-lightblue text-white py-2 px-6  rounded-r-xl"
-                        style={{ height: '70px' }}
-                    >
-                        Send
-                    </button>
+                    <FaSearch />
                 )}
-            </div>
-        </div>
+            </button>
+            <style>
+                {`
+                    .bg-custom-searchbar::placeholder {
+                        color: lightgray;
+                    }
+
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}
+            </style>
+        </form>
     );
 }
 

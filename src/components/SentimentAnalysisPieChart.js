@@ -1,59 +1,3 @@
-/*import React from 'react';
-import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
-
-const SentimentAnalysisPieChart = ({ summary }) => {
-    const totalReviews = summary["Number of Reviews"];
-    const pieData = [
-        { name: 'Positive', value: summary["Percentage of Positive Reviews"], count: summary["Number of Positive Reviews"] },
-        { name: 'Negative', value: summary["Percentage of Negative Reviews"], count: summary["Number of Negative Reviews"] },
-        { name: 'Neutral', value: summary["Percentage of Neutral Reviews"], count: summary["Number of Neutral Reviews"] },
-    ];
-
-    const COLORS = ['#87c187', '#F08080', '#ffd966'];
-
-    const renderCustomTooltip = ({ active, payload }) => {
-        if (active && payload && payload.length) {
-            const data = payload[0].payload;
-            return (
-                <div className="custom-tooltip bg-white p-2 border border-gray-300 rounded shadow">
-                    <p className="label text-sm">{`${data.name}: ${data.count} (${data.value}%)`}</p>
-                </div>
-            );
-        }
-
-        return null;
-    };
-
-    return (
-        <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center flex flex-col justify-center items-center border-black border">
-            <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>Sentiment Analysis</h4>
-            <PieChart width={200} height={250}>
-                <Pie
-                    data={pieData}
-                    cx={90}
-                    cy={90}
-                    labelLine={false}
-                    outerRadius={50}
-                    fill="#8884d8"
-                    dataKey="value"
-                >
-                    {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                </Pie>
-                <Tooltip content={renderCustomTooltip} />
-                <Legend
-                    wrapperStyle={{
-                        paddingTop: '20px'
-                    }}
-                />
-            </PieChart>
-        </div>
-    );
-};
-
-export default SentimentAnalysisPieChart;*/
-
 import React, { useEffect, useRef } from 'react';
 import * as echarts from 'echarts/core';
 import { TooltipComponent, LegendComponent } from 'echarts/components';
@@ -76,19 +20,26 @@ const SentimentAnalysisPieChart = ({ summary }) => {
     const chartDom = chartRef.current;
     const myChart = echarts.init(chartDom);
 
+    const totalReviews = summary["Number of Positive Reviews"] +
+                         summary["Number of Negative Reviews"] +
+                         summary["Number of Neutral Reviews"];
+
     const option = {
       tooltip: {
-        trigger: 'item'
-      },
-      /*legend: {
-        orient: 'vertical',
-        left: 'left',
-        top: 'middle',
-        textStyle: {
-          fontSize: 12,
-          fontFamily: "'Oswald', sans-serif"
+        trigger: 'item',
+        formatter: function (params) {
+          const value = params.value;
+          const name = params.name;
+          const percent = ((value / totalReviews) * 100).toFixed(0);
+          const color = params.color; // Gets the color of the current item
+          return `
+            <div style="display: flex; align-items: center;">
+              <div style="width: 12px; height: 12px; background-color: ${color}; border-radius: 50%; margin-right: 8px;"></div>
+              ${name}:  ${percent}%  (${value})
+            </div>
+          `;
         }
-      },*/
+      },
       series: [
         {
           name: 'Sentiment Analysis',
@@ -126,41 +77,40 @@ const SentimentAnalysisPieChart = ({ summary }) => {
 
     option && myChart.setOption(option);
 
+    const resizeChart = () => {
+      myChart.resize();
+    };
+
+    window.addEventListener('resize', resizeChart);
+
     return () => {
+      window.removeEventListener('resize', resizeChart);
       myChart.dispose();
     };
   }, [summary]);
 
   return (
-    <div className="bg-white p-4 m-2 rounded-lg shadow-md text-center flex flex-col items-center border-black border">
+    <div className="bg-white p-4 m-2 rounded-lg text-left flex flex-col items-left">
       <h4 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Oswald', sans-serif" }}>Sentiment Analysis</h4>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', marginRight: '20px', fontSize: '12px', fontFamily: "'Oswald', sans-serif" }}>
+      <div className="pt-5 w-full" style={{ display: 'flex', alignItems: 'center', position: 'relative', top: '-50px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', marginRight: '10px', fontSize: '8px', fontFamily: "'Oswald', sans-serif" }}>
           <div className="legend-item" style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
-            <span style={{ width: '12px', height: '12px', backgroundColor: '#36A98A', display: 'inline-block', marginRight: '5px' }}></span>
+            <span style={{ width: '25px', height: '20px', backgroundColor: '#36A98A', display: 'inline-block', marginRight: '5px' }}></span>
             <span>Positive ({summary["Number of Positive Reviews"]})</span>
           </div>
           <div className="legend-item" style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
-            <span style={{ width: '12px', height: '12px', backgroundColor: '#F85050', display: 'inline-block', marginRight: '5px' }}></span>
+            <span style={{ width: '25px', height: '20px', backgroundColor: '#F85050', display: 'inline-block', marginRight: '5px' }}></span>
             <span>Negative ({summary["Number of Negative Reviews"]})</span>
           </div>
           <div className="legend-item" style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
-            <span style={{ width: '12px', height: '12px', backgroundColor: '#FCD12A', display: 'inline-block', marginRight: '5px' }}></span>
+            <span style={{ width: '25px', height: '20px', backgroundColor: '#FCD12A', display: 'inline-block', marginRight: '5px' }}></span>
             <span>Neutral ({summary["Number of Neutral Reviews"]})</span>
           </div>
         </div>
-        <div ref={chartRef} style={{ width: 200, height: 200 }}></div>
+        <div ref={chartRef} style={{ display: 'flex', width: '100%', height: '200px', margin: 'auto', position: 'relative', top: '25px' }}></div>
       </div>
     </div>
   );
 };
 
 export default SentimentAnalysisPieChart;
-
-
-
-
-
-
-
-

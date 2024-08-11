@@ -3,11 +3,11 @@ const express = require('express'); // Web framework for Node.js
 const bodyParser = require('body-parser'); // Middleware to parse incoming request bodies
 const cors = require('cors'); // Middleware to enable Cross-Origin Resource Sharing
 const axios = require('axios'); // Promise-based HTTP client for making requests
-const WebSocket = require('ws'); // WebSocket library for real-time communication
+
 const jwt = require('jsonwebtoken'); // JSON Web Token library for creating and verifying tokens
 const { MongoClient, ObjectId } = require('mongodb'); // MongoDB client for connecting to MongoDB
 const bcrypt = require('bcrypt'); // Library for hashing passwords
-
+const passport = require('./passport'); // Import the passport configuration
 const fs = require('fs'); // File system module for reading files
 const path = require('path'); // Path module for working with file paths
 const https = require('https'); // HTTPS module for creating secure servers
@@ -16,6 +16,9 @@ const { decode } = require('punycode');
 const { JsonWebTokenError } = require('jsonwebtoken');
 const { start } = require('repl');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const http = require('http');
+const Mailjet = require('node-mailjet');
+var sanitizeUrl = require("@braintree/sanitize-url").sanitizeUrl;
 
 require('dotenv').config();
 // Access your API key as an environment variable (see "Set up your API key" above)
@@ -23,7 +26,7 @@ const genAI = new GoogleGenerativeAI(process.env.AI_API_KEY);
 
 // The Gemini 1.5 models are versatile and work with most use cases
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
+const AI_IP = "35.193.144.175";
 // SSL options
 const options = {
     key: fs.readFileSync(path.resolve(__dirname, 'localhost-key.pem')),
@@ -32,16 +35,17 @@ const options = {
 };
 
 
-
 // Create an Express application
 const app = express();
 // Define the port number the server will listen on
 const port = 3001;
 
 // Use bodyParser middleware to parse JSON request bodies
-app.use(bodyParser.json());
-// Use CORS middleware to allow cross-origin requests
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
+
+app.use(passport.initialize());
 
 // MongoDB connection URL and database name
 const mongoUrl = 'mongodb://localhost:27017';
@@ -172,7 +176,7 @@ app.post('/checkReport', async (req, res) => {
 // Define a POST route for scraping
 app.post('/scrape', async (req, res) => {
     // Extract the URL from the request body
-    const { url } = req.body;
+    const { url } = sanitizeUrl(req.body);
     console.log('Received URL from Extension:', url);
     // Check if URL is provided, if not, send a 400 Bad Request response
     if (!url) {
@@ -318,35 +322,41 @@ app.post('/ai', async (req, res) => {
 
         const shortText = summaryresponse.data;
 
-        
         res.send({
             aiSummary: {
                 shortSummary: shortText
             }
         });
-        
 
         // Forward the reviews to AI server on localhost:5000
-        const response = await axios.post('https://localhost:5000/process_reviews', reviews, {
-            httpsAgent: new https.Agent({
-                rejectUnauthorized: false, // This will allow self-signed certificates
-            }),
-        });
+        let response;
+        try {
+            response = await axios.post(`http://${AI_IP}:5000/process_reviews`, reviews);
+        } catch (error) {
+            console.error('First server request failed:', error);
+            try {
+                response = await axios.post('https://localhost:5000/process_reviews', reviews, {
+                    httpsAgent: new https.Agent({
+                        rejectUnauthorized: false, // This will allow self-signed certificates
+                    }),
+                });
+            } catch (fallbackError) {
+                console.error('Fallback server request also failed:', fallbackError);
+                throw fallbackError; // Re-throw the error to handle it further up if needed
+            }
+        }
         console.log('Response from AI:', response.data);
-
         // Process the AI response to add the timeline list
         const processedAIResponse = processReviews(JSON.stringify(response.data));
 
         // Extract and combine review texts
         const combinedReviewText = combineReviews(processedAIResponse.reviews);
 
-        
         const longPrompt = `Generate a 100 words or lesser summary of ${combinedReviewText}`;
 
         const longResult = await model.generateContent(longPrompt);
         const longResponse = await longResult.response;
-        const longText = longResponse.text();
-        
+        const longText = await longResponse.text();
 
         // Define aiSummary if it does not exist
         processedAIResponse.aiSummary = {};
@@ -371,6 +381,7 @@ app.post('/ai', async (req, res) => {
             { $set: processedAIResponse },
             { upsert: true } // Create a new document if it does not exist
         );
+
 
     } catch (error) {
         // Log the error message to the console
@@ -400,6 +411,12 @@ app.post('/api/databasequery', async (req, res) => {
     res.send(summaries);
 });
 
+
+const mailjet = Mailjet.apiConnect(
+    process.env.MJ_APIKEY_PUBLIC,
+    process.env.MJ_APIKEY_PRIVATE,
+);
+
 // Define a POST route for user registration
 app.post('/register', async (req, res) => {
     const { email, password } = req.body;
@@ -415,37 +432,73 @@ app.post('/register', async (req, res) => {
         // Hash the password
         const saltRounds = 10;
         const password_hash = await bcrypt.hash(password, saltRounds);
-        
-        const  startingReport = {
-            favourite: '',
-        };
-        // Create a new user document
-        const newUser = {
-            _id: email,
-            password_hash,
-            isVerified: false,
-            favouriteReport: startingReport,
-        };
 
-        // Insert the new user into the users collection
-        await usersCollection.insertOne(newUser);
-        
-        // Send back a json web token
-        jwt.sign({
-            id : email,
-            isVerified: false, 
-            favouriteReport: startingReport,
-        },
-        process.env.JWT_SECRET,
-        {
-            expiresIn: '1d'
-        },
-        (err, token) => {
-            if (err) {
-                return res.status(500).send(err);
-            }
-            res.status(201).json({token});
-        });
+        const startingReport = []
+
+        // Generate a verification token
+        const verificationToken = await bcrypt.hash(email + Date.now().toString(), saltRounds);
+
+        // Send verification email using Mailjet
+        const request = mailjet
+            .post('send', { version: 'v3.1' })
+            .request({
+                Messages: [
+                    {
+                        From: {
+                            Email: "commentwhiz2@gmail.com",
+                            Name: "CommentWhiz"
+                        },
+                        To: [
+                            {
+                                Email: email,
+                                Name: "CommentWhiz User"
+                            }
+                        ],
+                        Subject: "Verify your email address",
+                        TextPart: `Please verify your email by clicking on the following link: https://localhost:${port}/verify-email?token=${verificationToken}&email=${email}`,
+                        HTMLPart: `<p>Please verify your email by clicking on the following link: <a href="https://localhost:${port}/verify-email?token=${verificationToken}&email=${email}">Verify Email</a></p>`
+                    }
+                ]
+            });
+
+        request
+            .then(async (result) => {
+                console.log(result.body);
+
+                // Create a new user document
+                const newUser = {
+                    _id: email,
+                    password_hash,
+                    isVerified: false,
+                    verificationToken,
+                    favouriteReport: startingReport,
+                };
+
+                // Insert the new user into the users collection
+                await usersCollection.insertOne(newUser);
+
+                // Send back a json web token
+                jwt.sign({
+                    id: email,
+                    isVerified: false,
+                    favouriteReport: startingReport,
+                },
+                    process.env.JWT_SECRET,
+                    {
+                        expiresIn: '7d'
+                    },
+                    (err, token) => {
+                        if (err) {
+                            return res.status(500).send(err);
+                        }
+                        res.status(201).json({ token });
+                    });
+            })
+            .catch((err) => {
+                console.error(err.statusCode);
+                res.status(500).send('Error sending verification email');
+            });
+
     } catch (error) {
         // Log the error message to the console
         console.error('Error registering user:', error.message);
@@ -494,7 +547,7 @@ app.post('/login', async (req, res) => {
                 if (err) {
                     return res.status(500).send(err);
                 }
-                res.status(200).send('Login Successful').json({token});
+                res.status(200).json({ token });
                 });
     } 
 }catch (error) {
@@ -504,6 +557,82 @@ app.post('/login', async (req, res) => {
 }
 });
 
+const serveHTML = (message) => `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <style>
+        .fixed {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .popup {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+    <script>
+        setTimeout(function() {
+            window.location.href = 'https://localhost:3000';
+        }, 5000);
+    </script>
+</head>
+<body>
+    <div class="fixed">
+        <div class="popup">
+            <h1>${message}</h1>
+            <p>You will be redirected shortly...</p>
+        </div>
+    </div>
+</body>
+</html>
+`;
+
+app.get('/verify-email', async (req, res) => {
+    const { token, email } = req.query;
+
+    if (!token || !email) {
+        return res.status(400).send(serveHTML('Invalid verification link'));
+    }
+
+    try {
+        const db = client.db(dbName);
+        const usersCollection = db.collection('users');
+
+        // Find the user by email and token
+        const user = await usersCollection.findOne({ _id: email, verificationToken: token });
+
+        if (!user) {
+            return res.status(400).send(serveHTML('Invalid verification link'));
+        }
+
+        // Update the user document to set isVerified to true and remove the verification token
+        await usersCollection.updateOne(
+            { _id: email },
+            { $set: { isVerified: true }, $unset: { verificationToken: '' } }
+        );
+
+        res.send(serveHTML('Email verified successfully!'));
+    } catch (error) {
+        console.error('Error verifying email:', error.message);
+        res.status(500).send(serveHTML('An error occurred while verifying the email'));
+    }
+});
 
 // update User Info page 
 app.put('/user/:userId', async (req, res) => {
@@ -559,6 +688,212 @@ app.put('/user/:userId', async (req, res) => {
     }
     );
     });
+});
+
+// Middleware to verify the JWT token
+function verifyToken(req, res, next) {
+    const token = req.headers['authorization'];
+    if (!token) {
+        return res.status(401).send('Access Denied: No Token Provided!');
+    }
+    try {
+        const decoded = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET);
+        req.user = decoded;
+        next();
+    } catch (error) {
+        return res.status(400).send('Invalid Token');
+    }
+}
+
+// Route to get user data
+app.get('/user/:userId', verifyToken, async (req, res) => {
+    const userId = req.params.userId;
+
+    if (req.user.id !== userId) {
+        return res.status(403).send('Access Denied: You do not have permission to access this resource.');
+    }
+
+    try {
+        const db = client.db(dbName);
+        const usersCollection = db.collection('users');
+
+        const user = await usersCollection.findOne({ _id: userId }, { projection: { password_hash: 0 } });
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        res.status(200).send(user);
+    } catch (error) {
+        console.error('Error retrieving user data:', error);
+        res.status(500).send('Error retrieving user data');
+    }
+});
+
+// Update user favorite report (add favorite)
+app.put('/user/:userId/addFavorite', verifyToken, async (req, res) => {
+    const { userId } = req.params;
+    const { reportId } = req.body;
+
+    if (req.user.id !== userId) {
+        return res.status(403).send('Access Denied: You do not have permission to access this resource.');
+    }
+
+    try {
+        const db = client.db(dbName);
+        const usersCollection = db.collection('users');
+
+        await usersCollection.updateOne(
+            { _id: userId },
+            { $addToSet: { favouriteReport: reportId } }
+        );
+
+        res.status(200).send('Favorite report added');
+    } catch (error) {
+        console.error('Error adding favorite report:', error);
+        res.status(500).send('Error adding favorite report');
+    }
+});
+
+// Update user favorite report (remove favorite)
+app.put('/user/:userId/removeFavorite', verifyToken, async (req, res) => {
+    const { userId } = req.params;
+    const { reportId } = req.body;
+
+    if (req.user.id !== userId) {
+        return res.status(403).send('Access Denied: You do not have permission to access this resource.');
+    }
+
+    try {
+        const db = client.db(dbName);
+        const usersCollection = db.collection('users');
+
+        await usersCollection.updateOne(
+            { _id: userId },
+            { $pull: { favouriteReport: reportId } }
+        );
+
+        res.status(200).send('Favorite report removed');
+    } catch (error) {
+        console.error('Error removing favorite report:', error);
+        res.status(500).send('Error removing favorite report');
+    }
+});
+
+const escapeRegex = (text) => {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+};
+
+const sanitizeSearchInput = (text) => {
+    if (typeof text !== 'string') {
+        throw new Error('Invalid input type');
+    }
+
+    const trimmedInput = text.trim();
+
+    if (trimmedInput.length === 0 || trimmedInput.length > 100) {
+        throw new Error('Input too long or empty');
+    }
+
+    const sanitizedInput = escapeRegex(trimmedInput.toLowerCase());
+
+    const allowedCharacters = /^[a-zA-Z0-9\s]+$/;
+    if (!allowedCharacters.test(sanitizedInput)) {
+        throw new Error('Invalid characters in input');
+    }
+
+    return sanitizedInput;
+};
+
+app.get('/api/allreports', async (req, res) => {
+    const db = client.db(dbName);
+    const analysesCollection = db.collection('analyses');
+
+    const { page = 1, limit = 10, search = '', sort = 'Relevance', category = 'All' } = req.query;
+    console.log(req.query);
+
+    let query = {};
+    if (search) {
+        const safeSearch = sanitizeSearchInput(search);
+        query['summary.Product Name'] = { $regex: safeSearch, $options: 'i' };
+    }
+    if (category && category !== 'All') {
+        query['summary.product_category'] = category;
+    }
+
+    let options = {};
+    if (sort === 'Newest') {
+        options = { 'summary.Processed Time': -1 };
+    } else if (sort === 'Positivity') {
+        options = { 'summary.Percentage of Positive Reviews': -1 };
+    } else if (sort === 'Negativity') {
+        options = { 'summary.Percentage of Positive Reviews': 1 };
+    }
+
+    try {
+        const totalReports = await analysesCollection.countDocuments(query);
+        const skip = (page - 1) * limit;
+        const analyses = await analysesCollection.find(query)
+            .sort(options)
+            .skip(skip)
+            .limit(parseInt(limit))
+            .toArray();
+
+        const summaries = analyses.map(analysis => ({
+            id: analysis._id,
+            positive: analysis.summary['Percentage of Positive Reviews'] || '',
+            negative: analysis.summary['Percentage of Negative Reviews'] || '',
+            productName: analysis.summary['Product Name'] || '',
+            pictureUrl: analysis.summary['productImageBase64'] || ''
+        }));
+
+        res.json({
+            reports: summaries,
+            totalPages: Math.ceil(totalReports / limit)
+        });
+    } catch (error) {
+        console.error("Error fetching reports:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+// Route to get user's favorite reports
+app.get('/user/:userId/favoriteReports', verifyToken, async (req, res) => {
+    const userId = req.params.userId;
+
+    // Ensure that the userId in the token matches the userId in the URL
+    if (req.user.id !== userId) {
+        return res.status(403).send('Access Denied: You do not have permission to access this resource.');
+    }
+
+    try {
+        const db = client.db(dbName);
+        const usersCollection = db.collection('users');
+        const analysesCollection = db.collection('analyses');
+
+        // Find the user by email
+        const user = await usersCollection.findOne({ _id: userId });
+
+        if (!user || !user.favouriteReport) {
+            return res.status(404).send('No favorite reports found for this user');
+        }
+
+        // Fetch the favorite reports from the analyses collection
+        const favoriteReports = await analysesCollection.find({
+            _id: { $in: user.favouriteReport }
+        }).toArray();
+
+        res.status(200).send(favoriteReports);
+    } catch (error) {
+        console.error('Error fetching favorite reports:', error);
+        res.status(500).send('An error occurred while fetching favorite reports');
+    }
+});
+
+// Google authentication route
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+app.get('/auth/google/callback', passport.authenticate('google', { session: false }), (req, res) => {
+    res.redirect(`https://localhost:3000?token=${req.user.token}`);
 });
 
 // Start the Express server with HTTPS
