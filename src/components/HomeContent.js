@@ -9,7 +9,7 @@ const HomeContent = () => {
                     Welcome to Comment Whiz, the ultimate tool for insightful and comprehensive product review analysis. With the press of a button, our powerful servers and AI models get to work, creating detailed summarized reports of all the reviews for any product.
                 </p>
                 <p className="text-xl mb-6 leading-relaxed ml-5">
-                    Our extension seamlessly aggregates user reviews, analyzes sentiments, detects potential bot activities, and highlights key topics of discussion. This allows users to gain a well-rounded understanding of the product's reception and make more informed decisions.
+                    Our extension seamlessly aggregates user reviews, analyzes sentiments, detect sarcasm in reviews, and highlights key topics of discussion. This allows users to gain a well-rounded understanding of the product's reception and make more informed decisions.
                 </p>
                 <p className="text-xl mb-6 leading-relaxed ml-5">
                     Whether you're a buyer looking for authentic feedback or a seller aiming to understand customer perspectives, Comment Whiz delivers a clear, concise, and comprehensive view of all comments. Our advanced AI ensures that you are always equipped with the most relevant and accurate information.
