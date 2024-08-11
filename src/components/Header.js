@@ -5,21 +5,35 @@ import { jwtDecode } from 'jwt-decode'; // Correct import
 import { useToken } from "../auth/useToken";
 import { useUser } from "../auth/useUser";
 import SearchBar from "./SearchBar"; // Import the SearchBar component
+import Cookies from "js-cookie";
 
 function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [userEmail, setUserEmail] = useState('');
     const user = useUser();
-    const [token, setToken] = useToken(); // Correct destructuring
 
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
     };
 
+    const [token, setTokenInternal] = useState(() => {
+        try {
+            return Cookies.get("token"); // Get token from cookies
+        } catch (error) {
+            console.error("Error accessing cookies:", error);
+            return null;
+        }
+    });
+
+    const [userEmail, setUserEmail] = useState(null);
+
     useEffect(() => {
         if (token) {
-            const decodedToken = jwtDecode(token);
-            setUserEmail(decodedToken.id);
+            try {
+                const decodedToken = jwtDecode(token);
+                setUserEmail(decodedToken.id); // Assuming 'id' is the user email in the token payload
+            } catch (error) {
+                console.error("Error decoding token:", error);
+            }
         }
     }, [token]);
 
@@ -28,8 +42,8 @@ function Header() {
     };
 
     const handleLogout = () => {
-        setToken(null); // Clear the token from the state
-        localStorage.removeItem('token'); // Remove the token from local storage
+        setTokenInternal(null); // Clear the token from the state
+        Cookies.remove("token"); // Remove the token from cookies
         // You can add any other logout logic here if needed
         window.location.reload(); // Refresh the page
     };

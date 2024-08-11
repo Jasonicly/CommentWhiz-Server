@@ -432,7 +432,7 @@ app.post('/register', async (req, res) => {
         const saltRounds = 10;
         const password_hash = await bcrypt.hash(password, saltRounds);
 
-        const startingReport = []
+        const startingReport = [];
 
         // Generate a verification token
         const verificationToken = await bcrypt.hash(email + Date.now().toString(), saltRounds);
@@ -490,7 +490,16 @@ app.post('/register', async (req, res) => {
                         if (err) {
                             return res.status(500).send(err);
                         }
-                        res.status(201).json({ token });
+
+                        // Set the JWT as an HTTP-Only cookie
+                        res.cookie('token', token, {
+                            httpOnly: true,
+                            secure: process.env.NODE_ENV === 'production', // Ensure the cookie is secure in production
+                            sameSite: 'strict', // Prevent CSRF attacks
+                            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+                        });
+
+                        res.status(201).json({ success: true });
                     });
             })
             .catch((err) => {
@@ -546,8 +555,15 @@ app.post('/login', async (req, res) => {
                 if (err) {
                     return res.status(500).send(err);
                 }
-                res.status(200).json({ token });
+                // Set token as an HTTP-Only cookie
+                res.cookie('token', token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production', // Ensure the cookie is secure in production
+                    sameSite: 'strict', // Prevent CSRF attacks
+                    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
                 });
+                res.status(200).json({ success: true });
+            });
     } 
 }catch (error) {
     // Log the error message to the console
@@ -691,19 +707,19 @@ app.put('/user/:userId', async (req, res) => {
 
 // Middleware to verify the JWT token
 function verifyToken(req, res, next) {
-    const token = req.headers['authorization'];
+    const token = req.cookies.token; // Retrieve the token from cookies
+
     if (!token) {
         return res.status(401).send('Access Denied: No Token Provided!');
     }
     try {
-        const decoded = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
         next();
     } catch (error) {
         return res.status(400).send('Invalid Token');
     }
 }
-
 // Route to get user data
 app.get('/user/:userId', verifyToken, async (req, res) => {
     const userId = req.params.userId;
